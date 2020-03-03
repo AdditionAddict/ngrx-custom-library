@@ -17,7 +17,7 @@ import {
     NxaEntityCollectionReducerMethodsFactory,
     NxaEntityCollectionReducerFactory,
     NxaEntityCacheReducerFactory,
-    EntityCollection,
+    NxaEntityCollection,
     NxaChangeStateMap,
     NxaEntityActionDataServiceError,
     NxaDataServiceError,
@@ -573,7 +573,7 @@ describe('EntityCollectionReducer', () => {
                 { ...updatedEntity, name: 'Queried update' },
             ];
             const action = createAction('Hero', NxaEntityOp.QUERY_LOAD_SUCCESS, heroes);
-            const collection: EntityCollection<Hero> = entityReducer(
+            const collection: NxaEntityCollection<Hero> = entityReducer(
                 entityCache,
                 action
             )['Hero'];
@@ -2671,9 +2671,9 @@ describe('EntityCollectionReducer', () => {
         /** Make Hero collection readonly except for QUERY_LOAD  */
         function createReadOnlyHeroReducer(adapter: EntityAdapter<Hero>) {
             return function heroReducer(
-                collection: EntityCollection<Hero>,
+                collection: NxaEntityCollection<Hero>,
                 action: NxaEntityAction
-            ): EntityCollection<Hero> {
+            ): NxaEntityCollection<Hero> {
                 switch (action.payload.entityOp) {
                     case NxaEntityOp.QUERY_LOAD:
                         return collection.loading
@@ -2721,7 +2721,7 @@ describe('EntityCollectionReducer', () => {
                 },
                 {} as any
             ),
-        } as EntityCollection<T>;
+        } as NxaEntityCollection<T>;
     }
 
     function createInitialCache(entityMap: { [entityName: string]: any[] }) {

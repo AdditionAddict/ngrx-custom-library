@@ -1,4 +1,4 @@
-import { NxaChangeSetOperation, NxaChangeSetItemFactory as cif } from '../../lib';
+import { NxaChangeSetOperation, nxaChangeSetItemFactory as cif } from '../../lib';
 
 describe('NxaChangeSetItemFactory', () => {
     const hero = { id: 1, name: 'Hero 1' };

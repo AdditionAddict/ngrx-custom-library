@@ -7,7 +7,7 @@ import { NxaEntityAction } from '../actions/entity-action';
 import { NxaEntityCache } from '../reducers/entity-cache';
 import { NxaEntityCollectionService } from './entity-collection-service';
 import { NxaEntityCollectionServiceFactory } from './entity-collection-service-factory';
-import { NxaEntityCollectionServiceMap, EntityServices } from './entity-services';
+import { NxaEntityCollectionServiceMap, NxaEntityServices } from './entity-services';
 import { NxaEntitySelectors$ } from '../selectors/entity-selectors$';
 import { NxaEntityServicesElements } from './entity-services-elements';
 
@@ -34,7 +34,7 @@ import { NxaEntityServicesElements } from './entity-services-elements';
  * }
  */
 @Injectable()
-export class NxaEntityServicesBase implements EntityServices {
+export class NxaEntityServicesBase implements NxaEntityServices {
     // Dear @@ngrx/action developer: think hard before changing the constructor.
     // Doing so will break apps that derive from this base class,
     // and many apps will derive from this class.

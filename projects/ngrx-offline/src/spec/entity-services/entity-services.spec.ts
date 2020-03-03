@@ -10,12 +10,12 @@ import {
     NxaEntityCacheQuerySet,
     NxaMergeQuerySet,
     NxaEntityMetadataMap,
-    EntityDataModule,
+    NxaEntityDataModule,
     NxaEntityCacheEffects,
     NxaEntityDataService,
     NxaEntityActionFactory,
     NxaEntityDispatcherFactory,
-    EntityServices,
+    NxaEntityServices,
     NxaEntityCache,
     NxaHttpMethods,
     NxaDataServiceError,
@@ -191,7 +191,7 @@ function entityServicesSetup() {
         imports: [
             StoreModule.forRoot({}),
             EffectsModule.forRoot([]),
-            EntityDataModule.forRoot({
+            NxaEntityDataModule.forRoot({
                 entityMetadata: entityMetadata,
             }),
         ],
@@ -210,7 +210,7 @@ function entityServicesSetup() {
     const entityDispatcherFactory: NxaEntityDispatcherFactory = TestBed.get(
         NxaEntityDispatcherFactory
     );
-    const entityServices: EntityServices = TestBed.get(EntityServices);
+    const entityServices: NxaEntityServices = TestBed.get(NxaEntityServices);
     const store: Store<NxaEntityCache> = TestBed.get(Store);
 
     return {

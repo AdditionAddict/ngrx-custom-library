@@ -20,12 +20,12 @@ import {
     persistNxaOps,
     NxaEntityAction,
     NxaEntityActionFactory,
-    EntityDataModule,
+    NxaEntityDataModule,
     NxaEntityCacheEffects,
     NxaEntityEffects,
     NxaEntityOp,
     NxaEntityCollectionCreator,
-    EntityCollection,
+    NxaEntityCollection,
 } from '../lib';
 
 const TEST_ACTION = 'test/get-everything-succeeded';
@@ -86,7 +86,7 @@ describe('EntityDataModule', () => {
                 imports: [
                     StoreModule.forRoot({}),
                     EffectsModule.forRoot([]),
-                    EntityDataModule.forRoot({
+                    NxaEntityDataModule.forRoot({
                         entityMetadata: entityMetadata,
                     }),
                 ],
@@ -153,7 +153,7 @@ describe('EntityDataModule', () => {
                 imports: [
                     StoreModule.forRoot({}),
                     EffectsModule.forRoot([]),
-                    EntityDataModule.forRoot({
+                    NxaEntityDataModule.forRoot({
                         entityMetadata: entityMetadata,
                         entityCacheMetaReducers: [
                             loggingNxaEntityCacheMetaReducer,
@@ -260,7 +260,7 @@ function entityCacheMetaReducerFactory(
                 },
                 {} as any
             ),
-        } as EntityCollection<T>;
+        } as NxaEntityCollection<T>;
     }
 }
 // #endregion

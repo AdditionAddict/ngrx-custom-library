@@ -15,7 +15,7 @@ import {
     NXA_ENTITY_METADATA_TOKEN,
     NxaEntityOp,
     NxaEntityCollectionReducers,
-    EntityCollection,
+    NxaEntityCollection,
     NxaEntityAction,
     NXA_ENTITY_COLLECTION_META_REDUCERS,
     Logger,
@@ -173,16 +173,16 @@ describe('NxaEntityCollectionReducerRegistry', () => {
     });
 
     describe('with EntityCollectionMetadataReducers', () => {
-        let metaReducerA: MetaReducer<EntityCollection, NxaEntityAction>;
-        let metaReducerB: MetaReducer<EntityCollection, NxaEntityAction>;
+        let metaReducerA: MetaReducer<NxaEntityCollection, NxaEntityAction>;
+        let metaReducerB: MetaReducer<NxaEntityCollection, NxaEntityAction>;
         let metaReducerOutput: any[];
 
         // Create MetaReducer that reports how it was called on the way in and out
         function testMetadataReducerFactory(name: string) {
             // Return the MetaReducer
-            return (r: ActionReducer<EntityCollection, NxaEntityAction>) => {
+            return (r: ActionReducer<NxaEntityCollection, NxaEntityAction>) => {
                 // Return the wrapped reducer
-                return (state: EntityCollection, action: NxaEntityAction) => {
+                return (state: NxaEntityCollection, action: NxaEntityAction) => {
                     // entered
                     metaReducerOutput.push({ metaReducer: name, inOut: 'in', action });
                     // called reducer
@@ -316,7 +316,7 @@ describe('NxaEntityCollectionReducerRegistry', () => {
                 },
                 {} as any
             ),
-        } as EntityCollection<T>;
+        } as NxaEntityCollection<T>;
     }
 
     function createInitialCache(entityMap: { [entityName: string]: any[] }) {
@@ -337,9 +337,9 @@ describe('NxaEntityCollectionReducerRegistry', () => {
 
     function createNoopReducer<T>() {
         return function NoopReducer(
-            collection: EntityCollection<T>,
+            collection: NxaEntityCollection<T>,
             action: NxaEntityAction
-        ): EntityCollection<T> {
+        ): NxaEntityCollection<T> {
             return collection;
         };
     }

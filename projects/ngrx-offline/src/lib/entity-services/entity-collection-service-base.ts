@@ -6,11 +6,11 @@ import { Observable } from 'rxjs';
 import { NxaEntityAction, NxaEntityActionOptions } from '../actions/entity-action';
 import { NxaEntityActionGuard } from '../actions/entity-action-guard';
 import {
-    EntityCollection,
+    NxaEntityCollection,
     NxaChangeStateMap,
 } from '../reducers/entity-collection';
 import { NxaEntityDispatcher } from '../dispatchers/entity-dispatcher';
-import { EntityCollectionService } from './entity-collection-service';
+import { NxaEntityCollectionService } from './entity-collection-service';
 import { NxaEntityCollectionServiceElementsFactory } from './entity-collection-service-elements-factory';
 import { NxaEntityOp } from '../actions/entity-op';
 import { NxaEntitySelectors } from '../selectors/entity-selectors';
@@ -28,7 +28,7 @@ import { NxaQueryParams } from '../dataservices/interfaces';
 export class NxaEntityCollectionServiceBase<
     T,
     S$ extends NxaEntitySelectors$<T> = NxaEntitySelectors$<T>
-    > implements EntityCollectionService<T> {
+    > implements NxaEntityCollectionService<T> {
     /** Dispatcher of NxaEntityCommands (NxaEntityActions) */
     readonly dispatcher: NxaEntityDispatcher<T>;
 
@@ -432,7 +432,7 @@ export class NxaEntityCollectionServiceBase<
 
     // region Selectors$
     /** Observable of the collection as a whole */
-    collection$: Observable<EntityCollection<T>> | Store<EntityCollection<T>>;
+    collection$: Observable<NxaEntityCollection<T>> | Store<NxaEntityCollection<T>>;
 
     /** Observable of count of entities in the cached collection. */
     count$: Observable<number> | Store<number>;

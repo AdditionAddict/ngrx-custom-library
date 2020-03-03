@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 import { NxaEntityAction } from '../actions/entity-action';
 import { NxaEntityCache } from '../reducers/entity-cache';
-import { EntityCollectionService } from './entity-collection-service';
+import { NxaEntityCollectionService } from './entity-collection-service';
 
 // tslint:disable:member-ordering
 
@@ -14,7 +14,7 @@ import { EntityCollectionService } from './entity-collection-service';
  * Creates a new default EntityCollectionService for any entity type not in the registry.
  * Optionally register specialized EntityCollectionServices for individual types
  */
-export abstract class EntityServices {
+export abstract class NxaEntityServices {
     /** Dispatch any action to the store */
     abstract dispatch(action: Action): void;
 
@@ -29,7 +29,7 @@ export abstract class EntityServices {
      */
     abstract getEntityCollectionService<T = any>(
         entityName: string
-    ): EntityCollectionService<T>;
+    ): NxaEntityCollectionService<T>;
 
     /**
      * Actions scanned by the store after it processed them with reducers.
@@ -44,7 +44,7 @@ export abstract class EntityServices {
      * @param service {EntityCollectionService} The entity service
      */
     abstract registerEntityCollectionService<T>(
-        service: EntityCollectionService<T>
+        service: NxaEntityCollectionService<T>
     ): void;
 
     /** Register entity services for several entity types at once.
@@ -52,7 +52,7 @@ export abstract class EntityServices {
      * @param entityCollectionServices Array of EntityCollectionServices to register
      */
     abstract registerEntityCollectionServices(
-        entityCollectionServices: EntityCollectionService<any>[]
+        entityCollectionServices: NxaEntityCollectionService<any>[]
     ): void;
 
     /** Register entity services for several entity types at once.
@@ -70,5 +70,5 @@ export abstract class EntityServices {
  * A map of service or entity names to their corresponding EntityCollectionServices.
  */
 export interface NxaEntityCollectionServiceMap {
-    [entityName: string]: EntityCollectionService<any>;
+    [entityName: string]: NxaEntityCollectionService<any>;
 }
