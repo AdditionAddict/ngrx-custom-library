@@ -1,12 +1,10 @@
 import { MemoizedSelector } from '@ngrx/store';
-import {
-    NxaEntityMetadata,
-    NxaEntitySelectorsFactory,
-    NxaEntityCollection,
-    createEmptyNxaEntityCollection,
-    NxaPropsFilterFnFactory,
-    NxaEntitySelectors,
-} from '../../lib';
+import { NxaEntityMetadata } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntitySelectorsFactory, NxaEntitySelectors } from '../../lib/selectors/entity-selectors';
+import { NxaEntityCollection } from '../../lib/reducers/entity-collection';
+import { createEmptyNxaEntityCollection } from '../../lib/reducers/entity-collection-creator';
+import { NxaPropsFilterFnFactory } from '../../lib/entity-metadata/entity-filters';
+
 
 describe('NxaEntitySelectors', () => {
     /** HeroMetadata identifies the extra collection state properties */

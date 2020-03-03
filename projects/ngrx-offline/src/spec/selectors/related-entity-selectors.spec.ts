@@ -5,17 +5,15 @@ import { Update } from '@ngrx/entity';
 
 import { Observable } from 'rxjs';
 import { skip } from 'rxjs/operators';
+import { NxaEntityMetadataMap, NXA_ENTITY_METADATA_TOKEN } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { NxaEntitySelectorsFactory } from '../../lib/selectors/entity-selectors';
+import { NxaEntityCache } from '../../lib/reducers/entity-cache';
+import { NxaEntityDataModuleWithoutEffects } from '../../lib/entity-data-without-effects.module';
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+import { NxaEntityAction } from '../../lib/actions/entity-action';
 
-import {
-    NxaEntityMetadataMap,
-    NxaEntityActionFactory,
-    NxaEntitySelectorsFactory,
-    NxaEntityCache,
-    NxaEntityDataModuleWithoutEffects,
-    NXA_ENTITY_METADATA_TOKEN,
-    NxaEntityOp,
-    NxaEntityAction,
-} from '../../lib';
+
 
 const entityMetadataMap: NxaEntityMetadataMap = {
     Battle: {},

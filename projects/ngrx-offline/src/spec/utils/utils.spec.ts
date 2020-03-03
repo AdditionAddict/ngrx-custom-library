@@ -1,4 +1,5 @@
-import { CorrelationIdGenerator } from '../../lib';
+import { CorrelationIdGenerator } from "../../lib/utils/correlation-id-generator";
+
 
 describe('Utilities (utils)', () => {
     describe('CorrelationIdGenerator', () => {

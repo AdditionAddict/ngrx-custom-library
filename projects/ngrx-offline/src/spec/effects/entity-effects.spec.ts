@@ -7,20 +7,15 @@ import { Update } from '@ngrx/entity';
 import { of, merge, ReplaySubject, throwError, timer } from 'rxjs';
 import { delay, first, mergeMap } from 'rxjs/operators';
 
-import {
-    NxaEntityActionFactory,
-    NxaEntityEffects,
-    NxaEntityAction,
-    NxaEntityDataService,
-    NxaPersistenceResultHandler,
-    DefaultNxaPersistenceResultHandler,
-    NxaEntityOp,
-    NxaHttpMethods,
-    NxaDataServiceError,
-    makeNxaErrorOp,
-    NxaEntityActionDataServiceError,
-    Logger,
-} from '../../lib';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { Logger } from '../../lib/utils/interfaces';
+import { NxaEntityOp, makeNxaErrorOp } from '../../lib/actions/entity-op';
+import { NxaDataServiceError, NxaEntityActionDataServiceError } from '../../lib/dataservices/data-service-error';
+import { NxaEntityAction } from '../../lib/actions/entity-action';
+import { NxaEntityDataService } from '../../lib/dataservices/entity-data.service';
+import { NxaHttpMethods } from '../../lib/dataservices/interfaces';
+import { NxaEntityEffects } from '../../lib/effects/entity-effects';
+import { NxaPersistenceResultHandler, DefaultNxaPersistenceResultHandler } from '../../lib/dataservices/persistence-result-handler.service';
 
 describe('NxaEntityEffects (normal testing)', () => {
     // factory never changes in these tests
@@ -51,7 +46,7 @@ describe('NxaEntityEffects (normal testing)', () => {
             providers: [
                 NxaEntityEffects,
                 { provide: Actions, useValue: actions$ },
-                { provide: NxaEntityActionFactory, useValue: NxaEntityActionFactory },
+                { provide: NxaEntityActionFactory, useValue: nxaEntityActionFactory },
                 /* tslint:disable-next-line:no-use-before-declare */
                 { provide: NxaEntityDataService, useClass: TestDataService },
                 { provide: Logger, useValue: logger },

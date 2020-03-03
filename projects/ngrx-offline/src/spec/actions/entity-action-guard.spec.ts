@@ -1,4 +1,7 @@
-import { NxaEntityActionGuard, NxaEntityAction, NxaEntityOp } from '../../lib';
+import { NxaEntityActionGuard } from "../../lib/actions/entity-action-guard";
+import { NxaEntityAction } from '../../lib/actions/entity-action';
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+
 
 class Hero {
     id!: number;

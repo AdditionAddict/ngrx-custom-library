@@ -48,7 +48,7 @@ export class NxaEntityCacheEffects {
     constructor(
         private actions: Actions,
         private dataService: NxaEntityCacheDataService,
-        private NxaEntityActionFactory: NxaEntityActionFactory,
+        private nxaEntityActionFactory: NxaEntityActionFactory,
         private logger: Logger,
         /**
          * Injecting an optional Scheduler that will be undefined
@@ -118,7 +118,7 @@ export class NxaEntityCacheEffects {
             // Data: NxaSaveEntities result as a NxaSaveEntitiesSuccess action
             const d = this.dataService.NxaSaveEntities(NxaChangeSet, url).pipe(
                 concatMap(result =>
-                    this.handleNxaSaveEntitiesSuccess$(action, this.NxaEntityActionFactory)(
+                    this.handleNxaSaveEntitiesSuccess$(action, this.nxaEntityActionFactory)(
                         result
                     )
                 ),

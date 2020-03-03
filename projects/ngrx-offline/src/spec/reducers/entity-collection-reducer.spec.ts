@@ -3,28 +3,21 @@
 import { Action } from '@ngrx/store';
 import { EntityAdapter, Update, IdSelector } from '@ngrx/entity';
 
-import {
-    NxaEntityMetadataMap,
-    NxaEntityActionFactory,
-    NxaEntityOp,
-    NxaEntityActionOptions,
-    NxaEntityAction,
-    toUpdateFactory,
-    NxaEntityCollectionReducerRegistry,
-    NxaEntityCache,
-    NxaEntityCollectionCreator,
-    NxaEntityDefinitionService,
-    NxaEntityCollectionReducerMethodsFactory,
-    NxaEntityCollectionReducerFactory,
-    NxaEntityCacheReducerFactory,
-    NxaEntityCollection,
-    NxaChangeStateMap,
-    NxaEntityActionDataServiceError,
-    NxaDataServiceError,
-    NxaChangeType,
-    NxaChangeState,
-    Logger,
-} from '../../lib';
+import { NxaEntityMetadataMap } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntityCollection, NxaChangeType, NxaChangeState, NxaChangeStateMap } from '../../lib/reducers/entity-collection';
+import { NxaEntityCollectionCreator } from '../../lib/reducers/entity-collection-creator';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { NxaEntityCache } from '../../lib/reducers/entity-cache';
+import { NxaEntityCacheReducerFactory } from '../../lib/reducers/entity-cache-reducer';
+import { NxaEntityCollectionReducerMethodsFactory } from '../../lib/reducers/entity-collection-reducer-methods';
+import { NxaEntityCollectionReducerFactory } from '../../lib/reducers/entity-collection-reducer';
+import { NxaEntityCollectionReducerRegistry } from '../../lib/reducers/entity-collection-reducer-registry';
+import { NxaEntityDefinitionService } from '../../lib/entity-metadata/entity-definition.service';
+import { Logger } from '../../lib/utils/interfaces';
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+import { NxaDataServiceError, NxaEntityActionDataServiceError } from '../../lib/dataservices/data-service-error';
+import { toUpdateFactory } from '../../lib/utils/utilities';
+import { NxaEntityAction, NxaEntityActionOptions } from '../../lib/actions/entity-action';
 
 class Foo {
     id!: string;
@@ -45,7 +38,7 @@ const metadata: NxaEntityMetadataMap = {
     Villain: { selectId: villain => villain.key },
 };
 
-describe('EntityCollectionReducer', () => {
+describe('NxaEntityCollectionReducer', () => {
     // action factory never changes in these tests
     const nxaEntityActionFactory = new NxaEntityActionFactory();
     const createAction: (
@@ -53,7 +46,7 @@ describe('EntityCollectionReducer', () => {
         op: NxaEntityOp,
         data?: any,
         options?: NxaEntityActionOptions
-    ) => NxaEntityAction = nxaEntityActionFactory.create.bind(NxaEntityActionFactory);
+    ) => NxaEntityAction = nxaEntityActionFactory.create.bind(nxaEntityActionFactory);
 
     const toHeroUpdate = toUpdateFactory<Hero>();
 

@@ -48,7 +48,7 @@ export { NxaMergeStrategy } from './lib';
 export { NxaUpdateResponseData } from './lib';
 
 // // dataservices
-export { NxaDataServiceError } from './lib/';
+export { NxaDataServiceError } from './lib';
 export {
     NxaEntityActionDataServiceError,
 } from './lib';

@@ -27,7 +27,7 @@ export class NxaEntityDispatcherFactory implements OnDestroy {
     private raSubscription: Subscription;
 
     constructor(
-        private NxaEntityActionFactory: NxaEntityActionFactory,
+        private nxaEntityActionFactory: NxaEntityActionFactory,
         private store: Store<NxaEntityCache>,
         private entityDispatcherDefaultOptions: NxaEntityDispatcherDefaultOptions,
         @Inject(ScannedActionsSubject) scannedActions$: Observable<Action>,
@@ -66,7 +66,7 @@ export class NxaEntityDispatcherFactory implements OnDestroy {
         };
         return new NxaEntityDispatcherBase<T>(
             entityName,
-            this.NxaEntityActionFactory,
+            this.nxaEntityActionFactory,
             this.store,
             selectId,
             options,

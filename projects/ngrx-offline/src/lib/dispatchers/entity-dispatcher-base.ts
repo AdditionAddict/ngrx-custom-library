@@ -47,7 +47,7 @@ export class NxaEntityDispatcherBase<T> implements NxaEntityDispatcher<T> {
         /** Name of the entity type for which entities are dispatched */
         public entityName: string,
         /** Creates an {NxaEntityAction} */
-        public NxaEntityActionFactory: NxaEntityActionFactory,
+        public nxaEntityActionFactory: NxaEntityActionFactory,
         /** The store, scoped to the NxaEntityCache */
         public store: Store<NxaEntityCache>,
         /** Returns the primary key (id) of this entity */
@@ -86,7 +86,7 @@ export class NxaEntityDispatcherBase<T> implements NxaEntityDispatcher<T> {
         data?: P,
         options?: NxaEntityActionOptions
     ): NxaEntityAction<P> {
-        return this.NxaEntityActionFactory.create({
+        return this.nxaEntityActionFactory.create({
             entityName: this.entityName,
             entityOp,
             data,

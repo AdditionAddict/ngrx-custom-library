@@ -57,7 +57,7 @@ export class NxaEntityEffects {
     constructor(
         private actions: Actions<NxaEntityAction>,
         private dataService: NxaEntityDataService,
-        private NxaEntityActionFactory: NxaEntityActionFactory,
+        private nxaEntityActionFactory: NxaEntityActionFactory,
         private resultHandler: NxaPersistenceResultHandler,
         /**
          * Injecting an optional Scheduler that will be undefined
@@ -88,7 +88,7 @@ export class NxaEntityEffects {
             const c = this.cancel$.pipe(
                 filter(id => action.payload.correlationId === id),
                 map(id =>
-                    this.NxaEntityActionFactory.createFromAction(action, {
+                    this.nxaEntityActionFactory.createFromAction(action, {
                         entityOp: NxaEntityOp.CANCELED_PERSIST,
                     })
                 )
@@ -183,7 +183,7 @@ export class NxaEntityEffects {
         originalAction: NxaEntityAction
     ): Observable<NxaEntityAction> {
         const successOp = makeNxaSuccessOp(originalAction.payload.entityOp);
-        const successAction = this.NxaEntityActionFactory.createFromAction(
+        const successAction = this.nxaEntityActionFactory.createFromAction(
             originalAction,
             {
                 entityOp: successOp,

@@ -1,12 +1,9 @@
 import { NgModule } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import {
-    createNxaEntityDefinition,
-    NxaEntityDefinitionService,
-    NxaEntityMetadataMap,
-    NXA_ENTITY_METADATA_TOKEN,
-} from '../../lib';
+import { NxaEntityMetadataMap, NXA_ENTITY_METADATA_TOKEN } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntityDefinitionService } from '../../lib/entity-metadata/entity-definition.service';
+import { createNxaEntityDefinition } from '../../lib/entity-metadata/entity-definition';
 
 @NgModule({})
 class LazyModule {
@@ -47,7 +44,7 @@ describe('NxaEntityDefinitionService', () => {
         });
 
         it('throws if request definition for unknown entity', () => {
-            expect(() => service.getDefinition('Foo')).toThrowError(/no entity/i);
+            expect(() => service.getDefinition('Foo')).toThrowError(/No NxaEntityDefinition for entity type "Foo"/i);
         });
 
         it('returns undefined if request definition for unknown entity and `shouldThrow` is false', () => {

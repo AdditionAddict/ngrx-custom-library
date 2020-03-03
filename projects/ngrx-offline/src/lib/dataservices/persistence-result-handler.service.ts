@@ -34,14 +34,14 @@ export class DefaultNxaPersistenceResultHandler
     implements NxaPersistenceResultHandler {
     constructor(
         private logger: Logger,
-        private NxaEntityActionFactory: NxaEntityActionFactory
+        private nxaEntityActionFactory: NxaEntityActionFactory
     ) { }
 
     /** Handle successful result of persistence operation on an NxaEntityAction */
     handleSuccess(originalAction: NxaEntityAction): (data: any) => Action {
         const successOp = makeNxaSuccessOp(originalAction.payload.entityOp);
         return (data: any) =>
-            this.NxaEntityActionFactory.createFromAction(originalAction, {
+            this.nxaEntityActionFactory.createFromAction(originalAction, {
                 entityOp: successOp,
                 data,
             });
@@ -60,7 +60,7 @@ export class DefaultNxaPersistenceResultHandler
                 err instanceof NxaDataServiceError ? err : new NxaDataServiceError(err, null);
             const errorData: NxaEntityActionDataServiceError = { error, originalAction };
             this.logger.error(errorData);
-            const action = this.NxaEntityActionFactory.createFromAction<
+            const action = this.nxaEntityActionFactory.createFromAction<
                 NxaEntityActionDataServiceError
             >(originalAction, {
                 entityOp: errorOp,

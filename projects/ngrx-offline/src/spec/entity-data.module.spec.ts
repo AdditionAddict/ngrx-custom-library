@@ -14,19 +14,17 @@ import { TestBed } from '@angular/core/testing';
 import { Observable } from 'rxjs';
 import { map, skip } from 'rxjs/operators';
 
-import {
-    NxaEntityCache,
-    ofNxaEntityOp,
-    persistNxaOps,
-    NxaEntityAction,
-    NxaEntityActionFactory,
-    NxaEntityDataModule,
-    NxaEntityCacheEffects,
-    NxaEntityEffects,
-    NxaEntityOp,
-    NxaEntityCollectionCreator,
-    NxaEntityCollection,
-} from '../lib';
+import { NxaEntityCache } from '../lib/reducers/entity-cache';
+import { persistNxaOps, NxaEntityEffects } from '../lib/effects/entity-effects';
+import { ofNxaEntityOp } from '../lib/actions/entity-action-operators';
+import { NxaEntityAction } from '../lib/actions/entity-action';
+import { NxaEntityActionFactory } from '../lib/actions/entity-action-factory';
+import { NxaEntityDataModule } from '../lib/entity-data.module';
+import { NxaEntityCacheEffects } from '../lib/effects/entity-cache-effects';
+import { NxaEntityOp } from '../lib/actions/entity-op';
+import { NxaEntityCollectionCreator } from '../lib/reducers/entity-collection-creator';
+import { NxaEntityCollection } from '../lib/reducers/entity-collection';
+
 
 const TEST_ACTION = 'test/get-everything-succeeded';
 const EC_METAREDUCER_TOKEN = new InjectionToken<

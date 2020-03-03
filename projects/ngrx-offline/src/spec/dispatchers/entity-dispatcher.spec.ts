@@ -3,18 +3,16 @@ import { Update } from '@ngrx/entity';
 
 import { Subject } from 'rxjs';
 
-import {
-    NxaEntityDispatcherDefaultOptions,
-    CorrelationIdGenerator,
-    NxaEntityActionFactory,
-    createNxaEntityCacheSelector,
-    defaultSelectId,
-    NxaEntityDispatcherBase,
-    NxaEntityDispatcher,
-    NxaEntityAction,
-    NxaEntityOp,
-    NxaMergeStrategy,
-} from '../../lib';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+import { defaultSelectId } from '../../lib/utils/utilities';
+import { NxaMergeStrategy } from '../../lib/actions/merge-strategy';
+import { NxaEntityAction } from '../../lib/actions/entity-action';
+import { NxaEntityDispatcherDefaultOptions } from '../../lib/dispatchers/entity-dispatcher-default-options';
+import { NxaEntityDispatcher } from '../../lib/dispatchers/entity-dispatcher';
+import { CorrelationIdGenerator } from '../../lib/utils/correlation-id-generator';
+import { createNxaEntityCacheSelector } from '../../lib/selectors/entity-cache-selector';
+import { NxaEntityDispatcherBase } from '../../lib/dispatchers/entity-dispatcher-base';
 
 class Hero {
     id!: number;

@@ -2,24 +2,20 @@ import { TestBed } from '@angular/core/testing';
 import { Action, ActionReducer, MetaReducer } from '@ngrx/store';
 import { IdSelector } from '@ngrx/entity';
 
-import {
-    NxaEntityMetadataMap,
-    NxaEntityCollectionCreator,
-    NxaEntityActionFactory,
-    NxaEntityCache,
-    NxaEntityCollectionReducerRegistry,
-    NxaEntityCacheReducerFactory,
-    NxaEntityCollectionReducerMethodsFactory,
-    NxaEntityCollectionReducerFactory,
-    NxaEntityDefinitionService,
-    NXA_ENTITY_METADATA_TOKEN,
-    NxaEntityOp,
-    NxaEntityCollectionReducers,
-    NxaEntityCollection,
-    NxaEntityAction,
-    NXA_ENTITY_COLLECTION_META_REDUCERS,
-    Logger,
-} from '../../lib';
+import { NxaEntityMetadataMap, NXA_ENTITY_METADATA_TOKEN } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntityCollection } from '../../lib/reducers/entity-collection';
+import { NxaEntityCollectionCreator } from '../../lib/reducers/entity-collection-creator';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { NxaEntityCache } from '../../lib/reducers/entity-cache';
+import { NxaEntityCacheReducerFactory } from '../../lib/reducers/entity-cache-reducer';
+import { NxaEntityCollectionReducerMethodsFactory } from '../../lib/reducers/entity-collection-reducer-methods';
+import { NxaEntityCollectionReducerFactory } from '../../lib/reducers/entity-collection-reducer';
+import { NxaEntityCollectionReducerRegistry, NxaEntityCollectionReducers } from '../../lib/reducers/entity-collection-reducer-registry';
+import { NxaEntityDefinitionService } from '../../lib/entity-metadata/entity-definition.service';
+import { Logger } from '../../lib/utils/interfaces';
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+import { NxaEntityAction } from '../../lib/actions/entity-action';
+import { NXA_ENTITY_COLLECTION_META_REDUCERS } from '../../lib/reducers/constants';
 
 class Bar {
     id!: number;

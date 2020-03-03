@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { NxaDataServiceError } from '../../lib';
+import { NxaDataServiceError } from '../../lib/dataservices/data-service-error';
+
 
 describe('NxaDataServiceError', () => {
     describe('#message', () => {

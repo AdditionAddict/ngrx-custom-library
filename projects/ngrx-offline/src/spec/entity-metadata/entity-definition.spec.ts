@@ -1,4 +1,6 @@
-import { NxaEntityMetadata, createNxaEntityDefinition } from '../../lib';
+import { NxaEntityMetadata } from "../../lib/entity-metadata/entity-metadata";
+import { createNxaEntityDefinition } from '../../lib/entity-metadata/entity-definition';
+
 
 interface Hero {
     id: number;

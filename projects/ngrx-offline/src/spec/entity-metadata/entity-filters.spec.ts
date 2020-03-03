@@ -1,4 +1,4 @@
-import { NxaPropsFilterFnFactory } from '../../lib';
+import { NxaPropsFilterFnFactory } from "../../lib/entity-metadata/entity-filters";
 
 class Hero {
     id!: number;

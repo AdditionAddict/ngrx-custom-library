@@ -1,4 +1,6 @@
-import { NxaChangeSetOperation, nxaChangeSetItemFactory as cif } from '../../lib';
+import { NxaChangeSetOperation } from "../../lib/actions/entity-cache-action";
+import { nxaChangeSetItemFactory as cif } from '../../lib/actions/entity-cache-change-set';
+
 
 describe('NxaChangeSetItemFactory', () => {
     const hero = { id: 1, name: 'Hero 1' };

@@ -1,10 +1,8 @@
-import {
-    NxaEntityMetadata,
-    NxaEntityCollectionCreator,
-    NxaEntityDefinitionService,
-    createNxaEntityDefinition,
-    NxaEntityCollection,
-} from '../../lib';
+import { NxaEntityMetadata } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntityCollection } from '../../lib/reducers/entity-collection';
+import { NxaEntityCollectionCreator } from '../../lib/reducers/entity-collection-creator';
+import { NxaEntityDefinitionService } from '../../lib/entity-metadata/entity-definition.service';
+import { createNxaEntityDefinition } from '../../lib/entity-metadata/entity-definition';
 
 /** HeroMetadata identifies extra collection state properties */
 const heroMetadata: NxaEntityMetadata<Hero> = {

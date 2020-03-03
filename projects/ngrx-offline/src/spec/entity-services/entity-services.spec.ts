@@ -4,23 +4,20 @@ import { Actions, EffectsModule } from '@ngrx/effects';
 import { Observable } from 'rxjs';
 import { first, skip } from 'rxjs/operators';
 
-import {
-    NxaEntityAction,
-    NxaEntityOp,
-    NxaEntityCacheQuerySet,
-    NxaMergeQuerySet,
-    NxaEntityMetadataMap,
-    NxaEntityDataModule,
-    NxaEntityCacheEffects,
-    NxaEntityDataService,
-    NxaEntityActionFactory,
-    NxaEntityDispatcherFactory,
-    NxaEntityServices,
-    NxaEntityCache,
-    NxaHttpMethods,
-    NxaDataServiceError,
-    Logger,
-} from '../../lib';
+import { NxaEntityMetadataMap } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { NxaEntityCache } from '../../lib/reducers/entity-cache';
+import { Logger } from '../../lib/utils/interfaces';
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+import { NxaEntityCacheQuerySet, NxaMergeQuerySet } from '../../lib/actions/entity-cache-action';
+import { NxaDataServiceError } from '../../lib/dataservices/data-service-error';
+import { NxaEntityAction } from '../../lib/actions/entity-action';
+import { NxaEntityCacheEffects } from '../../lib/effects/entity-cache-effects';
+import { NxaEntityDataModule } from '../../lib/entity-data.module';
+import { NxaEntityDataService } from '../../lib/dataservices/entity-data.service';
+import { NxaEntityDispatcherFactory } from '../../lib/dispatchers/entity-dispatcher-factory';
+import { NxaEntityServices } from '../../lib/entity-services/entity-services';
+import { NxaHttpMethods } from '../../lib/dataservices/interfaces';
 
 describe('EntityServices', () => {
     describe('NxaEntityActionErrors$', () => {

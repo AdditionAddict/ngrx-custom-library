@@ -1,14 +1,10 @@
 import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import {
-    NxaEntityCollection,
-    NxaEntityChangeTracker,
-    createEmptyNxaEntityCollection,
-    NxaEntityChangeTrackerBase,
-    defaultSelectId,
-    NxaChangeType,
-    NxaChangeState,
-    NxaMergeStrategy,
-} from '../../lib';
+import { NxaEntityCollection, NxaChangeType, NxaChangeState } from '../../lib/reducers/entity-collection';
+import { createEmptyNxaEntityCollection } from '../../lib/reducers/entity-collection-creator';
+import { NxaEntityChangeTracker } from '../../lib/reducers/entity-change-tracker';
+import { NxaEntityChangeTrackerBase } from '../../lib/reducers/entity-change-tracker-base';
+import { defaultSelectId } from '../../lib/utils/utilities';
+import { NxaMergeStrategy } from '../../lib/actions/merge-strategy';
 
 interface Hero {
     id: number;

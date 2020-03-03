@@ -5,23 +5,15 @@ import { Actions } from '@ngrx/effects';
 import { observeOn } from 'rxjs/operators';
 import { asapScheduler, ReplaySubject, Subject } from 'rxjs';
 
-import {
-    NxaEntityCacheEffects,
-    NxaEntityActionFactory,
-    NxaEntityCacheDataService,
-    NxaSaveEntities,
-    NxaSaveEntitiesSuccess,
-    NxaSaveEntitiesCancel,
-    NxaSaveEntitiesCanceled,
-    NxaSaveEntitiesError,
-    NxaHttpMethods,
-    NxaDataServiceError,
-    NxaChangeSet,
-    NxaChangeSetItem,
-    NxaChangeSetOperation,
-    Logger,
-    NxaMergeStrategy,
-} from '../../lib';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { Logger } from '../../lib/utils/interfaces';
+import { NxaSaveEntities, NxaSaveEntitiesCancel, NxaSaveEntitiesSuccess, NxaSaveEntitiesError, NxaChangeSetOperation, NxaChangeSet, NxaSaveEntitiesCanceled } from '../../lib/actions/entity-cache-action';
+import { NxaDataServiceError } from '../../lib/dataservices/data-service-error';
+import { NxaMergeStrategy } from '../../lib/actions/merge-strategy';
+import { NxaEntityCacheEffects } from '../../lib/effects/entity-cache-effects';
+import { NxaHttpMethods } from '../../lib/dataservices/interfaces';
+import { NxaEntityCacheDataService } from '../../lib/dataservices/entity-cache-data.service';
+import { NxaChangeSetItem } from '../../lib/actions/entity-cache-change-set';
 
 describe('NxaEntityCacheEffects (normal testing)', () => {
     let actions$: ReplaySubject<Action>;

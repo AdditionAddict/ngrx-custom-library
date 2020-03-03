@@ -1,14 +1,12 @@
 import { Action } from '@ngrx/store';
 
 import { Subject } from 'rxjs';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { NxaEntityAction } from '../../lib/actions/entity-action';
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+import { ofNxaEntityType, ofNxaEntityOp } from '../../lib/actions/entity-action-operators';
 
-import {
-    NxaEntityAction,
-    NxaEntityActionFactory,
-    NxaEntityOp,
-    ofNxaEntityType,
-    ofNxaEntityOp,
-} from '../../lib';
+
 
 class Hero {
     id!: number;

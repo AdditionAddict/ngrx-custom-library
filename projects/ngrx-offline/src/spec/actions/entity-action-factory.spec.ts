@@ -1,10 +1,8 @@
-import {
-    NxaEntityActionOptions,
-    NxaEntityActionPayload,
-    NxaEntityOp,
-    NxaEntityActionFactory,
-    NxaMergeStrategy
-} from '../../lib';
+import { NxaEntityActionFactory } from "../../lib/actions/entity-action-factory";
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+import { NxaEntityActionOptions, NxaEntityActionPayload } from '../../lib/actions/entity-action';
+import { NxaMergeStrategy } from '../../lib/actions/merge-strategy';
+
 
 class Hero {
     id!: number;

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { Pluralizer, PLURAL_NAMES_TOKEN } from '../../lib/utils/interfaces';
+import { DefaultPluralizer } from '../../lib/utils/default-pluralizer';
 
-import { DefaultPluralizer, Pluralizer, PLURAL_NAMES_TOKEN } from '../../lib';
 
 describe('DefaultPluralizer', () => {
     describe('without plural names', () => {

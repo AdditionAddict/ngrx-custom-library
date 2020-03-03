@@ -8,26 +8,23 @@ import { Observable, of, throwError, timer } from 'rxjs';
 import { delay, filter, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
 
 import { commandDispatchTest } from '../dispatchers/entity-dispatcher.spec';
-import {
-    NxaEntityCollectionService,
-    NxaEntityActionOptions,
-    NxaPersistanceCanceled,
-    NxaEntityDispatcherDefaultOptions,
-    NxaEntityAction,
-    NxaEntityActionFactory,
-    NxaEntityCache,
-    NxaEntityOp,
-    NxaEntityMetadataMap,
-    NxaEntityDataModule,
-    NxaEntityCacheEffects,
-    NxaEntityDataService,
-    NxaEntityDispatcherFactory,
-    NxaEntityServices,
-    OP_NXA_SUCCESS,
-    NxaHttpMethods,
-    NxaDataServiceError,
-    Logger,
-} from '../../lib';
+
+import { NxaEntityMetadataMap } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { NxaEntityCache } from '../../lib/reducers/entity-cache';
+import { Logger } from '../../lib/utils/interfaces';
+import { NxaEntityOp, OP_NXA_SUCCESS } from '../../lib/actions/entity-op';
+import { NxaDataServiceError } from '../../lib/dataservices/data-service-error';
+import { NxaEntityAction, NxaEntityActionOptions } from '../../lib/actions/entity-action';
+import { NxaEntityCollectionService } from '../../lib/entity-services/entity-collection-service';
+import { NxaEntityDispatcherDefaultOptions } from '../../lib/dispatchers/entity-dispatcher-default-options';
+import { NxaPersistanceCanceled } from '../../lib/dispatchers/entity-dispatcher';
+import { NxaEntityCacheEffects } from '../../lib/effects/entity-cache-effects';
+import { NxaEntityDataModule } from '../../lib/entity-data.module';
+import { NxaEntityDataService } from '../../lib/dataservices/entity-data.service';
+import { NxaEntityDispatcherFactory } from '../../lib/dispatchers/entity-dispatcher-factory';
+import { NxaEntityServices } from '../../lib/entity-services/entity-services';
+import { NxaHttpMethods } from '../../lib/dataservices/interfaces';
 
 describe('EntityCollectionService', () => {
     describe('Command dispatching', () => {

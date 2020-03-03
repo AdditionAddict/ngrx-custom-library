@@ -1,21 +1,18 @@
 import { Action, MemoizedSelector, Store } from '@ngrx/store';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import {
-    NxaEntityMetadata,
-    NxaEntityCache,
-    NxaEntitySelectors$Factory,
-    NxaEntitySelectorsFactory,
-    createNxaEntityCacheSelector,
-    NXA_ENTITY_CACHE_NAME,
-    NxaEntityCollection,
-    NxaEntityActionFactory,
-    NxaEntityOp,
-    createEmptyNxaEntityCollection,
-    NxaPropsFilterFnFactory,
-    NxaEntitySelectors$,
-    NxaEntitySelectors,
-} from '../../lib';
+import { NxaEntityMetadata } from '../../lib/entity-metadata/entity-metadata';
+import { NxaEntityCache } from '../../lib/reducers/entity-cache';
+import { NxaEntitySelectors$Factory, NxaEntitySelectors$ } from '../../lib/selectors/entity-selectors$';
+import { NxaEntitySelectorsFactory, NxaEntitySelectors } from '../../lib/selectors/entity-selectors';
+import { createNxaEntityCacheSelector } from '../../lib/selectors/entity-cache-selector';
+import { NXA_ENTITY_CACHE_NAME } from '../../lib/reducers/constants';
+import { NxaEntityCollection } from '../../lib/reducers/entity-collection';
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { NxaEntityOp } from '../../lib/actions/entity-op';
+import { createEmptyNxaEntityCollection } from '../../lib/reducers/entity-collection-creator';
+import { NxaPropsFilterFnFactory } from '../../lib/entity-metadata/entity-filters';
+
 
 describe('NxaEntitySelectors$', () => {
     /** HeroMetadata identifies extra collection state properties */

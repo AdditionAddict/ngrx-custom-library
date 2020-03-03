@@ -10,14 +10,13 @@ import { of } from 'rxjs';
 
 import { Update } from '@ngrx/entity';
 
-import {
-    NxaDefaultDataService,
-    NxaDefaultDataServiceFactory,
-    NxaDefaultHttpUrlGenerator,
-    NxaHttpUrlGenerator,
-    NxaDefaultDataServiceConfig,
-    NxaDataServiceError,
-} from '../../lib';
+import { NxaHttpUrlGenerator, NxaDefaultHttpUrlGenerator } from '../../lib/dataservices/http-url-generator';
+import { NxaDefaultDataService, NxaDefaultDataServiceFactory } from '../../lib/dataservices/default-data.service';
+import { NxaDataServiceError } from '../../lib/dataservices/data-service-error';
+import { NxaDefaultDataServiceConfig } from '../../lib/dataservices/default-data-service-config';
+
+
+
 
 class Hero {
     id!: number;

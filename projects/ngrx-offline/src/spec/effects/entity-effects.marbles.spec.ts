@@ -7,26 +7,23 @@ import { Observable } from 'rxjs';
 import { Actions } from '@ngrx/effects';
 import { Update } from '@ngrx/entity';
 import { provideMockActions } from '@ngrx/effects/testing';
-import {
-    NxaEntityEffects,
-    NxaEntityActionFactory,
-    NxaEntityDataService,
-    NxaPersistenceResultHandler,
-    DefaultNxaPersistenceResultHandler,
-    NxaEntityOp,
-    NxaHttpMethods,
-    NxaDataServiceError,
-    NxaEntityAction,
-    makeNxaErrorOp,
-    NxaEntityActionDataServiceError,
-    Logger,
-} from '../../lib';
+
+import { NxaEntityActionFactory } from '../../lib/actions/entity-action-factory';
+import { Logger } from '../../lib/utils/interfaces';
+import { NxaEntityOp, makeNxaErrorOp } from '../../lib/actions/entity-op';
+import { NxaDataServiceError, NxaEntityActionDataServiceError } from '../../lib/dataservices/data-service-error';
+import { NxaEntityAction } from '../../lib/actions/entity-action';
+import { NxaEntityDataService } from '../../lib/dataservices/entity-data.service';
+import { NxaHttpMethods } from '../../lib/dataservices/interfaces';
+import { NxaEntityEffects } from '../../lib/effects/entity-effects';
+import { NxaPersistenceResultHandler, DefaultNxaPersistenceResultHandler } from '../../lib/dataservices/persistence-result-handler.service';
+
 import { ENTITY_EFFECTS_SCHEDULER } from '../../lib/effects/entity-effects-scheduler';
 
 //////// Tests begin ////////
 describe('NxaEntityEffects (marble testing)', () => {
     let effects: NxaEntityEffects;
-    let NxaEntityActionFactory: NxaEntityActionFactory;
+    let nxaEntityActionFactory: NxaEntityActionFactory;
     let dataService: TestDataService;
     let actions: Observable<any>;
     let logger: Logger;
@@ -52,7 +49,7 @@ describe('NxaEntityEffects (marble testing)', () => {
         });
         actions = TestBed.get(Actions);
         dataService = TestBed.get(NxaEntityDataService);
-        NxaEntityActionFactory = TestBed.get(NxaEntityActionFactory);
+        nxaEntityActionFactory = TestBed.get(NxaEntityActionFactory);
         effects = TestBed.get(NxaEntityEffects);
     });
 
@@ -61,8 +58,8 @@ describe('NxaEntityEffects (marble testing)', () => {
         const hero2 = { id: 2, name: 'B' } as Hero;
         const heroes = [hero1, hero2];
 
-        const action = NxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL);
-        const completion = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL);
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.QUERY_ALL_SUCCESS,
             heroes
@@ -79,7 +76,7 @@ describe('NxaEntityEffects (marble testing)', () => {
     });
 
     it('should return a QUERY_ALL_ERROR when data service fails', () => {
-        const action = NxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL);
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL);
         const httpError = { error: new Error('Test Failure'), status: 501 };
         const error = makeNxaDataServiceError('GET', httpError);
         const completion = makeEntityErrorCompletion(action, error);
@@ -95,8 +92,8 @@ describe('NxaEntityEffects (marble testing)', () => {
 
     it('should return a QUERY_BY_KEY_SUCCESS with a hero on success', () => {
         const hero = { id: 1, name: 'A' } as Hero;
-        const action = NxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_BY_KEY, 1);
-        const completion = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_BY_KEY, 1);
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.QUERY_BY_KEY_SUCCESS,
             hero
@@ -112,7 +109,7 @@ describe('NxaEntityEffects (marble testing)', () => {
     });
 
     it('should return a QUERY_BY_KEY_ERROR when data service fails', () => {
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.QUERY_BY_KEY,
             42
@@ -134,10 +131,10 @@ describe('NxaEntityEffects (marble testing)', () => {
         const hero2 = { id: 2, name: 'BB' } as Hero;
         const heroes = [hero1, hero2];
 
-        const action = NxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_MANY, {
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_MANY, {
             name: 'B',
         });
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.QUERY_MANY_SUCCESS,
             heroes
@@ -153,7 +150,7 @@ describe('NxaEntityEffects (marble testing)', () => {
     });
 
     it('should return a QUERY_MANY_ERROR when data service fails', () => {
-        const action = NxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_MANY, {
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_MANY, {
             name: 'B',
         });
         const httpError = { error: new Error('Resource not found'), status: 404 };
@@ -174,13 +171,13 @@ describe('NxaEntityEffects (marble testing)', () => {
     it('should return a SAVE_ADD_ONE_SUCCESS (optimistic) with the hero on success', () => {
         const hero = { id: 1, name: 'A' } as Hero;
 
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_ADD_ONE,
             hero,
             { isOptimistic: true }
         );
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_ADD_ONE_SUCCESS,
             hero,
@@ -199,12 +196,12 @@ describe('NxaEntityEffects (marble testing)', () => {
     it('should return a SAVE_ADD_ONE_SUCCESS (pessimistic) with the hero on success', () => {
         const hero = { id: 1, name: 'A' } as Hero;
 
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_ADD_ONE,
             hero
         );
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_ADD_ONE_SUCCESS,
             hero
@@ -221,7 +218,7 @@ describe('NxaEntityEffects (marble testing)', () => {
 
     it('should return a SAVE_ADD_ONE_ERROR when data service fails', () => {
         const hero = { id: 1, name: 'A' } as Hero;
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_ADD_ONE,
             hero
@@ -239,13 +236,13 @@ describe('NxaEntityEffects (marble testing)', () => {
     });
 
     it('should return a SAVE_DELETE_ONE_SUCCESS (Optimistic) with the delete id on success', () => {
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_DELETE_ONE,
             42,
             { isOptimistic: true }
         );
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_DELETE_ONE_SUCCESS,
             42,
@@ -262,12 +259,12 @@ describe('NxaEntityEffects (marble testing)', () => {
     });
 
     it('should return a SAVE_DELETE_ONE_SUCCESS (Pessimistic) on success', () => {
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_DELETE_ONE,
             42
         );
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_DELETE_ONE_SUCCESS,
             42
@@ -283,7 +280,7 @@ describe('NxaEntityEffects (marble testing)', () => {
     });
 
     it('should return a SAVE_DELETE_ONE_ERROR when data service fails', () => {
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_DELETE_ONE,
             42
@@ -305,13 +302,13 @@ describe('NxaEntityEffects (marble testing)', () => {
         const update = { id: 1, changes: updateEntity } as Update<Hero>;
         const updateResponse = { ...update, changed: true };
 
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPDATE_ONE,
             update,
             { isOptimistic: true }
         );
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPDATE_ONE_SUCCESS,
             updateResponse,
@@ -332,12 +329,12 @@ describe('NxaEntityEffects (marble testing)', () => {
         const update = { id: 1, changes: updateEntity } as Update<Hero>;
         const updateResponse = { ...update, changed: true };
 
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPDATE_ONE,
             update
         );
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPDATE_ONE_SUCCESS,
             updateResponse
@@ -354,7 +351,7 @@ describe('NxaEntityEffects (marble testing)', () => {
 
     it('should return a SAVE_UPDATE_ONE_ERROR when data service fails', () => {
         const update = { id: 1, changes: { id: 1, name: 'A' } } as Update<Hero>;
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPDATE_ONE,
             update
@@ -374,13 +371,13 @@ describe('NxaEntityEffects (marble testing)', () => {
     it('should return a SAVE_UPSERT_ONE_SUCCESS (optimistic) with the hero on success', () => {
         const hero = { id: 1, name: 'A' } as Hero;
 
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPSERT_ONE,
             hero,
             { isOptimistic: true }
         );
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPSERT_ONE_SUCCESS,
             hero,
@@ -399,12 +396,12 @@ describe('NxaEntityEffects (marble testing)', () => {
     it('should return a SAVE_UPSERT_ONE_SUCCESS (pessimistic) with the hero on success', () => {
         const hero = { id: 1, name: 'A' } as Hero;
 
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPSERT_ONE,
             hero
         );
-        const completion = NxaEntityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPSERT_ONE_SUCCESS,
             hero
@@ -421,7 +418,7 @@ describe('NxaEntityEffects (marble testing)', () => {
 
     it('should return a SAVE_UPSERT_ONE_ERROR when data service fails', () => {
         const hero = { id: 1, name: 'A' } as Hero;
-        const action = NxaEntityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
             NxaEntityOp.SAVE_UPSERT_ONE,
             hero
@@ -440,7 +437,7 @@ describe('NxaEntityEffects (marble testing)', () => {
 
     it(`should not do anything with an irrelevant action`, () => {
         // Would clear the cached collection
-        const action = NxaEntityActionFactory.create('Hero', NxaEntityOp.REMOVE_ALL);
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.REMOVE_ALL);
 
         actions = hot('-a---', { a: action });
         const expected = cold('---');
