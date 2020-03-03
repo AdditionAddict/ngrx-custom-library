@@ -141,7 +141,7 @@ export class EntityDataModuleWithoutEffects implements OnDestroy {
             | MetaReducer<EntityCache, Action>
             | InjectionToken<MetaReducer<EntityCache, Action>>)[]
     ) {
-        // Add the @ngrx/data feature to the Store's features
+        // Add the @@ngrx/action feature to the Store's features
         // as Store.forFeature does for StoreFeatureModule
         const key = entityCacheName || ENTITY_CACHE_NAME;
 

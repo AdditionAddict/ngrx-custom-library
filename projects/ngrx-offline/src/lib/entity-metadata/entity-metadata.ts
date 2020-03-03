@@ -6,10 +6,10 @@ import { EntityDispatcherDefaultOptions } from '../dispatchers/entity-dispatcher
 import { EntityFilterFn } from './entity-filters';
 
 export const ENTITY_METADATA_TOKEN = new InjectionToken<EntityMetadataMap>(
-    '@ngrx/data/entity-metadata'
+    '@@ngrx/action/entity-metadata'
 );
 
-/** Metadata that describe an entity type and its collection to @ngrx/data */
+/** Metadata that describe an entity type and its collection to @@ngrx/action */
 export interface EntityMetadata<T = any, S extends object = {}> {
     entityName: string;
     entityDispatcherOptions?: Partial<EntityDispatcherDefaultOptions>;
