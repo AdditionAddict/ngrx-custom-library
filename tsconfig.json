@@ -17,7 +17,15 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ngrx-offline": [
+        "dist/ngrx-offline"
+      ],
+      "ngrx-offline/*": [
+        "dist/ngrx-offline/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

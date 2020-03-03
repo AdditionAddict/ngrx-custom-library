@@ -1,0 +1,14 @@
+{
+  "name": "ngrx-offline-experimental",
+  "version": "0.0.1",
+  "description": "An experimental copy of the @ngrx/data module",
+  "author": "Andrew Allen",
+  "peerDependencies": {
+    "@angular/common": "^8.2.14",
+    "@angular/core": "^8.2.14",
+    "@ngrx/effects": "^8.6.0",
+    "@ngrx/entity": "^8.6.0",
+    "@ngrx/store": "^8.6.0",
+    "rxjs": "~6.4.0"
+  }
+}
