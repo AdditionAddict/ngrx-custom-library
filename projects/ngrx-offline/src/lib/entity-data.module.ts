@@ -2,35 +2,35 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 
 import { EffectsModule, EffectSources } from '@ngrx/effects';
 
-import { DefaultDataServiceFactory } from './dataservices/default-data.service';
+import { NxaDefaultDataServiceFactory } from './dataservices/default-data.service';
 
 import {
-    DefaultPersistenceResultHandler,
-    PersistenceResultHandler,
+    DefaultNxaPersistenceResultHandler,
+    NxaPersistenceResultHandler,
 } from './dataservices/persistence-result-handler.service';
 
 import {
-    DefaultHttpUrlGenerator,
-    HttpUrlGenerator,
+    NxaDefaultHttpUrlGenerator,
+    NxaHttpUrlGenerator,
 } from './dataservices/http-url-generator';
 
-import { EntityCacheDataService } from './dataservices/entity-cache-data.service';
-import { EntityCacheEffects } from './effects/entity-cache-effects';
-import { EntityDataService } from './dataservices/entity-data.service';
-import { EntityEffects } from './effects/entity-effects';
+import { NxaEntityCacheDataService } from './dataservices/entity-cache-data.service';
+import { NxaEntityCacheEffects } from './effects/entity-cache-effects';
+import { NxaEntityDataService } from './dataservices/entity-data.service';
+import { NxaEntityEffects } from './effects/entity-effects';
 
-import { ENTITY_METADATA_TOKEN } from './entity-metadata/entity-metadata';
+import { NXA_ENTITY_METADATA_TOKEN } from './entity-metadata/entity-metadata';
 
 import {
-    ENTITY_CACHE_META_REDUCERS,
-    ENTITY_COLLECTION_META_REDUCERS,
+    NXA_ENTITY_CACHE_META_REDUCERS,
+    NXA_ENTITY_COLLECTION_META_REDUCERS,
 } from './reducers/constants';
 import { Pluralizer, PLURAL_NAMES_TOKEN } from './utils/interfaces';
 import { DefaultPluralizer } from './utils/default-pluralizer';
 
 import {
-    EntityDataModuleConfig,
-    EntityDataModuleWithoutEffects,
+    NxaEntityDataModuleConfig,
+    NxaEntityDataModuleWithoutEffects,
 } from './entity-data-without-effects.module';
 
 /**
@@ -40,47 +40,47 @@ import {
  */
 @NgModule({
     imports: [
-        EntityDataModuleWithoutEffects,
+        NxaEntityDataModuleWithoutEffects,
         EffectsModule, // do not supply effects because can't replace later
     ],
     providers: [
-        DefaultDataServiceFactory,
-        EntityCacheDataService,
-        EntityDataService,
-        EntityCacheEffects,
-        EntityEffects,
-        { provide: HttpUrlGenerator, useClass: DefaultHttpUrlGenerator },
+        NxaDefaultDataServiceFactory,
+        NxaEntityCacheDataService,
+        NxaEntityDataService,
+        NxaEntityCacheEffects,
+        NxaEntityEffects,
+        { provide: NxaHttpUrlGenerator, useClass: NxaDefaultHttpUrlGenerator },
         {
-            provide: PersistenceResultHandler,
-            useClass: DefaultPersistenceResultHandler,
+            provide: NxaPersistenceResultHandler,
+            useClass: DefaultNxaPersistenceResultHandler,
         },
         { provide: Pluralizer, useClass: DefaultPluralizer },
     ],
 })
-export class EntityDataModule {
+export class NxaEntityDataModule {
     static forRoot(
-        config: EntityDataModuleConfig
-    ): ModuleWithProviders<EntityDataModule> {
+        config: NxaEntityDataModuleConfig
+    ): ModuleWithProviders<NxaEntityDataModule> {
         return {
-            ngModule: EntityDataModule,
+            ngModule: NxaEntityDataModule,
             providers: [
                 // TODO: Moved these effects classes up to EntityDataModule itself
                 // Remove this comment if that was a mistake.
-                // EntityCacheEffects,
-                // EntityEffects,
+                // NxaEntityCacheEffects,
+                // NxaEntityEffects,
                 {
-                    provide: ENTITY_METADATA_TOKEN,
+                    provide: NXA_ENTITY_METADATA_TOKEN,
                     multi: true,
                     useValue: config.entityMetadata ? config.entityMetadata : [],
                 },
                 {
-                    provide: ENTITY_CACHE_META_REDUCERS,
+                    provide: NXA_ENTITY_CACHE_META_REDUCERS,
                     useValue: config.entityCacheMetaReducers
                         ? config.entityCacheMetaReducers
                         : [],
                 },
                 {
-                    provide: ENTITY_COLLECTION_META_REDUCERS,
+                    provide: NXA_ENTITY_COLLECTION_META_REDUCERS,
                     useValue: config.entityCollectionMetaReducers
                         ? config.entityCollectionMetaReducers
                         : [],
@@ -96,11 +96,11 @@ export class EntityDataModule {
 
     constructor(
         private effectSources: EffectSources,
-        entityCacheEffects: EntityCacheEffects,
-        entityEffects: EntityEffects
+        entityCacheEffects: NxaEntityCacheEffects,
+        entityEffects: NxaEntityEffects
     ) {
         // We can't use `forFeature()` because, if we did, the developer could not
-        // replace the entity-data `EntityEffects` with a custom alternative.
+        // replace the entity-data `NxaEntityEffects` with a custom alternative.
         // Replacing that class is an extensibility point we need.
         //
         // The FEATURE_EFFECTS token is not exposed, so can't use that technique.

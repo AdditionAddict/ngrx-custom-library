@@ -7,33 +7,33 @@ import { catchError, delay, map, timeout } from 'rxjs/operators';
 import { IdSelector } from '@ngrx/entity';
 
 import {
-    ChangeSetOperation,
-    ChangeSet,
-    ChangeSetItem,
-    ChangeSetUpdate,
-    excludeEmptyChangeSetItems,
+    NxaChangeSetOperation,
+    NxaChangeSet,
+    NxaChangeSetItem,
+    NxaChangeSetUpdate,
+    excludeEmptyNxaChangeSetItems,
 } from '../actions/entity-cache-change-set';
-import { DataServiceError } from './data-service-error';
-import { DefaultDataServiceConfig } from './default-data-service-config';
-import { EntityDefinitionService } from '../entity-metadata/entity-definition.service';
-import { RequestData } from './interfaces';
+import { NxaDataServiceError } from './data-service-error';
+import { NxaDefaultDataServiceConfig } from './default-data-service-config';
+import { NxaEntityDefinitionService } from '../entity-metadata/entity-definition.service';
+import { NxaRequestData } from './interfaces';
 
-const updateOp = ChangeSetOperation.Update;
+const updateOp = NxaChangeSetOperation.Update;
 
 /**
- * Default data service for making remote service calls targeting the entire EntityCache.
- * See EntityDataService for services that target a single EntityCollection
+ * Default data service for making remote service calls targeting the entire NxaEntityCache.
+ * See NxaEntityDataService for services that target a single EntityCollection
  */
 @Injectable()
-export class EntityCacheDataService {
+export class NxaEntityCacheDataService {
     protected idSelectors: { [entityName: string]: IdSelector<any> } = {};
     protected saveDelay = 0;
     protected timeout = 0;
 
     constructor(
-        protected entityDefinitionService: EntityDefinitionService,
+        protected entityDefinitionService: NxaEntityDefinitionService,
         protected http: HttpClient,
-        @Optional() config?: DefaultDataServiceConfig
+        @Optional() config?: NxaDefaultDataServiceConfig
     ) {
         const { saveDelay = 0, timeout: to = 0 } = config || {};
         this.saveDelay = saveDelay;
@@ -42,26 +42,26 @@ export class EntityCacheDataService {
 
     /**
      * Save changes to multiple entities across one or more entity collections.
-     * Server endpoint must understand the essential SaveEntities protocol,
-     * in particular the ChangeSet interface (except for Update<T>).
-     * This implementation extracts the entity changes from a ChangeSet Update<T>[] and sends those.
+     * Server endpoint must understand the essential NxaSaveEntities protocol,
+     * in particular the NxaChangeSet interface (except for Update<T>).
+     * This implementation extracts the entity changes from a NxaChangeSet Update<T>[] and sends those.
      * It then reconstructs Update<T>[] in the returned observable result.
-     * @param changeSet  An array of SaveEntityItems.
+     * @param NxaChangeSet  An array of SaveEntityItems.
      * Each SaveEntityItem describe a change operation for one or more entities of a single collection,
      * known by its 'entityName'.
      * @param url The server endpoint that receives this request.
      */
-    saveEntities(changeSet: ChangeSet, url: string): Observable<ChangeSet> {
-        changeSet = this.filterChangeSet(changeSet);
+    NxaSaveEntities(NxaChangeSet: NxaChangeSet, url: string): Observable<NxaChangeSet> {
+        NxaChangeSet = this.filterNxaChangeSet(NxaChangeSet);
         // Assume server doesn't understand @ngrx/entity Update<T> structure;
         // Extract the entity changes from the Update<T>[] and restore on the return from server
-        changeSet = this.flattenUpdates(changeSet);
+        NxaChangeSet = this.flattenUpdates(NxaChangeSet);
 
-        let result$: Observable<ChangeSet> = this.http
-            .post<ChangeSet>(url, changeSet)
+        let result$: Observable<NxaChangeSet> = this.http
+            .post<NxaChangeSet>(url, NxaChangeSet)
             .pipe(
                 map(result => this.restoreUpdates(result)),
-                catchError(this.handleError({ method: 'POST', url, data: changeSet }))
+                catchError(this.handleError({ method: 'POST', url, data: NxaChangeSet }))
             );
 
         if (this.timeout) {
@@ -76,30 +76,30 @@ export class EntityCacheDataService {
     }
 
     // #region helpers
-    protected handleError(reqData: RequestData) {
+    protected handleError(reqData: NxaRequestData) {
         return (err: any) => {
-            const error = new DataServiceError(err, reqData);
+            const error = new NxaDataServiceError(err, reqData);
             return throwError(error);
         };
     }
 
     /**
-     * Filter changeSet to remove unwanted ChangeSetItems.
-     * This implementation excludes null and empty ChangeSetItems.
-     * @param changeSet ChangeSet with changes to filter
+     * Filter NxaChangeSet to remove unwanted NxaChangeSetItems.
+     * This implementation excludes null and empty NxaChangeSetItems.
+     * @param NxaChangeSet NxaChangeSet with changes to filter
      */
-    protected filterChangeSet(changeSet: ChangeSet): ChangeSet {
-        return excludeEmptyChangeSetItems(changeSet);
+    protected filterNxaChangeSet(NxaChangeSet: NxaChangeSet): NxaChangeSet {
+        return excludeEmptyNxaChangeSetItems(NxaChangeSet);
     }
 
     /**
      * Convert the entities in update changes from @ngrx Update<T> structure to just T.
      * Reverse of restoreUpdates().
      */
-    protected flattenUpdates(changeSet: ChangeSet): ChangeSet {
-        let changes = changeSet.changes;
+    protected flattenUpdates(NxaChangeSet: NxaChangeSet): NxaChangeSet {
+        let changes = NxaChangeSet.changes;
         if (changes.length === 0) {
-            return changeSet;
+            return NxaChangeSet;
         }
         let hasMutated = false;
         changes = changes.map(item => {
@@ -107,27 +107,27 @@ export class EntityCacheDataService {
                 hasMutated = true;
                 return {
                     ...item,
-                    entities: (item as ChangeSetUpdate).entities.map(u => u.changes),
+                    entities: (item as NxaChangeSetUpdate).entities.map(u => u.changes),
                 };
             } else {
                 return item;
             }
-        }) as ChangeSetItem[];
-        return hasMutated ? { ...changeSet, changes } : changeSet;
+        }) as NxaChangeSetItem[];
+        return hasMutated ? { ...NxaChangeSet, changes } : NxaChangeSet;
     }
 
     /**
      * Convert the flattened T entities in update changes back to @ngrx Update<T> structures.
      * Reverse of flattenUpdates().
      */
-    protected restoreUpdates(changeSet: ChangeSet): ChangeSet {
-        if (changeSet == null) {
+    protected restoreUpdates(NxaChangeSet: NxaChangeSet): NxaChangeSet {
+        if (NxaChangeSet == null) {
             // Nothing? Server probably responded with 204 - No Content because it made no changes to the inserted or updated entities
-            return changeSet;
+            return NxaChangeSet;
         }
-        let changes = changeSet.changes;
+        let changes = NxaChangeSet.changes;
         if (changes.length === 0) {
-            return changeSet;
+            return NxaChangeSet;
         }
         let hasMutated = false;
         changes = changes.map(item => {
@@ -141,12 +141,12 @@ export class EntityCacheDataService {
                         id: selectId(u),
                         changes: u,
                     })),
-                } as ChangeSetUpdate;
+                } as NxaChangeSetUpdate;
             } else {
                 return item;
             }
-        }) as ChangeSetItem[];
-        return hasMutated ? { ...changeSet, changes } : changeSet;
+        }) as NxaChangeSetItem[];
+        return hasMutated ? { ...NxaChangeSet, changes } : NxaChangeSet;
     }
 
     /**

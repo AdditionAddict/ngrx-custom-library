@@ -1,16 +1,16 @@
 import { MemoizedSelector } from '@ngrx/store';
 import {
-    EntityMetadata,
-    EntitySelectorsFactory,
-    EntityCollection,
-    createEmptyEntityCollection,
-    PropsFilterFnFactory,
-    EntitySelectors,
+    NxaEntityMetadata,
+    NxaEntitySelectorsFactory,
+    NxaEntityCollection,
+    createEmptyNxaEntityCollection,
+    NxaPropsFilterFnFactory,
+    NxaEntitySelectors,
 } from '../../lib';
 
-describe('EntitySelectors', () => {
+describe('NxaEntitySelectors', () => {
     /** HeroMetadata identifies the extra collection state properties */
-    const heroMetadata: EntityMetadata<Hero> = {
+    const heroMetadata: NxaEntityMetadata<Hero> = {
         entityName: 'Hero',
         filterFn: nameFilter,
         additionalCollectionState: {
@@ -19,19 +19,19 @@ describe('EntitySelectors', () => {
         },
     };
 
-    const villainMetadata: EntityMetadata<Villain> = {
+    const villainMetadata: NxaEntityMetadata<Villain> = {
         entityName: 'Villain',
         selectId: villain => villain.key,
     };
 
     let collectionCreator: any;
-    let entitySelectorsFactory: EntitySelectorsFactory;
+    let entitySelectorsFactory: NxaEntitySelectorsFactory;
 
     beforeEach(() => {
         collectionCreator = jasmine.createSpyObj('entityCollectionCreator', [
             'create',
         ]);
-        entitySelectorsFactory = new EntitySelectorsFactory(collectionCreator);
+        entitySelectorsFactory = new NxaEntitySelectorsFactory(collectionCreator);
     });
 
     describe('#createCollectionSelector', () => {
@@ -86,7 +86,7 @@ describe('EntitySelectors', () => {
         });
     });
 
-    describe('#createEntitySelectors', () => {
+    describe('#createNxaEntitySelectors', () => {
         let heroCollection: HeroCollection;
         let heroEntities: Hero[];
 
@@ -104,7 +104,7 @@ describe('EntitySelectors', () => {
             });
         });
 
-        it('should have expected Hero selectors (a super-set of EntitySelectors)', () => {
+        it('should have expected Hero selectors (a super-set of NxaEntitySelectors)', () => {
             const store = { entityCache: { Hero: heroCollection } };
 
             const selectors = entitySelectorsFactory.create<Hero, HeroSelectors>(
@@ -130,12 +130,12 @@ describe('EntitySelectors', () => {
             const store = { entityCache: { Hero: heroCollection } };
 
             // Create EntitySelectorFactory directly rather than injecting it!
-            // Works ONLY if have not changed the name of the EntityCache.
-            // In this case, where also not supplying the EntityCollectionCreator
+            // Works ONLY if have not changed the name of the NxaEntityCache.
+            // In this case, where also not supplying the NxaEntityCollectionCreator
             // selector for additional collection properties might fail,
             // but doesn't in this test because the additional Foo property is in the store.
 
-            const eaFactory = new EntitySelectorsFactory();
+            const eaFactory = new NxaEntitySelectorsFactory();
             const selectors = eaFactory.create<Hero, HeroSelectors>(heroMetadata);
 
             expect(selectors.selectEntities).toBeDefined('selectEntities');
@@ -168,7 +168,7 @@ describe('EntitySelectors', () => {
         });
 
         it('should have expected Villain selectors', () => {
-            const collection = <EntityCollection<Villain>>(<any>{
+            const collection = <NxaEntityCollection<Villain>>(<any>{
                 ids: [24],
                 entities: { 24: { key: 'evil', name: 'A' } },
                 filter: 'B', // doesn't matter because no filter function
@@ -196,13 +196,13 @@ describe('EntitySelectors', () => {
 
 function createHeroState(state: Partial<HeroCollection>): HeroCollection {
     return {
-        ...createEmptyEntityCollection<Hero>('Hero'),
+        ...createEmptyNxaEntityCollection<Hero>('Hero'),
         ...state,
     } as HeroCollection;
 }
 
 function nameFilter<T>(entities: T[], pattern: string) {
-    return PropsFilterFnFactory<any>(['name'])(entities, pattern);
+    return NxaPropsFilterFnFactory<any>(['name'])(entities, pattern);
 }
 
 /// Hero
@@ -212,13 +212,13 @@ interface Hero {
 }
 
 /** HeroCollection is EntityCollection<Hero> with extra collection properties */
-interface HeroCollection extends EntityCollection<Hero> {
+interface HeroCollection extends NxaEntityCollection<Hero> {
     foo: string;
     bar: number;
 }
 
 /** HeroSelectors identifies the extra selectors for the extra collection properties */
-interface HeroSelectors extends EntitySelectors<Hero> {
+interface HeroSelectors extends NxaEntitySelectors<Hero> {
     selectFoo: MemoizedSelector<Object, string>;
     selectBar: MemoizedSelector<Object, number>;
 }

@@ -1,13 +1,13 @@
 import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import {
-    EntityCollection,
-    EntityChangeTracker,
-    createEmptyEntityCollection,
-    EntityChangeTrackerBase,
+    NxaEntityCollection,
+    NxaEntityChangeTracker,
+    createEmptyNxaEntityCollection,
+    NxaEntityChangeTrackerBase,
     defaultSelectId,
-    ChangeType,
-    ChangeState,
-    MergeStrategy,
+    NxaChangeType,
+    NxaChangeState,
+    NxaMergeStrategy,
 } from '../../lib';
 
 interface Hero {
@@ -29,19 +29,19 @@ const adapter: EntityAdapter<Hero> = createEntityAdapter<Hero>({
     sortComparer: sortByName,
 });
 
-describe('EntityChangeTrackerBase', () => {
-    let origCollection: EntityCollection<Hero>;
-    let tracker: EntityChangeTracker<Hero>;
+describe('NxaEntityChangeTrackerBase', () => {
+    let origCollection: NxaEntityCollection<Hero>;
+    let tracker: NxaEntityChangeTracker<Hero>;
 
     beforeEach(() => {
-        origCollection = createEmptyEntityCollection<Hero>('Hero');
+        origCollection = createEmptyNxaEntityCollection<Hero>('Hero');
         origCollection.entities = {
             1: { id: 1, name: 'Alice', power: 'Strong' },
             2: { id: 2, name: 'Gail', power: 'Loud' },
             7: { id: 7, name: 'Bob', power: 'Swift' },
         };
         origCollection.ids = [1, 7, 2];
-        tracker = new EntityChangeTrackerBase(adapter, defaultSelectId);
+        tracker = new NxaEntityChangeTrackerBase(adapter, defaultSelectId);
     });
 
     describe('#commitAll', () => {
@@ -143,7 +143,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeQueryResults(
                 [serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.IgnoreChanges // manually provide strategy
+                NxaMergeStrategy.IgnoreChanges // manually provide strategy
             );
 
             expect(collection.entities[updatedHero.id]).toEqual(
@@ -169,7 +169,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeQueryResults(
                 [unchangedHeroServerUpdated, serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.PreserveChanges // manually provide strategy
+                NxaMergeStrategy.PreserveChanges // manually provide strategy
             );
 
             expect(collection.entities[unchangedHero.id]).toEqual(
@@ -198,7 +198,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeQueryResults(
                 [unchangedHeroServerUpdated, serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.OverwriteChanges // manually provide strategy
+                NxaMergeStrategy.OverwriteChanges // manually provide strategy
             );
 
             expect(collection.entities[unchangedHero.id]).toEqual(
@@ -258,7 +258,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeSaveAdds(
                 [serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.IgnoreChanges // manually provide strategy
+                NxaMergeStrategy.IgnoreChanges // manually provide strategy
             );
 
             expect(collection.entities[updatedHero.id]).toEqual(
@@ -284,7 +284,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeSaveAdds(
                 [unchangedHeroServerUpdated, serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.PreserveChanges // manually provide strategy
+                NxaMergeStrategy.PreserveChanges // manually provide strategy
             );
 
             expect(collection.entities[unchangedHero.id]).toEqual(
@@ -313,7 +313,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeSaveAdds(
                 [unchangedHeroServerUpdated, serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.OverwriteChanges // manually provide strategy
+                NxaMergeStrategy.OverwriteChanges // manually provide strategy
             );
 
             expect(collection.entities[unchangedHero.id]).toEqual(
@@ -381,7 +381,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeSaveUpserts(
                 [serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.IgnoreChanges // manually provide strategy
+                NxaMergeStrategy.IgnoreChanges // manually provide strategy
             );
 
             expect(collection.entities[updatedHero.id]).toEqual(
@@ -407,7 +407,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeSaveUpserts(
                 [unchangedHeroServerUpdated, serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.PreserveChanges // manually provide strategy
+                NxaMergeStrategy.PreserveChanges // manually provide strategy
             );
 
             expect(collection.entities[unchangedHero.id]).toEqual(
@@ -436,7 +436,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.mergeSaveUpserts(
                 [unchangedHeroServerUpdated, serverUpdatedHero],
                 initialCache.Hero,
-                MergeStrategy.OverwriteChanges // manually provide strategy
+                NxaMergeStrategy.OverwriteChanges // manually provide strategy
             );
 
             expect(collection.entities[unchangedHero.id]).toEqual(
@@ -464,7 +464,7 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).not.toBe(origCollection);
             const change = collection.changeState[addedEntity.id];
             expect(change).toBeDefined('tracking the entity');
-            expectChangeType(change, ChangeType.Added);
+            expectNxaChangeType(change, NxaChangeType.Added);
             expect(change!.originalValue).toBeUndefined(
                 'no original value for a new entity'
             );
@@ -481,7 +481,7 @@ describe('EntityChangeTrackerBase', () => {
 
             const change = collection.changeState[updatedEntity.id];
             expect(change).toBeDefined('is still tracked as an added entity');
-            expectChangeType(change, ChangeType.Added);
+            expectNxaChangeType(change, NxaChangeType.Added);
             expect(change!.originalValue).toBeUndefined(
                 'still no original value for added entity'
             );
@@ -492,12 +492,12 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).toBe(origCollection);
         });
 
-        it('should return the same collection if MergeStrategy.IgnoreChanges', () => {
+        it('should return the same collection if NxaMergeStrategy.IgnoreChanges', () => {
             const addedEntity = { id: 42, name: 'Ted', power: 'Chatty' };
             const collection = tracker.trackAddOne(
                 addedEntity,
                 origCollection,
-                MergeStrategy.IgnoreChanges
+                NxaMergeStrategy.IgnoreChanges
             );
 
             expect(collection).toBe(origCollection);
@@ -521,9 +521,9 @@ describe('EntityChangeTrackerBase', () => {
             trackKeys.forEach((key, ix) => {
                 const change = collection.changeState[key];
                 expect(change).toBeDefined(`tracking the entity ${key}`);
-                expectChangeType(
+                expectNxaChangeType(
                     change,
-                    ChangeType.Added,
+                    NxaChangeType.Added,
                     `tracking ${key} as a new entity`
                 );
                 expect(change!.originalValue).toBeUndefined(
@@ -548,7 +548,7 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).not.toBe(origCollection);
             const change = collection.changeState[existingEntity!.id];
             expect(change).toBeDefined('tracking the entity');
-            expectChangeType(change, ChangeType.Deleted);
+            expectNxaChangeType(change, NxaChangeType.Deleted);
             expect(change!.originalValue).toBe(
                 existingEntity,
                 'originalValue is the existing entity'
@@ -564,7 +564,7 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).not.toBe(origCollection);
             const change = collection.changeState[existingEntity!.id];
             expect(change).toBeDefined('tracking the entity');
-            expectChangeType(change, ChangeType.Deleted);
+            expectNxaChangeType(change, NxaChangeType.Deleted);
             expect(change!.originalValue).toBe(
                 existingEntity,
                 'originalValue is the existing entity'
@@ -604,12 +604,12 @@ describe('EntityChangeTrackerBase', () => {
 
             let change = collection.changeState[updatedEntity.id];
             expect(change).toBeDefined('tracking the updated existing entity');
-            expectChangeType(change, ChangeType.Updated, 'updated at first');
+            expectNxaChangeType(change, NxaChangeType.Updated, 'updated at first');
 
             collection = tracker.trackDeleteOne(updatedEntity.id, collection);
             change = collection.changeState[updatedEntity.id];
             expect(change).toBeDefined('tracking the deleted, updated entity');
-            expectChangeType(change, ChangeType.Deleted, 'after delete');
+            expectNxaChangeType(change, NxaChangeType.Deleted, 'after delete');
             expect(change!.originalValue).toEqual(
                 existingEntity,
                 'tracking original value'
@@ -625,7 +625,7 @@ describe('EntityChangeTrackerBase', () => {
 
             let change = collection.changeState[existingEntity!.id];
             expect(change).toBeDefined('tracking the deleted entity');
-            expectChangeType(change, ChangeType.Deleted);
+            expectNxaChangeType(change, NxaChangeType.Deleted);
 
             // This shouldn't be possible but let's try it.
             const updatedEntity: any = { ...existingEntity, name: 'Double Test' };
@@ -634,7 +634,7 @@ describe('EntityChangeTrackerBase', () => {
             collection = tracker.trackUpdateOne(toUpdate(updatedEntity), collection);
             change = collection.changeState[updatedEntity.id];
             expect(change).toBeDefined('is still tracked as a deleted entity');
-            expectChangeType(change, ChangeType.Deleted);
+            expectNxaChangeType(change, NxaChangeType.Deleted);
             expect(change!.originalValue).toEqual(
                 existingEntity,
                 'still tracking original value'
@@ -651,12 +651,12 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).toBe(origCollection);
         });
 
-        it('should return same collection if MergeStrategy.IgnoreChanges', () => {
+        it('should return same collection if NxaMergeStrategy.IgnoreChanges', () => {
             const existingEntity = getFirstExistingEntity();
             const collection = tracker.trackDeleteOne(
                 existingEntity!.id,
                 origCollection,
-                MergeStrategy.IgnoreChanges
+                NxaMergeStrategy.IgnoreChanges
             );
             expect(collection).toBe(origCollection);
             const change = collection.changeState[existingEntity!.id];
@@ -675,7 +675,7 @@ describe('EntityChangeTrackerBase', () => {
             existingEntities.forEach((entity, ix) => {
                 const change = collection.changeState[existingEntities[ix]!.id];
                 expect(change).toBeDefined(`tracking entity #${ix}`);
-                expectChangeType(change, ChangeType.Deleted, `entity #${ix}`);
+                expectNxaChangeType(change, NxaChangeType.Deleted, `entity #${ix}`);
                 expect(change!.originalValue).toBe(
                     existingEntities[ix],
                     `entity #${ix} originalValue`
@@ -705,7 +705,7 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).not.toBe(origCollection);
             const change = collection.changeState[existingEntity!.id];
             expect(change).toBeDefined('tracking the entity');
-            expectChangeType(change, ChangeType.Updated);
+            expectNxaChangeType(change, NxaChangeType.Updated);
             expect(change!.originalValue).toBe(
                 existingEntity,
                 'originalValue is the existing entity'
@@ -722,7 +722,7 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).not.toBe(origCollection);
             const change = collection.changeState[existingEntity!.id];
             expect(change).toBeDefined('tracking the entity');
-            expectChangeType(change, ChangeType.Updated);
+            expectNxaChangeType(change, NxaChangeType.Updated);
             expect(change!.originalValue).toBe(
                 existingEntity,
                 'originalValue is the existing entity'
@@ -739,7 +739,7 @@ describe('EntityChangeTrackerBase', () => {
 
             let change = collection.changeState[existingEntity!.id];
             expect(change).toBeDefined('tracking the updated entity');
-            expectChangeType(change, ChangeType.Updated);
+            expectNxaChangeType(change, NxaChangeType.Updated);
 
             // This shouldn't be possible but let's try it.
             const addedEntity: any = { ...existingEntity, name: 'Double Test' };
@@ -748,7 +748,7 @@ describe('EntityChangeTrackerBase', () => {
             collection = tracker.trackAddOne(addedEntity, collection);
             change = collection.changeState[addedEntity.id];
             expect(change).toBeDefined('is still tracked as an updated entity');
-            expectChangeType(change, ChangeType.Updated);
+            expectNxaChangeType(change, NxaChangeType.Updated);
             expect(change!.originalValue).toEqual(
                 existingEntity,
                 'still tracking original value'
@@ -766,7 +766,7 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).toBe(origCollection);
         });
 
-        it('should return same collection if MergeStrategy.IgnoreChanges', () => {
+        it('should return same collection if NxaMergeStrategy.IgnoreChanges', () => {
             const existingEntity = getFirstExistingEntity();
             const updatedEntity = toUpdate({
                 ...existingEntity,
@@ -775,7 +775,7 @@ describe('EntityChangeTrackerBase', () => {
             const collection = tracker.trackUpdateOne(
                 updatedEntity,
                 origCollection,
-                MergeStrategy.IgnoreChanges
+                NxaMergeStrategy.IgnoreChanges
             );
             expect(collection).toBe(origCollection);
             const change = collection.changeState[existingEntity!.id];
@@ -797,7 +797,7 @@ describe('EntityChangeTrackerBase', () => {
             existingEntities.forEach((entity, ix) => {
                 const change = collection.changeState[existingEntities[ix]!.id];
                 expect(change).toBeDefined(`tracking entity #${ix}`);
-                expectChangeType(change, ChangeType.Updated, `entity #${ix}`);
+                expectNxaChangeType(change, NxaChangeType.Updated, `entity #${ix}`);
                 expect(change!.originalValue).toBe(
                     existingEntities[ix],
                     `entity #${ix} originalValue`
@@ -830,7 +830,7 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).not.toBe(origCollection);
             const change = collection.changeState[addedEntity.id];
             expect(change).toBeDefined('tracking the entity');
-            expectChangeType(change, ChangeType.Added);
+            expectNxaChangeType(change, NxaChangeType.Added);
             expect(change!.originalValue).toBeUndefined(
                 'no originalValue for added entity'
             );
@@ -845,7 +845,7 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).not.toBe(origCollection);
             const change = collection.changeState[existingEntity!.id];
             expect(change).toBeDefined('tracking the entity');
-            expectChangeType(change, ChangeType.Updated);
+            expectNxaChangeType(change, NxaChangeType.Updated);
             expect(change!.originalValue).toBe(
                 existingEntity,
                 'originalValue is the existing entity'
@@ -861,7 +861,7 @@ describe('EntityChangeTrackerBase', () => {
 
             let change = collection.changeState[existingEntity!.id];
             expect(change).toBeDefined('tracking the updated entity');
-            expectChangeType(change, ChangeType.Updated, 'first updated');
+            expectNxaChangeType(change, NxaChangeType.Updated, 'first updated');
 
             const updatedAgainEntity = {
                 ...existingEntity,
@@ -874,9 +874,9 @@ describe('EntityChangeTrackerBase', () => {
             );
             change = collection.changeState[updatedAgainEntity.id];
             expect(change).toBeDefined('is still tracked as an updated entity');
-            expectChangeType(
+            expectNxaChangeType(
                 change,
-                ChangeType.Updated,
+                NxaChangeType.Updated,
                 'still updated after attempted add'
             );
             expect(change!.originalValue).toEqual(
@@ -890,13 +890,13 @@ describe('EntityChangeTrackerBase', () => {
             expect(collection).toBe(origCollection);
         });
 
-        it('should return same collection if MergeStrategy.IgnoreChanges', () => {
+        it('should return same collection if NxaMergeStrategy.IgnoreChanges', () => {
             const existingEntity = getFirstExistingEntity();
             const updatedEntity = { ...existingEntity, name: 'test update' };
             const collection = tracker.trackUpsertOne(
                 updatedEntity as Hero,
                 origCollection,
-                MergeStrategy.IgnoreChanges
+                NxaMergeStrategy.IgnoreChanges
             );
             expect(collection).toBe(origCollection);
             const change = collection.changeState[existingEntity!.id];
@@ -922,12 +922,12 @@ describe('EntityChangeTrackerBase', () => {
                 const change = collection.changeState[(updatedEntities[ix] as Hero).id];
                 expect(change).toBeDefined(`tracking entity #${ix}`);
                 // first two should be updated, the 3rd is added
-                expectChangeType(
+                expectNxaChangeType(
                     change,
-                    ix === 2 ? ChangeType.Added : ChangeType.Updated,
+                    ix === 2 ? NxaChangeType.Added : NxaChangeType.Updated,
                     `entity #${ix}`
                 );
-                if (change!.changeType === ChangeType.Updated) {
+                if (change!.changeType === NxaChangeType.Updated) {
                     expect(change!.originalValue).toBe(
                         exitingEntities[ix],
                         `entity #${ix} originalValue`
@@ -1208,14 +1208,14 @@ describe('EntityChangeTrackerBase', () => {
                 loading: false,
                 changeState: {
                     [deletedHero.id]: {
-                        changeType: ChangeType.Deleted,
+                        changeType: NxaChangeType.Deleted,
                         originalValue: deletedHero,
                     },
                     [updatedHero.id]: {
-                        changeType: ChangeType.Updated,
+                        changeType: NxaChangeType.Updated,
                         originalValue: updatedHero,
                     },
-                    [addedHero.id]: { changeType: ChangeType.Added },
+                    [addedHero.id]: { changeType: NxaChangeType.Added },
                 },
             },
         };
@@ -1231,14 +1231,14 @@ describe('EntityChangeTrackerBase', () => {
         };
     }
 
-    /** Test for ChangeState with expected ChangeType */
-    function expectChangeType(
-        change: ChangeState<any> | undefined,
-        expectedChangeType: ChangeType,
+    /** Test for NxaChangeState with expected NxaChangeType */
+    function expectNxaChangeType(
+        change: NxaChangeState<any> | undefined,
+        expectedNxaChangeType: NxaChangeType,
         msg?: string
     ) {
-        expect(ChangeType[change!.changeType]).toEqual(
-            ChangeType[expectedChangeType],
+        expect(NxaChangeType[change!.changeType]).toEqual(
+            NxaChangeType[expectedNxaChangeType],
             msg
         );
     }

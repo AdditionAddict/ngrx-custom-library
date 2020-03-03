@@ -1,5 +1,5 @@
 /** How to merge an entity, after query or save, when the corresponding entity in the collection has unsaved changes. */
-export enum MergeStrategy {
+export enum NxaMergeStrategy {
     /**
      * Update the collection entities and ignore all change tracking for this operation.
      * Each entity's `changeState` is untouched.

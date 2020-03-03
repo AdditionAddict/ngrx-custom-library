@@ -7,13 +7,13 @@ import { Observable } from 'rxjs';
 import { Update } from '@ngrx/entity';
 
 import {
-    DefaultDataService,
-    DefaultDataServiceFactory,
-    HttpUrlGenerator,
-    EntityHttpResourceUrls,
-    EntityDataService,
-    EntityCollectionDataService,
-    QueryParams,
+    NxaDefaultDataService,
+    NxaDefaultDataServiceFactory,
+    NxaHttpUrlGenerator,
+    NxaEntityHttpResourceUrls,
+    NxaEntityDataService,
+    NxaEntityCollectionDataService,
+    NxaQueryParams,
 } from '../../lib';
 
 // region Test Helpers
@@ -32,7 +32,7 @@ export class Bazinga {
 }
 
 export class BazingaDataService
-    implements EntityCollectionDataService<Bazinga> {
+    implements NxaEntityCollectionDataService<Bazinga> {
     name: string;
 
     // TestBed bug requires `@Optional` even though http is always provided.
@@ -55,7 +55,7 @@ export class BazingaDataService
     getById(id: any): Observable<Bazinga> {
         return this.bazinga();
     }
-    getWithQuery(params: string | QueryParams): Observable<Bazinga[]> {
+    getWithQuery(params: string | NxaQueryParams): Observable<Bazinga[]> {
         return this.bazinga();
     }
     update(update: Update<Bazinga>): Observable<Bazinga> {
@@ -76,7 +76,7 @@ export class BazingaDataService
 })
 export class CustomDataServiceModule {
     constructor(
-        entityDataService: EntityDataService,
+        entityDataService: NxaEntityDataService,
         bazingaService: BazingaDataService
     ) {
         entityDataService.registerService('Bazinga', bazingaService);
@@ -88,7 +88,7 @@ function bazingaFail() {
 }
 
 /** Test version always returns canned Hero resource base URLs  */
-class TestHttpUrlGenerator implements HttpUrlGenerator {
+class TestNxaHttpUrlGenerator implements NxaHttpUrlGenerator {
     entityResource(entityName: string, root: string): string {
         return 'api/hero/';
     }
@@ -96,28 +96,28 @@ class TestHttpUrlGenerator implements HttpUrlGenerator {
         return 'api/heroes/';
     }
     registerHttpResourceUrls(
-        entityHttpResourceUrls: EntityHttpResourceUrls
+        entityHttpResourceUrls: NxaEntityHttpResourceUrls
     ): void { }
 }
 
 // endregion
 
 ///// Tests begin ////
-describe('EntityDataService', () => {
+describe('NxaEntityDataService', () => {
     const nullHttp = {};
-    let entityDataService: EntityDataService;
+    let entityDataService: NxaEntityDataService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [CustomDataServiceModule],
             providers: [
-                DefaultDataServiceFactory,
-                EntityDataService,
+                NxaDefaultDataServiceFactory,
+                NxaEntityDataService,
                 { provide: HttpClient, useValue: nullHttp },
-                { provide: HttpUrlGenerator, useClass: TestHttpUrlGenerator },
+                { provide: NxaHttpUrlGenerator, useClass: TestNxaHttpUrlGenerator },
             ],
         });
-        entityDataService = TestBed.get(EntityDataService);
+        entityDataService = TestBed.get(NxaEntityDataService);
     });
 
     describe('#getService', () => {
@@ -126,9 +126,9 @@ describe('EntityDataService', () => {
             expect(service).toBeDefined();
         });
 
-        it('data service should be a DefaultDataService by default', () => {
+        it('data service should be a NxaDefaultDataService by default', () => {
             const service = entityDataService.getService('Hero');
-            expect(service instanceof DefaultDataService).toBe(true);
+            expect(service instanceof NxaDefaultDataService).toBe(true);
         });
 
         it('gets the same service every time you ask for it', () => {
@@ -162,9 +162,9 @@ describe('EntityDataService', () => {
             service = entityDataService.getService('Villain');
             expect(service).toBe(customVillainService, 'custom Villain data service');
 
-            // Other services are still DefaultDataServices
+            // Other services are still NxaDefaultDataServices
             service = entityDataService.getService('Foo');
-            expect(service.name).toBe('Foo DefaultDataService');
+            expect(service.name).toBe('Foo NxaDefaultDataService');
         });
 
         it('can register a custom service using a module import', () => {

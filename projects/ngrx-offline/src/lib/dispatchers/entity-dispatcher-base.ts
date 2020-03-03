@@ -13,29 +13,29 @@ import {
 
 import { CorrelationIdGenerator } from '../utils/correlation-id-generator';
 import { defaultSelectId, toUpdateFactory } from '../utils/utilities';
-import { EntityAction, EntityActionOptions } from '../actions/entity-action';
-import { EntityActionFactory } from '../actions/entity-action-factory';
-import { EntityActionGuard } from '../actions/entity-action-guard';
-import { EntityCache } from '../reducers/entity-cache';
-import { EntityCacheSelector } from '../selectors/entity-cache-selector';
-import { EntityCollection } from '../reducers/entity-collection';
-import { EntityCommands } from './entity-commands';
-import { EntityDispatcher, PersistanceCanceled } from './entity-dispatcher';
-import { EntityDispatcherDefaultOptions } from './entity-dispatcher-default-options';
-import { EntityOp, OP_ERROR, OP_SUCCESS } from '../actions/entity-op';
-import { MergeStrategy } from '../actions/merge-strategy';
-import { QueryParams } from '../dataservices/interfaces';
-import { UpdateResponseData } from '../actions/update-response-data';
+import { NxaEntityAction, NxaEntityActionOptions } from '../actions/entity-action';
+import { NxaEntityActionFactory } from '../actions/entity-action-factory';
+import { NxaEntityActionGuard } from '../actions/entity-action-guard';
+import { NxaEntityCache } from '../reducers/entity-cache';
+import { NxaEntityCacheSelector } from '../selectors/entity-cache-selector';
+import { NxaEntityCollection } from '../reducers/entity-collection';
+import { NxaEntityCommands } from './entity-commands';
+import { NxaEntityDispatcher, NxaPersistanceCanceled } from './entity-dispatcher';
+import { NxaEntityDispatcherDefaultOptions } from './entity-dispatcher-default-options';
+import { NxaEntityOp, OP_NXA_ERROR, OP_NXA_SUCCESS } from '../actions/entity-op';
+import { NxaMergeStrategy } from '../actions/merge-strategy';
+import { NxaQueryParams } from '../dataservices/interfaces';
+import { NxaUpdateResponseData } from '../actions/update-response-data';
 
 /**
  * Dispatches EntityCollection actions to their reducers and effects (default implementation).
- * All save commands rely on an Ngrx Effect such as `EntityEffects.persist$`.
+ * All save commands rely on an Ngrx Effect such as `NxaEntityEffects.persist$`.
  */
-export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
-    /** Utility class with methods to validate EntityAction payloads.*/
-    guard: EntityActionGuard<T>;
+export class NxaEntityDispatcherBase<T> implements NxaEntityDispatcher<T> {
+    /** Utility class with methods to validate NxaEntityAction payloads.*/
+    guard: NxaEntityActionGuard<T>;
 
-    private entityCollection$: Observable<EntityCollection<T>>;
+    private entityCollection$: Observable<NxaEntityCollection<T>>;
 
     /**
      * Convert an entity (or partial entity) into the `Update<T>` object
@@ -46,47 +46,47 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
     constructor(
         /** Name of the entity type for which entities are dispatched */
         public entityName: string,
-        /** Creates an {EntityAction} */
-        public entityActionFactory: EntityActionFactory,
-        /** The store, scoped to the EntityCache */
-        public store: Store<EntityCache>,
+        /** Creates an {NxaEntityAction} */
+        public NxaEntityActionFactory: NxaEntityActionFactory,
+        /** The store, scoped to the NxaEntityCache */
+        public store: Store<NxaEntityCache>,
         /** Returns the primary key (id) of this entity */
         public selectId: IdSelector<T> = defaultSelectId,
         /**
          * Dispatcher options configure dispatcher behavior such as
          * whether add is optimistic or pessimistic by default.
          */
-        private defaultDispatcherOptions: EntityDispatcherDefaultOptions,
+        private defaultDispatcherOptions: NxaEntityDispatcherDefaultOptions,
         /** Actions scanned by the store after it processed them with reducers. */
         private reducedActions$: Observable<Action>,
-        /** Store selector for the EntityCache */
-        entityCacheSelector: EntityCacheSelector,
+        /** Store selector for the NxaEntityCache */
+        entityCacheSelector: NxaEntityCacheSelector,
         /** Generates correlation ids for query and save methods */
         private correlationIdGenerator: CorrelationIdGenerator
     ) {
-        this.guard = new EntityActionGuard(entityName, selectId);
+        this.guard = new NxaEntityActionGuard(entityName, selectId);
         this.toUpdate = toUpdateFactory<T>(selectId);
 
         const collectionSelector = createSelector(
             entityCacheSelector,
-            cache => cache[entityName] as EntityCollection<T>
+            cache => cache[entityName] as NxaEntityCollection<T>
         );
         this.entityCollection$ = store.select(collectionSelector);
     }
 
     /**
-     * Create an {EntityAction} for this entity type.
-     * @param entityOp {EntityOp} the entity operation
+     * Create an {NxaEntityAction} for this entity type.
+     * @param entityOp {NxaEntityOp} the entity operation
      * @param [data] the action data
      * @param [options] additional options
-     * @returns the EntityAction
+     * @returns the NxaEntityAction
      */
-    createEntityAction<P = any>(
-        entityOp: EntityOp,
+    createNxaEntityAction<P = any>(
+        entityOp: NxaEntityOp,
         data?: P,
-        options?: EntityActionOptions
-    ): EntityAction<P> {
-        return this.entityActionFactory.create({
+        options?: NxaEntityActionOptions
+    ): NxaEntityAction<P> {
+        return this.NxaEntityActionFactory.create({
             entityName: this.entityName,
             entityOp,
             data,
@@ -95,19 +95,19 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
     }
 
     /**
-     * Create an {EntityAction} for this entity type and
+     * Create an {NxaEntityAction} for this entity type and
      * dispatch it immediately to the store.
-     * @param op {EntityOp} the entity operation
+     * @param op {NxaEntityOp} the entity operation
      * @param [data] the action data
      * @param [options] additional options
-     * @returns the dispatched EntityAction
+     * @returns the dispatched NxaEntityAction
      */
     createAndDispatch<P = any>(
-        op: EntityOp,
+        op: NxaEntityOp,
         data?: P,
-        options?: EntityActionOptions
-    ): EntityAction<P> {
-        const action = this.createEntityAction(op, data, options);
+        options?: NxaEntityActionOptions
+    ): NxaEntityAction<P> {
+        const action = this.createNxaEntityAction(op, data, options);
         this.dispatch(action);
         return action;
     }
@@ -131,13 +131,13 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * @returns A terminating Observable of the entity
      * after server reports successful save or the save error.
      */
-    add(entity: T, options?: EntityActionOptions): Observable<T> {
-        options = this.setSaveEntityActionOptions(
+    add(entity: T, options?: NxaEntityActionOptions): Observable<T> {
+        options = this.setSaveNxaEntityActionOptions(
             options,
             this.defaultDispatcherOptions.optimisticAdd
         );
-        const action = this.createEntityAction(
-            EntityOp.SAVE_ADD_ONE,
+        const action = this.createNxaEntityAction(
+            NxaEntityOp.SAVE_ADD_ONE,
             entity,
             options
         );
@@ -158,18 +158,18 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * Dispatch action to cancel the persistence operation (query or save).
      * Will cause save observable to error with a PersistenceCancel error.
      * Caller is responsible for undoing changes in cache from pending optimistic save
-     * @param correlationId The correlation id for the corresponding EntityAction
+     * @param correlationId The correlation id for the corresponding NxaEntityAction
      * @param [reason] explains why canceled and by whom.
      */
     cancel(
         correlationId: any,
         reason?: string,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         if (!correlationId) {
             throw new Error('Missing correlationId');
         }
-        this.createAndDispatch(EntityOp.CANCEL_PERSIST, reason, { correlationId });
+        this.createAndDispatch(NxaEntityOp.CANCEL_PERSIST, reason, { correlationId });
     }
 
     /**
@@ -178,7 +178,7 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * @returns A terminating Observable of the deleted key
      * after server reports successful save or the save error.
      */
-    delete(entity: T, options?: EntityActionOptions): Observable<number | string>;
+    delete(entity: T, options?: NxaEntityActionOptions): Observable<number | string>;
 
     /**
      * Dispatch action to delete entity from remote storage by key.
@@ -188,19 +188,19 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      */
     delete(
         key: number | string,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): Observable<number | string>;
     delete(
         arg: number | string | T,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): Observable<number | string> {
-        options = this.setSaveEntityActionOptions(
+        options = this.setSaveNxaEntityActionOptions(
             options,
             this.defaultDispatcherOptions.optimisticDelete
         );
         const key = this.getKey(arg);
-        const action = this.createEntityAction(
-            EntityOp.SAVE_DELETE_ONE,
+        const action = this.createNxaEntityAction(
+            NxaEntityOp.SAVE_DELETE_ONE,
             key,
             options
         );
@@ -219,9 +219,9 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * after server reports success query or the query error.
      * @see load()
      */
-    getAll(options?: EntityActionOptions): Observable<T[]> {
-        options = this.setQueryEntityActionOptions(options);
-        const action = this.createEntityAction(EntityOp.QUERY_ALL, null, options);
+    getAll(options?: NxaEntityActionOptions): Observable<T[]> {
+        options = this.setQueryNxaEntityActionOptions(options);
+        const action = this.createNxaEntityAction(NxaEntityOp.QUERY_ALL, null, options);
         this.dispatch(action);
         return this.getResponseData$<T[]>(options.correlationId).pipe(
             // Use the returned entity ids to get the entities from the collection
@@ -251,9 +251,9 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * @returns A terminating Observable of the collection
      * after server reports successful query or the query error.
      */
-    getByKey(key: any, options?: EntityActionOptions): Observable<T> {
-        options = this.setQueryEntityActionOptions(options);
-        const action = this.createEntityAction(EntityOp.QUERY_BY_KEY, key, options);
+    getByKey(key: any, options?: NxaEntityActionOptions): Observable<T> {
+        options = this.setQueryNxaEntityActionOptions(options);
+        const action = this.createNxaEntityAction(NxaEntityOp.QUERY_BY_KEY, key, options);
         this.dispatch(action);
         return this.getResponseData$<T>(options.correlationId).pipe(
             // Use the returned entity data's id to get the entity from the collection
@@ -275,12 +275,12 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * after server reports successful query or the query error.
      */
     getWithQuery(
-        queryParams: QueryParams | string,
-        options?: EntityActionOptions
+        queryParams: NxaQueryParams | string,
+        options?: NxaEntityActionOptions
     ): Observable<T[]> {
-        options = this.setQueryEntityActionOptions(options);
-        const action = this.createEntityAction(
-            EntityOp.QUERY_MANY,
+        options = this.setQueryNxaEntityActionOptions(options);
+        const action = this.createNxaEntityAction(
+            NxaEntityOp.QUERY_MANY,
             queryParams,
             options
         );
@@ -313,9 +313,9 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * after server reports successful query or the query error.
      * @see getAll
      */
-    load(options?: EntityActionOptions): Observable<T[]> {
-        options = this.setQueryEntityActionOptions(options);
-        const action = this.createEntityAction(EntityOp.QUERY_LOAD, null, options);
+    load(options?: NxaEntityActionOptions): Observable<T[]> {
+        options = this.setQueryNxaEntityActionOptions(options);
+        const action = this.createNxaEntityAction(NxaEntityOp.QUERY_LOAD, null, options);
         this.dispatch(action);
         return this.getResponseData$<T[]>(options.correlationId).pipe(
             shareReplay(1)
@@ -330,16 +330,16 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * @returns A terminating Observable of the updated entity
      * after server reports successful save or the save error.
      */
-    update(entity: Partial<T>, options?: EntityActionOptions): Observable<T> {
+    update(entity: Partial<T>, options?: NxaEntityActionOptions): Observable<T> {
         // update entity might be a partial of T but must at least have its key.
         // pass the Update<T> structure as the payload
         const update = this.toUpdate(entity);
-        options = this.setSaveEntityActionOptions(
+        options = this.setSaveNxaEntityActionOptions(
             options,
             this.defaultDispatcherOptions.optimisticUpdate
         );
-        const action = this.createEntityAction(
-            EntityOp.SAVE_UPDATE_ONE,
+        const action = this.createNxaEntityAction(
+            NxaEntityOp.SAVE_UPDATE_ONE,
             update,
             options
         );
@@ -347,7 +347,7 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
             this.guard.mustBeUpdate(action);
         }
         this.dispatch(action);
-        return this.getResponseData$<UpdateResponseData<T>>(
+        return this.getResponseData$<NxaUpdateResponseData<T>>(
             options.correlationId
         ).pipe(
             // Use the update entity data id to get the entity from the collection
@@ -368,13 +368,13 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * @returns A terminating Observable of the entity
      * after server reports successful save or the save error.
      */
-    upsert(entity: T, options?: EntityActionOptions): Observable<T> {
-        options = this.setSaveEntityActionOptions(
+    upsert(entity: T, options?: NxaEntityActionOptions): Observable<T> {
+        options = this.setSaveNxaEntityActionOptions(
             options,
             this.defaultDispatcherOptions.optimisticUpsert
         );
-        const action = this.createEntityAction(
-            EntityOp.SAVE_UPSERT_ONE,
+        const action = this.createNxaEntityAction(
+            NxaEntityOp.SAVE_UPSERT_ONE,
             entity,
             options
         );
@@ -404,8 +404,8 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * Replace all entities in the cached collection.
      * Does not save to remote storage.
      */
-    addAllToCache(entities: T[], options?: EntityActionOptions): void {
-        this.createAndDispatch(EntityOp.ADD_ALL, entities, options);
+    addAllToCache(entities: T[], options?: NxaEntityActionOptions): void {
+        this.createAndDispatch(NxaEntityOp.ADD_ALL, entities, options);
     }
 
     /**
@@ -413,8 +413,8 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * Does not save to remote storage.
      * Ignored if an entity with the same primary key is already in cache.
      */
-    addOneToCache(entity: T, options?: EntityActionOptions): void {
-        this.createAndDispatch(EntityOp.ADD_ONE, entity, options);
+    addOneToCache(entity: T, options?: NxaEntityActionOptions): void {
+        this.createAndDispatch(NxaEntityOp.ADD_ONE, entity, options);
     }
 
     /**
@@ -422,13 +422,13 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * Does not save to remote storage.
      * Entities with primary keys already in cache are ignored.
      */
-    addManyToCache(entities: T[], options?: EntityActionOptions): void {
-        this.createAndDispatch(EntityOp.ADD_MANY, entities, options);
+    addManyToCache(entities: T[], options?: NxaEntityActionOptions): void {
+        this.createAndDispatch(NxaEntityOp.ADD_MANY, entities, options);
     }
 
     /** Clear the cached entity collection */
-    clearCache(options?: EntityActionOptions): void {
-        this.createAndDispatch(EntityOp.REMOVE_ALL, undefined, options);
+    clearCache(options?: NxaEntityActionOptions): void {
+        this.createAndDispatch(NxaEntityOp.REMOVE_ALL, undefined, options);
     }
 
     /**
@@ -436,19 +436,19 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * Does not delete that entity from remote storage.
      * @param entity The entity to remove
      */
-    removeOneFromCache(entity: T, options?: EntityActionOptions): void;
+    removeOneFromCache(entity: T, options?: NxaEntityActionOptions): void;
 
     /**
      * Remove an entity directly from the cache.
      * Does not delete that entity from remote storage.
      * @param key The primary key of the entity to remove
      */
-    removeOneFromCache(key: number | string, options?: EntityActionOptions): void;
+    removeOneFromCache(key: number | string, options?: NxaEntityActionOptions): void;
     removeOneFromCache(
         arg: (number | string) | T,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
-        this.createAndDispatch(EntityOp.REMOVE_ONE, this.getKey(arg), options);
+        this.createAndDispatch(NxaEntityOp.REMOVE_ONE, this.getKey(arg), options);
     }
 
     /**
@@ -456,7 +456,7 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * Does not delete these entities from remote storage.
      * @param entity The entities to remove
      */
-    removeManyFromCache(entities: T[], options?: EntityActionOptions): void;
+    removeManyFromCache(entities: T[], options?: NxaEntityActionOptions): void;
 
     /**
      * Remove multiple entities directly from the cache.
@@ -465,11 +465,11 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      */
     removeManyFromCache(
         keys: (number | string)[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void;
     removeManyFromCache(
         args: (number | string)[] | T[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         if (!args || args.length === 0) {
             return;
@@ -479,7 +479,7 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
                 ? // if array[0] is a key, assume they're all keys
                 (<T[]>args).map(arg => this.getKey(arg))
                 : args;
-        this.createAndDispatch(EntityOp.REMOVE_MANY, keys, options);
+        this.createAndDispatch(NxaEntityOp.REMOVE_MANY, keys, options);
     }
 
     /**
@@ -489,11 +489,11 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * The update entity may be partial (but must have its key)
      * in which case it patches the existing entity.
      */
-    updateOneInCache(entity: Partial<T>, options?: EntityActionOptions): void {
+    updateOneInCache(entity: Partial<T>, options?: NxaEntityActionOptions): void {
         // update entity might be a partial of T but must at least have its key.
         // pass the Update<T> structure as the payload
         const update: Update<T> = this.toUpdate(entity);
-        this.createAndDispatch(EntityOp.UPDATE_ONE, update, options);
+        this.createAndDispatch(NxaEntityOp.UPDATE_ONE, update, options);
     }
 
     /**
@@ -505,13 +505,13 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      */
     updateManyInCache(
         entities: Partial<T>[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         if (!entities || entities.length === 0) {
             return;
         }
         const updates: Update<T>[] = entities.map(entity => this.toUpdate(entity));
-        this.createAndDispatch(EntityOp.UPDATE_MANY, updates, options);
+        this.createAndDispatch(NxaEntityOp.UPDATE_MANY, updates, options);
     }
 
     /**
@@ -520,8 +520,8 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * Upsert entity might be a partial of T but must at least have its key.
      * Pass the Update<T> structure as the payload
      */
-    upsertOneInCache(entity: Partial<T>, options?: EntityActionOptions): void {
-        this.createAndDispatch(EntityOp.UPSERT_ONE, entity, options);
+    upsertOneInCache(entity: Partial<T>, options?: NxaEntityActionOptions): void {
+        this.createAndDispatch(NxaEntityOp.UPSERT_ONE, entity, options);
     }
 
     /**
@@ -530,12 +530,12 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      */
     upsertManyInCache(
         entities: Partial<T>[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         if (!entities || entities.length === 0) {
             return;
         }
-        this.createAndDispatch(EntityOp.UPSERT_MANY, entities, options);
+        this.createAndDispatch(NxaEntityOp.UPSERT_MANY, entities, options);
     }
 
     /**
@@ -543,17 +543,17 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
      * when using the `filteredEntities` selector.
      */
     setFilter(pattern: any): void {
-        this.createAndDispatch(EntityOp.SET_FILTER, pattern);
+        this.createAndDispatch(NxaEntityOp.SET_FILTER, pattern);
     }
 
     /** Set the loaded flag */
     setLoaded(isLoaded: boolean): void {
-        this.createAndDispatch(EntityOp.SET_LOADED, !!isLoaded);
+        this.createAndDispatch(NxaEntityOp.SET_LOADED, !!isLoaded);
     }
 
     /** Set the loading flag */
     setLoading(isLoading: boolean): void {
-        this.createAndDispatch(EntityOp.SET_LOADING, !!isLoading);
+        this.createAndDispatch(NxaEntityOp.SET_LOADING, !!isLoading);
     }
     // #endregion Cache-only operations that do not update remote storage
 
@@ -567,7 +567,7 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
     }
 
     /**
-     * Return Observable of data from the server-success EntityAction with
+     * Return Observable of data from the server-success NxaEntityAction with
      * the given Correlation Id, after that action was processed by the ngrx store.
      * or else put the server error on the Observable error channel.
      * @param crid The correlationId for both the save and response actions.
@@ -580,31 +580,31 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
          */
         return this.reducedActions$.pipe(
             filter((act: any) => !!act.payload),
-            filter((act: EntityAction) => {
+            filter((act: NxaEntityAction) => {
                 const { correlationId, entityName, entityOp } = act.payload;
                 return (
                     entityName === this.entityName &&
                     correlationId === crid &&
-                    (entityOp.endsWith(OP_SUCCESS) ||
-                        entityOp.endsWith(OP_ERROR) ||
-                        entityOp === EntityOp.CANCEL_PERSIST)
+                    (entityOp.endsWith(OP_NXA_SUCCESS) ||
+                        entityOp.endsWith(OP_NXA_ERROR) ||
+                        entityOp === NxaEntityOp.CANCEL_PERSIST)
                 );
             }),
             take(1),
             mergeMap(act => {
                 const { entityOp } = act.payload;
-                return entityOp === EntityOp.CANCEL_PERSIST
-                    ? throwError(new PersistanceCanceled(act.payload.data))
-                    : entityOp.endsWith(OP_SUCCESS)
+                return entityOp === NxaEntityOp.CANCEL_PERSIST
+                    ? throwError(new NxaPersistanceCanceled(act.payload.data))
+                    : entityOp.endsWith(OP_NXA_SUCCESS)
                         ? of(act.payload.data as D)
                         : throwError(act.payload.data.error);
             })
         );
     }
 
-    private setQueryEntityActionOptions(
-        options?: EntityActionOptions
-    ): EntityActionOptions {
+    private setQueryNxaEntityActionOptions(
+        options?: NxaEntityActionOptions
+    ): NxaEntityActionOptions {
         options = options || {};
         const correlationId =
             options.correlationId == null
@@ -613,10 +613,10 @@ export class EntityDispatcherBase<T> implements EntityDispatcher<T> {
         return { ...options, correlationId };
     }
 
-    private setSaveEntityActionOptions(
-        options?: EntityActionOptions,
+    private setSaveNxaEntityActionOptions(
+        options?: NxaEntityActionOptions,
         defaultOptimism?: boolean
-    ): EntityActionOptions {
+    ): NxaEntityActionOptions {
         options = options || {};
         const correlationId =
             options.correlationId == null

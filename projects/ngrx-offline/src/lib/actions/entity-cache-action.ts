@@ -1,21 +1,21 @@
 /*
- * Actions dedicated to the EntityCache as a whole
+ * Actions dedicated to the NxaEntityCache as a whole
  */
 import { Action } from '@ngrx/store';
 
-import { ChangeSet, ChangeSetOperation } from './entity-cache-change-set';
-export { ChangeSet, ChangeSetOperation } from './entity-cache-change-set';
+import { NxaChangeSet, NxaChangeSetOperation } from './entity-cache-change-set';
+export { NxaChangeSet, NxaChangeSetOperation } from './entity-cache-change-set';
 
-import { DataServiceError } from '../dataservices/data-service-error';
-import { EntityActionOptions } from '../actions/entity-action';
-import { EntityCache } from '../reducers/entity-cache';
-import { MergeStrategy } from '../actions/merge-strategy';
+import { NxaDataServiceError } from '../dataservices/data-service-error';
+import { NxaEntityActionOptions } from '../actions/entity-action';
+import { NxaEntityCache } from '../reducers/entity-cache';
+import { NxaMergeStrategy } from '../actions/merge-strategy';
 
-export enum EntityCacheAction {
+export enum NxaEntityCacheAction {
     CLEAR_COLLECTIONS = '@@ngrx/action/entity-cache/clear-collections',
     LOAD_COLLECTIONS = '@@ngrx/action/entity-cache/load-collections',
     MERGE_QUERY_SET = '@@ngrx/action/entity-cache/merge-query-set',
-    SET_ENTITY_CACHE = '@@ngrx/action/entity-cache/set-cache',
+    SET_NXA_ENTITY_CACHE = '@@ngrx/action/entity-cache/set-cache',
 
     SAVE_ENTITIES = '@@ngrx/action/entity-cache/save-entities',
     SAVE_ENTITIES_CANCEL = '@@ngrx/action/entity-cache/save-entities-cancel',
@@ -27,9 +27,9 @@ export enum EntityCacheAction {
 /**
  * Hash of entities keyed by EntityCollection name,
  * typically the result of a query that returned results from a multi-collection query
- * that will be merged into an EntityCache via the `MergeQuerySet` action.
+ * that will be merged into an NxaEntityCache via the `NxaMergeQuerySet` action.
  */
-export interface EntityCacheQuerySet {
+export interface NxaEntityCacheQuerySet {
     [entityName: string]: any[];
 }
 
@@ -39,9 +39,9 @@ export interface EntityCacheQuerySet {
  * If empty array, does nothing. If no array, clear all collections.
  * @param [tag] Optional tag to identify the operation from the app perspective.
  */
-export class ClearCollections implements Action {
+export class NxaClearCollections implements Action {
     readonly payload: { collections?: string[]; tag?: string };
-    readonly type = EntityCacheAction.CLEAR_COLLECTIONS;
+    readonly type = NxaEntityCacheAction.CLEAR_COLLECTIONS;
 
     constructor(collections?: string[], tag?: string) {
         this.payload = { collections, tag };
@@ -55,11 +55,11 @@ export class ClearCollections implements Action {
  * @param [tag] Optional tag to identify the operation from the app perspective.
  * in the form of a map of entity collections.
  */
-export class LoadCollections implements Action {
-    readonly payload: { collections: EntityCacheQuerySet; tag?: string };
-    readonly type = EntityCacheAction.LOAD_COLLECTIONS;
+export class NxaLoadCollections implements Action {
+    readonly payload: { collections: NxaEntityCacheQuerySet; tag?: string };
+    readonly type = NxaEntityCacheAction.LOAD_COLLECTIONS;
 
-    constructor(collections: EntityCacheQuerySet, tag?: string) {
+    constructor(collections: NxaEntityCacheQuerySet, tag?: string) {
         this.payload = { collections, tag };
     }
 }
@@ -72,27 +72,27 @@ export class LoadCollections implements Action {
  * @param querySet The result of the query in the form of a map of entity collections.
  * These are the entity data to merge into the respective collections.
  * @param mergeStrategy How to merge a queried entity when it is already in the collection.
- * The default is MergeStrategy.PreserveChanges
+ * The default is NxaMergeStrategy.PreserveChanges
  * @param [tag] Optional tag to identify the operation from the app perspective.
  */
-export class MergeQuerySet implements Action {
+export class NxaMergeQuerySet implements Action {
     readonly payload: {
-        querySet: EntityCacheQuerySet;
-        mergeStrategy?: MergeStrategy;
+        querySet: NxaEntityCacheQuerySet;
+        mergeStrategy?: NxaMergeStrategy;
         tag?: string;
     };
 
-    readonly type = EntityCacheAction.MERGE_QUERY_SET;
+    readonly type = NxaEntityCacheAction.MERGE_QUERY_SET;
 
     constructor(
-        querySet: EntityCacheQuerySet,
-        mergeStrategy?: MergeStrategy,
+        querySet: NxaEntityCacheQuerySet,
+        mergeStrategy?: NxaMergeStrategy,
         tag?: string
     ) {
         this.payload = {
             querySet,
             mergeStrategy:
-                mergeStrategy === null ? MergeStrategy.PreserveChanges : mergeStrategy,
+                mergeStrategy === null ? NxaMergeStrategy.PreserveChanges : mergeStrategy,
             tag,
         };
     }
@@ -100,55 +100,55 @@ export class MergeQuerySet implements Action {
 
 /**
  * Create entity cache action for replacing the entire entity cache.
- * Dangerous because brute force but useful as when re-hydrating an EntityCache
+ * Dangerous because brute force but useful as when re-hydrating an NxaEntityCache
  * from local browser storage when the application launches.
  * @param cache New state of the entity cache
  * @param [tag] Optional tag to identify the operation from the app perspective.
  */
-export class SetEntityCache implements Action {
-    readonly payload: { cache: EntityCache; tag?: string };
-    readonly type = EntityCacheAction.SET_ENTITY_CACHE;
+export class NxaSetEntityCache implements Action {
+    readonly payload: { cache: NxaEntityCache; tag?: string };
+    readonly type = NxaEntityCacheAction.SET_NXA_ENTITY_CACHE;
 
-    constructor(public readonly cache: EntityCache, tag?: string) {
+    constructor(public readonly cache: NxaEntityCache, tag?: string) {
         this.payload = { cache, tag };
     }
 }
 
-// #region SaveEntities
-export class SaveEntities implements Action {
+// #region NxaSaveEntities
+export class NxaSaveEntities implements Action {
     readonly payload: {
-        readonly changeSet: ChangeSet;
+        readonly NxaChangeSet: NxaChangeSet;
         readonly url: string;
         readonly correlationId?: any;
         readonly isOptimistic?: boolean;
-        readonly mergeStrategy?: MergeStrategy;
+        readonly mergeStrategy?: NxaMergeStrategy;
         readonly tag?: string;
         error?: Error;
         skip?: boolean; // not used
     };
-    readonly type = EntityCacheAction.SAVE_ENTITIES;
+    readonly type = NxaEntityCacheAction.SAVE_ENTITIES;
 
     constructor(
-        changeSet: ChangeSet,
+        NxaChangeSet: NxaChangeSet,
         url: string,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ) {
         options = options || {};
-        if (changeSet) {
-            changeSet.tag = changeSet.tag || options.tag;
+        if (NxaChangeSet) {
+            NxaChangeSet.tag = NxaChangeSet.tag || options.tag;
         }
-        this.payload = { changeSet, url, ...options, tag: changeSet.tag };
+        this.payload = { NxaChangeSet, url, ...options, tag: NxaChangeSet.tag };
     }
 }
 
-export class SaveEntitiesCancel implements Action {
+export class NxaSaveEntitiesCancel implements Action {
     readonly payload: {
         readonly correlationId: any;
         readonly reason?: string;
         readonly entityNames?: string[];
         readonly tag?: string;
     };
-    readonly type = EntityCacheAction.SAVE_ENTITIES_CANCEL;
+    readonly type = NxaEntityCacheAction.SAVE_ENTITIES_CANCEL;
 
     constructor(
         correlationId: any,
@@ -160,55 +160,55 @@ export class SaveEntitiesCancel implements Action {
     }
 }
 
-export class SaveEntitiesCanceled implements Action {
+export class NxaSaveEntitiesCanceled implements Action {
     readonly payload: {
         readonly correlationId: any;
         readonly reason?: string;
         readonly tag?: string;
     };
-    readonly type = EntityCacheAction.SAVE_ENTITIES_CANCEL;
+    readonly type = NxaEntityCacheAction.SAVE_ENTITIES_CANCEL;
 
     constructor(correlationId: any, reason?: string, tag?: string) {
         this.payload = { correlationId, reason, tag };
     }
 }
 
-export class SaveEntitiesError {
+export class NxaSaveEntitiesError {
     readonly payload: {
-        readonly error: DataServiceError;
-        readonly originalAction: SaveEntities;
+        readonly error: NxaDataServiceError;
+        readonly originalAction: NxaSaveEntities;
         readonly correlationId: any;
     };
-    readonly type = EntityCacheAction.SAVE_ENTITIES_ERROR;
-    constructor(error: DataServiceError, originalAction: SaveEntities) {
+    readonly type = NxaEntityCacheAction.SAVE_ENTITIES_ERROR;
+    constructor(error: NxaDataServiceError, originalAction: NxaSaveEntities) {
         const correlationId = originalAction.payload.correlationId;
         this.payload = { error, originalAction, correlationId };
     }
 }
 
-export class SaveEntitiesSuccess implements Action {
+export class NxaSaveEntitiesSuccess implements Action {
     readonly payload: {
-        readonly changeSet: ChangeSet;
+        readonly NxaChangeSet: NxaChangeSet;
         readonly url: string;
         readonly correlationId?: any;
         readonly isOptimistic?: boolean;
-        readonly mergeStrategy?: MergeStrategy;
+        readonly mergeStrategy?: NxaMergeStrategy;
         readonly tag?: string;
         error?: Error;
         skip?: boolean; // not used
     };
-    readonly type = EntityCacheAction.SAVE_ENTITIES_SUCCESS;
+    readonly type = NxaEntityCacheAction.SAVE_ENTITIES_SUCCESS;
 
     constructor(
-        changeSet: ChangeSet,
+        NxaChangeSet: NxaChangeSet,
         url: string,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ) {
         options = options || {};
-        if (changeSet) {
-            changeSet.tag = changeSet.tag || options.tag;
+        if (NxaChangeSet) {
+            NxaChangeSet.tag = NxaChangeSet.tag || options.tag;
         }
-        this.payload = { changeSet, url, ...options, tag: changeSet.tag };
+        this.payload = { NxaChangeSet, url, ...options, tag: NxaChangeSet.tag };
     }
 }
-// #endregion SaveEntities
+// #endregion NxaSaveEntities

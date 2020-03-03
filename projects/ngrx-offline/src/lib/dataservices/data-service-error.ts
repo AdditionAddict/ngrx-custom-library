@@ -1,5 +1,5 @@
-import { EntityAction } from '../actions/entity-action';
-import { RequestData } from './interfaces';
+import { NxaEntityAction } from '../actions/entity-action';
+import { NxaRequestData } from './interfaces';
 
 /**
  * Error from a DataService
@@ -7,12 +7,12 @@ import { RequestData } from './interfaces';
  * @param error the HttpErrorResponse or the error thrown by the service
  * @param requestData the HTTP request information such as the method and the url.
  */
-// If extend from Error, `dse instanceof DataServiceError` returns false
+// If extend from Error, `dse instanceof NxaDataServiceError` returns false
 // in some (all?) unit tests so don't bother trying.
-export class DataServiceError {
+export class NxaDataServiceError {
     message: string | null;
 
-    constructor(public error: any, public requestData: RequestData | null) {
+    constructor(public error: any, public requestData: NxaRequestData | null) {
         this.message = typeof error === 'string' ? error : extractMessage(error);
     }
 }
@@ -38,8 +38,8 @@ function extractMessage(sourceError: any): string | null {
             : null;
 }
 
-/** Payload for an EntityAction data service error such as QUERY_ALL_ERROR */
-export interface EntityActionDataServiceError {
-    error: DataServiceError;
-    originalAction: EntityAction;
+/** Payload for an NxaEntityAction data service error such as QUERY_ALL_ERROR */
+export interface NxaEntityActionDataServiceError {
+    error: NxaDataServiceError;
+    originalAction: NxaEntityAction;
 }

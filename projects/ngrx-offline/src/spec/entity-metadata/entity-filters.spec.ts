@@ -1,4 +1,4 @@
-import { PropsFilterFnFactory } from '../../lib';
+import { NxaPropsFilterFnFactory } from '../../lib';
 
 class Hero {
     id!: number;
@@ -6,12 +6,12 @@ class Hero {
     saying?: string;
 }
 
-describe('EntityFilterFn - PropsFilter', () => {
+describe('NxaEntityFilterFn - PropsFilter', () => {
     it('can match entity on full text of a target prop', () => {
         const entity1: Hero = { id: 42, name: 'Foo' };
         const entity2: Hero = { id: 21, name: 'Bar' };
         const entities: Hero[] = [entity1, entity2];
-        const filter = PropsFilterFnFactory<Hero>(['name']);
+        const filter = NxaPropsFilterFnFactory<Hero>(['name']);
         expect(filter(entities, 'Foo')).toEqual([entity1]);
     });
 
@@ -19,7 +19,7 @@ describe('EntityFilterFn - PropsFilter', () => {
         const entity1: Hero = { id: 42, name: 'Foo' };
         const entity2: Hero = { id: 21, name: 'Bar' };
         const entities: Hero[] = [entity1, entity2];
-        const filter = PropsFilterFnFactory<Hero>(['name']);
+        const filter = NxaPropsFilterFnFactory<Hero>(['name']);
         expect(filter(entities, /fo/i)).toEqual([entity1]);
     });
 
@@ -27,7 +27,7 @@ describe('EntityFilterFn - PropsFilter', () => {
         const entity1: Hero = { id: 42, name: 'Foo' };
         const entity2: Hero = { id: 21, name: 'Bar', saying: 'Foo is not Bar' };
         const entities: Hero[] = [entity1, entity2];
-        const filter = PropsFilterFnFactory<Hero>(['name', 'saying']);
+        const filter = NxaPropsFilterFnFactory<Hero>(['name', 'saying']);
         expect(filter(entities, /fo/i)).toEqual([entity1, entity2]);
     });
 
@@ -35,18 +35,18 @@ describe('EntityFilterFn - PropsFilter', () => {
         const entity1: Hero = { id: 42, name: 'Foo' };
         const entity2: Hero = { id: 21, name: 'Bar' };
         const entities: Hero[] = [entity1, entity2];
-        const filter = PropsFilterFnFactory<Hero>(['name']);
+        const filter = NxaPropsFilterFnFactory<Hero>(['name']);
         expect(filter(entities, 'Baz')).toEqual([]);
     });
 
     it('returns empty array for empty input entities array', () => {
         const entities: Hero[] = [];
-        const filter = PropsFilterFnFactory<Hero>(['name']);
+        const filter = NxaPropsFilterFnFactory<Hero>(['name']);
         expect(filter(entities, 'Foo')).toEqual([]);
     });
 
     it('returns empty array for null input entities array', () => {
-        const filter = PropsFilterFnFactory<Hero>(['name']);
+        const filter = NxaPropsFilterFnFactory<Hero>(['name']);
         expect(filter(null as any, 'Foo')).toEqual([]);
     });
 });

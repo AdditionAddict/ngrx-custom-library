@@ -3,30 +3,30 @@ import { Action, ActionReducer } from '@ngrx/store';
 import { IdSelector } from '@ngrx/entity';
 
 import {
-    EntityMetadataMap,
-    EntityCollectionCreator,
-    EntityActionFactory,
-    EntityCache,
-    EntityCacheReducerFactory,
-    EntityCollectionReducerMethodsFactory,
-    EntityCollectionReducerFactory,
-    EntityCollectionReducerRegistry,
-    EntityDefinitionService,
-    ENTITY_METADATA_TOKEN,
-    EntityOp,
-    ClearCollections,
-    EntityCacheQuerySet,
-    LoadCollections,
-    MergeQuerySet,
-    SetEntityCache,
-    SaveEntities,
-    SaveEntitiesCancel,
-    SaveEntitiesSuccess,
-    DataServiceError,
-    SaveEntitiesError,
-    EntityCollection,
-    ChangeSet,
-    ChangeSetOperation,
+    NxaEntityMetadataMap,
+    NxaEntityCollectionCreator,
+    NxaEntityActionFactory,
+    NxaEntityCache,
+    NxaEntityCacheReducerFactory,
+    NxaEntityCollectionReducerMethodsFactory,
+    NxaEntityCollectionReducerFactory,
+    NxaEntityCollectionReducerRegistry,
+    NxaEntityDefinitionService,
+    NXA_ENTITY_METADATA_TOKEN,
+    NxaEntityOp,
+    NxaClearCollections,
+    NxaEntityCacheQuerySet,
+    NxaLoadCollections,
+    NxaMergeQuerySet,
+    NxaSetEntityCache,
+    NxaSaveEntities,
+    NxaSaveEntitiesCancel,
+    NxaSaveEntitiesSuccess,
+    NxaDataServiceError,
+    NxaSaveEntitiesError,
+    NxaEntityCollection,
+    NxaChangeSet,
+    NxaChangeSetOperation,
     Logger,
 } from '../../lib';
 
@@ -40,51 +40,51 @@ class Villain {
     name!: string;
 }
 
-const metadata: EntityMetadataMap = {
+const metadata: NxaEntityMetadataMap = {
     Fool: {},
     Hero: {},
     Knave: {},
     Villain: { selectId: villain => villain.key },
 };
 
-describe('EntityCacheReducer', () => {
-    let collectionCreator: EntityCollectionCreator;
-    let entityActionFactory: EntityActionFactory;
-    let entityCacheReducer: ActionReducer<EntityCache, Action>;
+describe('NxaEntityCacheReducer', () => {
+    let collectionCreator: NxaEntityCollectionCreator;
+    let nxaEntityActionFactory: NxaEntityActionFactory;
+    let entityCacheReducer: ActionReducer<NxaEntityCache, Action>;
 
     beforeEach(() => {
-        entityActionFactory = new EntityActionFactory();
+        nxaEntityActionFactory = new NxaEntityActionFactory();
         const logger = jasmine.createSpyObj('Logger', ['error', 'log', 'warn']);
 
         TestBed.configureTestingModule({
             providers: [
-                EntityCacheReducerFactory,
-                EntityCollectionCreator,
+                NxaEntityCacheReducerFactory,
+                NxaEntityCollectionCreator,
                 {
-                    provide: EntityCollectionReducerMethodsFactory,
-                    useClass: EntityCollectionReducerMethodsFactory,
+                    provide: NxaEntityCollectionReducerMethodsFactory,
+                    useClass: NxaEntityCollectionReducerMethodsFactory,
                 },
-                EntityCollectionReducerFactory,
-                EntityCollectionReducerRegistry,
-                EntityDefinitionService,
-                { provide: ENTITY_METADATA_TOKEN, multi: true, useValue: metadata },
+                NxaEntityCollectionReducerFactory,
+                NxaEntityCollectionReducerRegistry,
+                NxaEntityDefinitionService,
+                { provide: NXA_ENTITY_METADATA_TOKEN, multi: true, useValue: metadata },
                 { provide: Logger, useValue: logger },
             ],
         });
 
-        collectionCreator = TestBed.get(EntityCollectionCreator);
+        collectionCreator = TestBed.get(NxaEntityCollectionCreator);
         const entityCacheReducerFactory = TestBed.get(
-            EntityCacheReducerFactory
-        ) as EntityCacheReducerFactory;
+            NxaEntityCacheReducerFactory
+        ) as NxaEntityCacheReducerFactory;
         entityCacheReducer = entityCacheReducerFactory.create();
     });
 
     describe('#create', () => {
         it('creates a default hero reducer when QUERY_ALL for hero', () => {
             const hero: Hero = { id: 42, name: 'Bobby' };
-            const action = entityActionFactory.create<Hero>(
+            const action = nxaEntityActionFactory.create<Hero>(
                 'Hero',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 hero
             );
 
@@ -95,22 +95,22 @@ describe('EntityCacheReducer', () => {
         });
 
         it('throws when ask for reducer of unknown entity type', () => {
-            const action = entityActionFactory.create('Foo', EntityOp.QUERY_ALL);
+            const action = nxaEntityActionFactory.create('Foo', NxaEntityOp.QUERY_ALL);
             expect(() => entityCacheReducer({}, action)).toThrowError(
-                /no EntityDefinition/i
+                /no NxaEntityDefinition/i
             );
         });
     });
 
     /**
-     * Test the EntityCache-level actions, SET and MERGE, which can
+     * Test the NxaEntityCache-level actions, SET and MERGE, which can
      * be used to restore the entity cache from a know state such as
      * re-hydrating from browser storage.
      * Useful for an offline-capable app.
      */
-    describe('EntityCache-level actions', () => {
+    describe('NxaEntityCache-level actions', () => {
         let initialHeroes: Hero[];
-        let initialCache: EntityCache;
+        let initialCache: NxaEntityCache;
 
         beforeEach(() => {
             initialHeroes = [
@@ -138,7 +138,7 @@ describe('EntityCacheReducer', () => {
 
             it('should clear an existing cached collection', () => {
                 const collections = ['Hero'];
-                const action = new ClearCollections(collections);
+                const action = new NxaClearCollections(collections);
                 const state = entityCacheReducer(initialCache, action);
                 expect(state['Hero'].ids).toEqual([], 'empty Hero collection');
                 expect(state['Fool'].ids.length).toBeGreaterThan(0, 'Fools remain');
@@ -150,7 +150,7 @@ describe('EntityCacheReducer', () => {
 
             it('should clear multiple existing cached collections', () => {
                 const collections = ['Hero', 'Villain'];
-                const action = new ClearCollections(collections);
+                const action = new NxaClearCollections(collections);
                 const state = entityCacheReducer(initialCache, action);
                 expect(state['Hero'].ids).toEqual([], 'empty Hero collection');
                 expect(state['Villain'].ids).toEqual([], 'empty Villain collection');
@@ -160,7 +160,7 @@ describe('EntityCacheReducer', () => {
             it('should initialize an empty cache with the collections', () => {
                 // because ANY call to a reducer creates the collection!
                 const collections = ['Hero', 'Villain'];
-                const action = new ClearCollections(collections);
+                const action = new NxaClearCollections(collections);
 
                 const state = entityCacheReducer({}, action);
                 expect(Object.keys(state)).toEqual(
@@ -173,13 +173,13 @@ describe('EntityCacheReducer', () => {
 
             it('should return cache matching existing cache for empty collections array', () => {
                 const collections: string[] = [];
-                const action = new ClearCollections(collections);
+                const action = new NxaClearCollections(collections);
                 const state = entityCacheReducer(initialCache, action);
                 expect(state).toEqual(initialCache);
             });
 
             it('should clear every collection in an existing cache when collections is falsy', () => {
-                const action = new ClearCollections(undefined);
+                const action = new NxaClearCollections(undefined);
                 const state = entityCacheReducer(initialCache, action);
                 expect(Object.keys(state).sort()).toEqual(
                     ['Fool', 'Hero', 'Villain'],
@@ -192,7 +192,7 @@ describe('EntityCacheReducer', () => {
         });
 
         describe('LOAD_COLLECTIONS', () => {
-            function shouldHaveExpectedHeroes(entityCache: EntityCache) {
+            function shouldHaveExpectedHeroes(entityCache: NxaEntityCache) {
                 const heroCollection = entityCache['Hero'];
                 expect(heroCollection.ids).toEqual([2, 1], 'Hero ids');
                 expect(heroCollection.entities).toEqual({
@@ -203,12 +203,12 @@ describe('EntityCacheReducer', () => {
             }
 
             it('should initialize an empty cache with the collections', () => {
-                const collections: EntityCacheQuerySet = {
+                const collections: NxaEntityCacheQuerySet = {
                     Hero: initialHeroes,
                     Villain: [{ key: 'DE', name: 'Dr. Evil' }],
                 };
 
-                const action = new LoadCollections(collections);
+                const action = new NxaLoadCollections(collections);
 
                 const state = entityCacheReducer({}, action);
                 shouldHaveExpectedHeroes(state);
@@ -217,26 +217,26 @@ describe('EntityCacheReducer', () => {
             });
 
             it('should return cache matching existing cache when collections set is empty', () => {
-                const action = new LoadCollections({});
+                const action = new NxaLoadCollections({});
                 const state = entityCacheReducer(initialCache, action);
                 expect(state).toEqual(initialCache);
             });
 
             it('should add a new collection to existing cache', () => {
-                const collections: EntityCacheQuerySet = {
+                const collections: NxaEntityCacheQuerySet = {
                     Knave: [{ id: 96, name: 'Sneaky Pete' }],
                 };
-                const action = new LoadCollections(collections);
+                const action = new NxaLoadCollections(collections);
                 const state = entityCacheReducer(initialCache, action);
                 expect(state['Knave'].ids).toEqual([96], 'Knave ids');
                 expect(state['Knave'].loaded).toBe(true, 'Knave loaded');
             });
 
             it('should replace an existing cached collection', () => {
-                const collections: EntityCacheQuerySet = {
+                const collections: NxaEntityCacheQuerySet = {
                     Hero: [{ id: 42, name: 'Bobby' }],
                 };
-                const action = new LoadCollections(collections);
+                const action = new NxaLoadCollections(collections);
                 const state = entityCacheReducer(initialCache, action);
                 const heroCollection = state['Hero'];
                 expect(heroCollection.ids).toEqual([42], 'only the loaded hero');
@@ -248,7 +248,7 @@ describe('EntityCacheReducer', () => {
         });
 
         describe('MERGE_QUERY_SET', () => {
-            function shouldHaveExpectedHeroes(entityCache: EntityCache) {
+            function shouldHaveExpectedHeroes(entityCache: NxaEntityCache) {
                 expect(entityCache['Hero'].ids).toEqual([2, 1], 'Hero ids');
                 expect(entityCache['Hero'].entities).toEqual({
                     1: initialHeroes[1],
@@ -257,12 +257,12 @@ describe('EntityCacheReducer', () => {
             }
 
             it('should initialize an empty cache with query set', () => {
-                const querySet: EntityCacheQuerySet = {
+                const querySet: NxaEntityCacheQuerySet = {
                     Hero: initialHeroes,
                     Villain: [{ key: 'DE', name: 'Dr. Evil' }],
                 };
 
-                const action = new MergeQuerySet(querySet);
+                const action = new NxaMergeQuerySet(querySet);
 
                 const state = entityCacheReducer({}, action);
                 shouldHaveExpectedHeroes(state);
@@ -270,26 +270,26 @@ describe('EntityCacheReducer', () => {
             });
 
             it('should return cache matching existing cache when query set is empty', () => {
-                const action = new MergeQuerySet({});
+                const action = new NxaMergeQuerySet({});
                 const state = entityCacheReducer(initialCache, action);
                 shouldHaveExpectedHeroes(state);
             });
 
             it('should add a new collection to existing cache', () => {
-                const querySet: EntityCacheQuerySet = {
+                const querySet: NxaEntityCacheQuerySet = {
                     Villain: [{ key: 'DE', name: 'Dr. Evil' }],
                 };
-                const action = new MergeQuerySet(querySet);
+                const action = new NxaMergeQuerySet(querySet);
                 const state = entityCacheReducer(initialCache, action);
                 shouldHaveExpectedHeroes(state);
                 expect(state['Villain'].ids).toEqual(['DE'], 'Villain ids');
             });
 
             it('should merge into an existing cached collection', () => {
-                const querySet: EntityCacheQuerySet = {
+                const querySet: NxaEntityCacheQuerySet = {
                     Hero: [{ id: 42, name: 'Bobby' }],
                 };
-                const action = new MergeQuerySet(querySet);
+                const action = new NxaMergeQuerySet(querySet);
                 const state = entityCacheReducer(initialCache, action);
                 const heroCollection = state['Hero'];
                 const expectedIds = initialHeroes.map(h => h.id).concat(42);
@@ -301,16 +301,16 @@ describe('EntityCacheReducer', () => {
             });
         });
 
-        describe('SET_ENTITY_CACHE', () => {
+        describe('SET_NXA_ENTITY_CACHE', () => {
             it('should initialize cache', () => {
                 const cache = createInitialCache({
                     Hero: initialHeroes,
                     Villain: [{ key: 'DE', name: 'Dr. Evil' }],
                 });
 
-                const action = new SetEntityCache(cache);
+                const action = new NxaSetEntityCache(cache);
                 // const action = {  // equivalent
-                //   type: SET_ENTITY_CACHE,
+                //   type: SET_NXA_ENTITY_CACHE,
                 //   payload: cache
                 // };
 
@@ -324,7 +324,7 @@ describe('EntityCacheReducer', () => {
             });
 
             it('should clear the cache when set with empty object', () => {
-                const action = new SetEntityCache({});
+                const action = new NxaSetEntityCache({});
                 const state = entityCacheReducer(initialCache, action);
                 expect(Object.keys(state)).toEqual([]);
             });
@@ -338,7 +338,7 @@ describe('EntityCacheReducer', () => {
                 const newHeroes = [{ id: 42, name: 'Bobby' }];
                 const newCache = createInitialCache({ Hero: newHeroes });
 
-                const action = new SetEntityCache(newCache);
+                const action = new NxaSetEntityCache(newCache);
                 const state = entityCacheReducer(priorCache, action);
                 expect(state['Villain']).toBeUndefined('No villains');
 
@@ -350,8 +350,8 @@ describe('EntityCacheReducer', () => {
 
         describe('SAVE_ENTITIES', () => {
             it('should turn on loading flags for affected collections and nothing more when pessimistic', () => {
-                const changeSet = createTestChangeSet();
-                const action = new SaveEntities(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                const action = new NxaSaveEntities(NxaChangeSet, 'api/save', {
                     isOptimistic: false,
                 });
 
@@ -365,8 +365,8 @@ describe('EntityCacheReducer', () => {
             });
 
             it('should initialize an empty cache with entities when optimistic and turn on loading flags', () => {
-                const changeSet = createTestChangeSet();
-                const action = new SaveEntities(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                const action = new NxaSaveEntities(NxaChangeSet, 'api/save', {
                     isOptimistic: true,
                 });
 
@@ -386,8 +386,8 @@ describe('EntityCacheReducer', () => {
                 const initialEntities = createInitialSaveTestEntities();
                 let entityCache = createInitialCache(initialEntities);
 
-                const changeSet = createTestChangeSet();
-                const action = new SaveEntities(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                const action = new NxaSaveEntities(NxaChangeSet, 'api/save', {
                     isOptimistic: true,
                 });
 
@@ -424,8 +424,8 @@ describe('EntityCacheReducer', () => {
             const corid = 'CORID42';
 
             it('should not turn off loading flags if you do not specify collections', () => {
-                const changeSet = createTestChangeSet();
-                let action: Action = new SaveEntities(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                let action: Action = new NxaSaveEntities(NxaChangeSet, 'api/save', {
                     correlationId: corid,
                     isOptimistic: false,
                 });
@@ -434,14 +434,14 @@ describe('EntityCacheReducer', () => {
                 let entityCache = entityCacheReducer({}, action);
                 expectLoadingFlags(entityCache, true);
 
-                action = new SaveEntitiesCancel(corid, 'Test Cancel'); // no names so no flags turned off.
+                action = new NxaSaveEntitiesCancel(corid, 'Test Cancel'); // no names so no flags turned off.
                 entityCache = entityCacheReducer(entityCache, action);
                 expectLoadingFlags(entityCache, true);
             });
 
             it('should turn off loading flags for collections that you specify', () => {
-                const changeSet = createTestChangeSet();
-                let action: Action = new SaveEntities(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                let action: Action = new NxaSaveEntities(NxaChangeSet, 'api/save', {
                     correlationId: corid,
                     isOptimistic: false,
                 });
@@ -450,7 +450,7 @@ describe('EntityCacheReducer', () => {
                 let entityCache = entityCacheReducer({}, action);
                 expectLoadingFlags(entityCache, true);
 
-                action = new SaveEntitiesCancel(corid, 'Test Cancel', ['Hero', 'Fool']);
+                action = new NxaSaveEntitiesCancel(corid, 'Test Cancel', ['Hero', 'Fool']);
                 entityCache = entityCacheReducer(entityCache, action);
                 expectLoadingFlags(entityCache, false, ['Hero', 'Fool']);
                 expectLoadingFlags(entityCache, true, ['Knave', 'Villain']);
@@ -459,8 +459,8 @@ describe('EntityCacheReducer', () => {
 
         describe('SAVE_ENTITIES_SUCCESS', () => {
             it('should initialize an empty cache with entities when pessimistic', () => {
-                const changeSet = createTestChangeSet();
-                const action = new SaveEntitiesSuccess(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                const action = new NxaSaveEntitiesSuccess(NxaChangeSet, 'api/save', {
                     isOptimistic: false,
                 });
 
@@ -480,8 +480,8 @@ describe('EntityCacheReducer', () => {
                 const initialEntities = createInitialSaveTestEntities();
                 let entityCache = createInitialCache(initialEntities);
 
-                const changeSet = createTestChangeSet();
-                const action = new SaveEntitiesSuccess(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                const action = new NxaSaveEntitiesSuccess(NxaChangeSet, 'api/save', {
                     isOptimistic: false,
                 });
 
@@ -517,8 +517,8 @@ describe('EntityCacheReducer', () => {
                 const initialEntities = createInitialSaveTestEntities();
                 let entityCache = createInitialCache(initialEntities);
 
-                const changeSet = createTestChangeSet();
-                const action = new SaveEntitiesSuccess(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                const action = new NxaSaveEntitiesSuccess(NxaChangeSet, 'api/save', {
                     isOptimistic: true,
                 });
 
@@ -554,27 +554,27 @@ describe('EntityCacheReducer', () => {
         describe('SAVE_ENTITIES_ERROR', () => {
             it('should turn loading flags off', () => {
                 // Begin as if saving optimistically
-                const changeSet = createTestChangeSet();
-                const saveAction = new SaveEntities(changeSet, 'api/save', {
+                const NxaChangeSet = createTestNxaChangeSet();
+                const saveAction = new NxaSaveEntities(NxaChangeSet, 'api/save', {
                     isOptimistic: true,
                 });
                 let entityCache = entityCacheReducer({}, saveAction);
 
                 expectLoadingFlags(entityCache, true);
 
-                const dsError = new DataServiceError(new Error('Test Error'), {
+                const dsError = new NxaDataServiceError(new Error('Test Error'), {
                     url: 'api/save',
                 } as any);
-                const errorAction = new SaveEntitiesError(dsError, saveAction);
+                const errorAction = new NxaSaveEntitiesError(dsError, saveAction);
                 entityCache = entityCacheReducer(entityCache, errorAction);
 
                 expectLoadingFlags(entityCache, false);
 
                 // Added entities remain in cache (if not on the server), with pending changeState
                 expect(entityCache['Hero'].ids).toEqual([42, 43], 'added Hero ids');
-                const heroChangeState = entityCache['Hero'].changeState;
-                expect(heroChangeState[42]).toBeDefined('Hero [42] has changeState');
-                expect(heroChangeState[43]).toBeDefined('Hero [43] has changeState');
+                const heroNxaChangeState = entityCache['Hero'].changeState;
+                expect(heroNxaChangeState[42]).toBeDefined('Hero [42] has changeState');
+                expect(heroNxaChangeState[43]).toBeDefined('Hero [43] has changeState');
             });
         });
     });
@@ -595,11 +595,11 @@ describe('EntityCacheReducer', () => {
                 },
                 {} as any
             ),
-        } as EntityCollection<T>;
+        } as NxaEntityCollection<T>;
     }
 
     function createInitialCache(entityMap: { [entityName: string]: any[] }) {
-        const cache: EntityCache = {};
+        const cache: NxaEntityCache = {};
         // tslint:disable-next-line:forin
         for (const entityName in entityMap) {
             const selectId =
@@ -636,26 +636,26 @@ describe('EntityCacheReducer', () => {
         return entities;
     }
 
-    function createTestChangeSet() {
-        const changeSet: ChangeSet = {
+    function createTestNxaChangeSet() {
+        const NxaChangeSet: NxaChangeSet = {
             changes: [
                 {
                     entityName: 'Hero',
-                    op: ChangeSetOperation.Add,
+                    op: NxaChangeSetOperation.Add,
                     entities: [
                         { id: 42, name: 'Hero 42' },
                         { id: 43, name: 'Hero 43', power: 'Power 43' },
                     ] as Hero[],
                 },
-                { entityName: 'Hero', op: ChangeSetOperation.Delete, entities: [3, 5] },
+                { entityName: 'Hero', op: NxaChangeSetOperation.Delete, entities: [3, 5] },
                 {
                     entityName: 'Villain',
-                    op: ChangeSetOperation.Delete,
+                    op: NxaChangeSetOperation.Delete,
                     entities: ['9'],
                 },
                 {
                     entityName: 'Villain',
-                    op: ChangeSetOperation.Add,
+                    op: NxaChangeSetOperation.Add,
                     entities: [
                         { key: '44', name: 'Villain 44' },
                         { key: '45', name: 'Villain 45', sin: 'Sin 45' },
@@ -663,12 +663,12 @@ describe('EntityCacheReducer', () => {
                 },
                 {
                     entityName: 'Fool',
-                    op: ChangeSetOperation.Update,
+                    op: NxaChangeSetOperation.Update,
                     entities: [{ id: 1, changes: { id: 1, skill: 'Updated Skill 1' } }],
                 },
                 {
                     entityName: 'Knave',
-                    op: ChangeSetOperation.Upsert,
+                    op: NxaChangeSetOperation.Upsert,
                     entities: [
                         { id: 6, name: 'Upsert Update Knave 6' },
                         { id: 66, name: 'Upsert Add Knave 66' },
@@ -676,17 +676,17 @@ describe('EntityCacheReducer', () => {
                 },
             ],
         };
-        return changeSet;
+        return NxaChangeSet;
     }
 
     /**
-     * Expect the loading flags of the named EntityCache collections to be in the `flag` state.
+     * Expect the loading flags of the named NxaEntityCache collections to be in the `flag` state.
      * @param entityCache cache to check
      * @param flag True if should be loading; false if should not be loading
      * @param entityNames names of collections to check; if undefined, check all collections
      */
     function expectLoadingFlags(
-        entityCache: EntityCache,
+        entityCache: NxaEntityCache,
         flag: boolean,
         entityNames?: string[]
     ) {

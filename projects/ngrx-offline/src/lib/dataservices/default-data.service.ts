@@ -10,22 +10,22 @@ import { catchError, delay, map, timeout } from 'rxjs/operators';
 
 import { Update } from '@ngrx/entity';
 
-import { DataServiceError } from './data-service-error';
-import { DefaultDataServiceConfig } from './default-data-service-config';
+import { NxaDataServiceError } from './data-service-error';
+import { NxaDefaultDataServiceConfig } from './default-data-service-config';
 import {
-    EntityCollectionDataService,
-    HttpMethods,
-    QueryParams,
-    RequestData,
+    NxaEntityCollectionDataService,
+    NxaHttpMethods,
+    NxaQueryParams,
+    NxaRequestData,
 } from './interfaces';
-import { HttpUrlGenerator } from './http-url-generator';
+import { NxaHttpUrlGenerator } from './http-url-generator';
 
 /**
  * A basic, generic entity data service
  * suitable for persistence of most entities.
  * Assumes a common REST-y web API
  */
-export class DefaultDataService<T> implements EntityCollectionDataService<T> {
+export class NxaDefaultDataService<T> implements NxaEntityCollectionDataService<T> {
     protected _name: string;
     protected delete404OK: boolean;
     protected entityName: string;
@@ -42,10 +42,10 @@ export class DefaultDataService<T> implements EntityCollectionDataService<T> {
     constructor(
         entityName: string,
         protected http: HttpClient,
-        protected httpUrlGenerator: HttpUrlGenerator,
-        config?: DefaultDataServiceConfig
+        protected httpUrlGenerator: NxaHttpUrlGenerator,
+        config?: NxaDefaultDataServiceConfig
     ) {
-        this._name = `${entityName} DefaultDataService`;
+        this._name = `${entityName} NxaDefaultDataService`;
         this.entityName = entityName;
         const {
             root = 'api',
@@ -92,7 +92,7 @@ export class DefaultDataService<T> implements EntityCollectionDataService<T> {
         return this.execute('GET', this.entityUrl + key, err);
     }
 
-    getWithQuery(queryParams: QueryParams | string): Observable<T[]> {
+    getWithQuery(queryParams: NxaQueryParams | string): Observable<T[]> {
         const qParams =
             typeof queryParams === 'string'
                 ? { fromString: queryParams }
@@ -118,12 +118,12 @@ export class DefaultDataService<T> implements EntityCollectionDataService<T> {
     }
 
     protected execute(
-        method: HttpMethods,
+        method: NxaHttpMethods,
         url: string,
         data?: any, // data, error, or undefined/null
         options?: any
     ): Observable<any> {
-        const req: RequestData = { method, url, data, options };
+        const req: NxaRequestData = { method, url, data, options };
 
         if (data instanceof Error) {
             return this.handleError(req)(data);
@@ -172,18 +172,18 @@ export class DefaultDataService<T> implements EntityCollectionDataService<T> {
         return result$.pipe(catchError(this.handleError(req)));
     }
 
-    private handleError(reqData: RequestData) {
+    private handleError(reqData: NxaRequestData) {
         return (err: any) => {
             const ok = this.handleDelete404(err, reqData);
             if (ok) {
                 return ok;
             }
-            const error = new DataServiceError(err, reqData);
+            const error = new NxaDataServiceError(err, reqData);
             return throwError(error);
         };
     }
 
-    private handleDelete404(error: HttpErrorResponse, reqData: RequestData) {
+    private handleDelete404(error: HttpErrorResponse, reqData: NxaRequestData) {
         if (
             error.status === 404 &&
             reqData.method === 'DELETE' &&
@@ -201,22 +201,22 @@ export class DefaultDataService<T> implements EntityCollectionDataService<T> {
  * Assumes a common REST-y web API
  */
 @Injectable()
-export class DefaultDataServiceFactory {
+export class NxaDefaultDataServiceFactory {
     constructor(
         protected http: HttpClient,
-        protected httpUrlGenerator: HttpUrlGenerator,
-        @Optional() protected config?: DefaultDataServiceConfig
+        protected httpUrlGenerator: NxaHttpUrlGenerator,
+        @Optional() protected config?: NxaDefaultDataServiceConfig
     ) {
         config = config || {};
         httpUrlGenerator.registerHttpResourceUrls(config.entityHttpResourceUrls);
     }
 
     /**
-     * Create a default {EntityCollectionDataService} for the given entity type
+     * Create a default {NxaEntityCollectionDataService} for the given entity type
      * @param entityName {string} Name of the entity type for this data service
      */
-    create<T>(entityName: string): EntityCollectionDataService<T> {
-        return new DefaultDataService<T>(
+    create<T>(entityName: string): NxaEntityCollectionDataService<T> {
+        return new NxaDefaultDataService<T>(
             entityName,
             this.http,
             this.httpUrlGenerator,

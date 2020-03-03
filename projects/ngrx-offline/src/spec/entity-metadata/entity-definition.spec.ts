@@ -1,4 +1,4 @@
-import { EntityMetadata, createEntityDefinition } from '../../lib';
+import { NxaEntityMetadata, createNxaEntityDefinition } from '../../lib';
 
 interface Hero {
     id: number;
@@ -16,22 +16,22 @@ const filter = <T>(entities: T[], pattern?: any) => entities;
 
 const selectIdForNonId = (entity: any) => entity.key;
 
-const HERO_METADATA: EntityMetadata<Hero> = {
+const HERO_METADATA: NxaEntityMetadata<Hero> = {
     entityName: 'Hero',
     sortComparer: sorter,
     filterFn: filter,
 };
 
-describe('EntityDefinition', () => {
-    let heroMetadata: EntityMetadata<Hero>;
+describe('NxaEntityDefinition', () => {
+    let heroMetadata: NxaEntityMetadata<Hero>;
 
-    describe('#createEntityDefinition', () => {
+    describe('#createNxaEntityDefinition', () => {
         beforeEach(() => {
             heroMetadata = { ...HERO_METADATA };
         });
 
         it('generates expected `initialState`', () => {
-            const def = createEntityDefinition(heroMetadata);
+            const def = createNxaEntityDefinition(heroMetadata);
             const initialState = def.initialState;
             expect(initialState).toEqual({
                 entityName: 'Hero',
@@ -50,7 +50,7 @@ describe('EntityDefinition', () => {
                 ...heroMetadata,
                 additionalCollectionState: { foo: 'foo' },
             };
-            const def = createEntityDefinition(metadata);
+            const def = createNxaEntityDefinition(metadata);
             const initialState = def.initialState;
             expect(initialState).toEqual(<any>{
                 entityName: 'Hero',
@@ -65,27 +65,27 @@ describe('EntityDefinition', () => {
         });
 
         it('creates default `selectId` on the definition when no metadata.selectId', () => {
-            const def = createEntityDefinition(heroMetadata);
+            const def = createNxaEntityDefinition(heroMetadata);
             expect(def.selectId({ id: 42 } as Hero)).toBe(42);
         });
 
         it('creates expected `selectId` on the definition when  metadata.selectId exists', () => {
-            const metadata: EntityMetadata = {
+            const metadata: NxaEntityMetadata = {
                 entityName: 'NonIdClass',
                 selectId: selectIdForNonId,
             };
-            const def = createEntityDefinition(metadata);
+            const def = createNxaEntityDefinition(metadata);
             expect(def.selectId({ key: 'foo' })).toBe('foo');
         });
 
         it('sets `sortComparer` to false if not in metadata', () => {
             delete heroMetadata.sortComparer;
-            const def = createEntityDefinition(heroMetadata);
+            const def = createNxaEntityDefinition(heroMetadata);
             expect(def.metadata.sortComparer).toBe(false);
         });
 
         it('sets `entityDispatchOptions to {} if not in metadata', () => {
-            const def = createEntityDefinition(heroMetadata);
+            const def = createNxaEntityDefinition(heroMetadata);
             expect(def.entityDispatcherOptions).toEqual({});
         });
 
@@ -95,13 +95,13 @@ describe('EntityDefinition', () => {
                 optimisticUpdate: false,
             };
             heroMetadata.entityDispatcherOptions = options;
-            const def = createEntityDefinition(heroMetadata);
+            const def = createNxaEntityDefinition(heroMetadata);
             expect(def.entityDispatcherOptions).toBe(options);
         });
 
         it('throws error if missing `entityName`', () => {
-            const metadata: EntityMetadata = <any>{};
-            expect(() => createEntityDefinition(metadata)).toThrowError(/entityName/);
+            const metadata: NxaEntityMetadata = <any>{};
+            expect(() => createNxaEntityDefinition(metadata)).toThrowError(/entityName/);
         });
     });
 });

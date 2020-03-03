@@ -1,19 +1,19 @@
 import { InjectionToken } from '@angular/core';
 import { MetaReducer } from '@ngrx/store';
-import { EntityCache } from './entity-cache';
+import { NxaEntityCache } from './entity-cache';
 
-export const ENTITY_CACHE_NAME = 'entityCache';
-export const ENTITY_CACHE_NAME_TOKEN = new InjectionToken<string>(
+export const NXA_ENTITY_CACHE_NAME = 'entityCache';
+export const NXA_ENTITY_CACHE_NAME_TOKEN = new InjectionToken<string>(
     '@@ngrx/action/entity-cache-name'
 );
 
-export const ENTITY_CACHE_META_REDUCERS = new InjectionToken<
+export const NXA_ENTITY_CACHE_META_REDUCERS = new InjectionToken<
     MetaReducer<any, any>[]
 >('@@ngrx/action/entity-cache-meta-reducers');
-export const ENTITY_COLLECTION_META_REDUCERS = new InjectionToken<
+export const NXA_ENTITY_COLLECTION_META_REDUCERS = new InjectionToken<
     MetaReducer<any, any>[]
 >('@@ngrx/action/entity-collection-meta-reducers');
 
-export const INITIAL_ENTITY_CACHE_STATE = new InjectionToken<
-    EntityCache | (() => EntityCache)
+export const INITIAL_NXA_ENTITY_CACHE_STATE = new InjectionToken<
+    NxaEntityCache | (() => NxaEntityCache)
 >('@@ngrx/action/initial-entity-cache-state');

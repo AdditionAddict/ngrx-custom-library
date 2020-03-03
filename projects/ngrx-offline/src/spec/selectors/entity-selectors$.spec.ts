@@ -2,24 +2,24 @@ import { Action, MemoizedSelector, Store } from '@ngrx/store';
 
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
-    EntityMetadata,
-    EntityCache,
-    EntitySelectors$Factory,
-    EntitySelectorsFactory,
-    createEntityCacheSelector,
-    ENTITY_CACHE_NAME,
-    EntityCollection,
-    EntityActionFactory,
-    EntityOp,
-    createEmptyEntityCollection,
-    PropsFilterFnFactory,
-    EntitySelectors$,
-    EntitySelectors,
+    NxaEntityMetadata,
+    NxaEntityCache,
+    NxaEntitySelectors$Factory,
+    NxaEntitySelectorsFactory,
+    createNxaEntityCacheSelector,
+    NXA_ENTITY_CACHE_NAME,
+    NxaEntityCollection,
+    NxaEntityActionFactory,
+    NxaEntityOp,
+    createEmptyNxaEntityCollection,
+    NxaPropsFilterFnFactory,
+    NxaEntitySelectors$,
+    NxaEntitySelectors,
 } from '../../lib';
 
-describe('EntitySelectors$', () => {
+describe('NxaEntitySelectors$', () => {
     /** HeroMetadata identifies extra collection state properties */
-    const heroMetadata: EntityMetadata<Hero> = {
+    const heroMetadata: NxaEntityMetadata<Hero> = {
         entityName: 'Hero',
         filterFn: nameFilter,
         additionalCollectionState: {
@@ -31,17 +31,17 @@ describe('EntitySelectors$', () => {
     /** As entityAdapter.initialState would create it */
     const emptyHeroCollection = createHeroState({ foo: 'foo', bar: 3.14 });
 
-    const villainMetadata: EntityMetadata<Villain> = {
+    const villainMetadata: NxaEntityMetadata<Villain> = {
         entityName: 'Villain',
         selectId: villain => villain.key,
     };
 
-    // Hero has a super-set of EntitySelectors$
-    describe('EntitySelectors$Factory.create (Hero)', () => {
+    // Hero has a super-set of NxaEntitySelectors$
+    describe('NxaEntitySelectors$Factory.create (Hero)', () => {
         // Some immutable cache states
-        const emptyCache: EntityCache = {};
+        const emptyCache: NxaEntityCache = {};
 
-        const initializedHeroCache: EntityCache = <any>{
+        const initializedHeroCache: NxaEntityCache = <any>{
             // The state of the HeroCollection in this test suite
             // as the EntityReducer might initialize it.
             Hero: emptyHeroCollection,
@@ -57,52 +57,52 @@ describe('EntitySelectors$', () => {
         let loading: boolean;
 
         // The store during tests will be the entity cache
-        let store: Store<{ entityCache: EntityCache }>;
+        let store: Store<{ entityCache: NxaEntityCache }>;
 
         // Observable of state changes, which these tests simulate
-        let state$: BehaviorSubject<{ entityCache: EntityCache }>;
+        let state$: BehaviorSubject<{ entityCache: NxaEntityCache }>;
 
         let actions$: Subject<Action>;
 
-        const nextCacheState = (cache: EntityCache) =>
+        const nextCacheState = (cache: NxaEntityCache) =>
             state$.next({ entityCache: cache });
 
-        let heroCollectionSelectors: HeroSelectors;
+        let heroNxaCollectionSelectors: HeroSelectors;
 
-        let factory: EntitySelectors$Factory;
+        let factory: NxaEntitySelectors$Factory;
 
         beforeEach(() => {
             actions$ = new Subject<Action>();
             state$ = new BehaviorSubject({ entityCache: emptyCache });
-            store = new Store<{ entityCache: EntityCache }>(
+            store = new Store<{ entityCache: NxaEntityCache }>(
                 state$,
                 null as any,
                 null as any
             );
 
-            // EntitySelectors
+            // NxaEntitySelectors
             collectionCreator = jasmine.createSpyObj('entityCollectionCreator', [
                 'create',
             ]);
             collectionCreator.create.and.returnValue(emptyHeroCollection);
-            const entitySelectorsFactory = new EntitySelectorsFactory(
+            const entitySelectorsFactory = new NxaEntitySelectorsFactory(
                 collectionCreator
             );
-            heroCollectionSelectors = entitySelectorsFactory.create<
+            heroNxaCollectionSelectors = entitySelectorsFactory.create<
                 Hero,
                 HeroSelectors
             >(heroMetadata);
 
             // EntitySelectorFactory
-            factory = new EntitySelectors$Factory(
+            factory = new NxaEntitySelectors$Factory(
                 store,
                 actions$ as any,
-                createEntityCacheSelector(ENTITY_CACHE_NAME)
+                createNxaEntityCacheSelector(NXA_ENTITY_CACHE_NAME)
             );
 
             // listen for changes to the hero collection
             store
-                .select<HeroCollection>(ENTITY_CACHE_NAME as any, 'Hero')
+                .select<HeroCollection>(NXA_ENTITY_CACHE_NAME as any, 'Hero')
                 .subscribe((c: HeroCollection) => (collection = c));
         });
 
@@ -117,9 +117,9 @@ describe('EntitySelectors$', () => {
         it('can select$ the default empty collection when store collection is undefined ', () => {
             const selectors$ = factory.create<Hero, HeroSelectors$>(
                 'Hero',
-                heroCollectionSelectors
+                heroNxaCollectionSelectors
             );
-            let selectorCollection: EntityCollection<HeroCollection>;
+            let selectorCollection: NxaEntityCollection<HeroCollection>;
             selectors$.collection$.subscribe(c => (selectorCollection = c));
             expect(selectorCollection!).toBeDefined('selector collection');
             expect(selectorCollection!.entities).toEqual({}, 'entities');
@@ -134,7 +134,7 @@ describe('EntitySelectors$', () => {
         it('selectors$ emit default empty values when collection is undefined', () => {
             const selectors$ = factory.create<Hero, HeroSelectors$>(
                 'Hero',
-                heroCollectionSelectors
+                heroNxaCollectionSelectors
             );
 
             subscribeToSelectors(selectors$);
@@ -149,7 +149,7 @@ describe('EntitySelectors$', () => {
         it('selectors$ emit updated hero values', () => {
             const selectors$ = factory.create<Hero, HeroSelectors$>(
                 'Hero',
-                heroCollectionSelectors
+                heroNxaCollectionSelectors
             );
 
             subscribeToSelectors(selectors$);
@@ -195,7 +195,7 @@ describe('EntitySelectors$', () => {
             collectionCreator.create.and.returnValue(defaultHeroState);
             const selectors$ = factory.create<Hero, HeroSelectors$>(
                 'Hero',
-                heroCollectionSelectors
+                heroNxaCollectionSelectors
             ); // <- override default state
 
             subscribeToSelectors(selectors$);
@@ -223,46 +223,46 @@ describe('EntitySelectors$', () => {
             expect(entityCacheValues[1].Hero).toBeDefined('has Hero collection');
         });
 
-        it('`actions$` emits hero collection EntityActions and no other actions', () => {
+        it('`actions$` emits hero collection NxaEntityActions and no other actions', () => {
             const actionsReceived: Action[] = [];
             const selectors$ = factory.create<Hero, HeroSelectors$>(
                 'Hero',
-                heroCollectionSelectors
+                heroNxaCollectionSelectors
             );
-            const entityActions$ = selectors$.entityActions$;
-            entityActions$.subscribe(action => actionsReceived.push(action));
+            const NxaEntityActions$ = selectors$.NxaEntityActions$;
+            NxaEntityActions$.subscribe(action => actionsReceived.push(action));
 
-            const eaFactory = new EntityActionFactory();
+            const eaFactory = new NxaEntityActionFactory();
             actions$.next({ type: 'Generic action' });
-            // EntityAction but not for heroes
-            actions$.next(eaFactory.create('Villain', EntityOp.QUERY_ALL));
-            // Hero EntityAction
-            const heroAction = eaFactory.create('Hero', EntityOp.QUERY_ALL);
+            // NxaEntityAction but not for heroes
+            actions$.next(eaFactory.create('Villain', NxaEntityOp.QUERY_ALL));
+            // Hero NxaEntityAction
+            const heroAction = eaFactory.create('Hero', NxaEntityOp.QUERY_ALL);
             actions$.next(heroAction);
 
             expect(actionsReceived.length).toBe(1, 'only one hero action');
             expect(actionsReceived[0]).toBe(heroAction, 'expected hero action');
         });
 
-        it('`errors$` emits hero collection EntityAction errors and no other actions', () => {
+        it('`errors$` emits hero collection NxaEntityAction errors and no other actions', () => {
             const actionsReceived: Action[] = [];
             const selectors$ = factory.create<Hero, HeroSelectors$>(
                 'Hero',
-                heroCollectionSelectors
+                heroNxaCollectionSelectors
             );
             const errors$ = selectors$.errors$;
             errors$.subscribe(action => actionsReceived.push(action));
 
-            const eaFactory = new EntityActionFactory();
+            const eaFactory = new NxaEntityActionFactory();
             actions$.next({ type: 'Generic action' });
-            // EntityAction error but not for heroes
-            actions$.next(eaFactory.create('Villain', EntityOp.QUERY_ALL_ERROR));
-            // Hero EntityAction (but not an error)
-            actions$.next(eaFactory.create('Hero', EntityOp.QUERY_ALL));
-            // Hero EntityAction Error
+            // NxaEntityAction error but not for heroes
+            actions$.next(eaFactory.create('Villain', NxaEntityOp.QUERY_ALL_ERROR));
+            // Hero NxaEntityAction (but not an error)
+            actions$.next(eaFactory.create('Hero', NxaEntityOp.QUERY_ALL));
+            // Hero NxaEntityAction Error
             const heroErrorAction = eaFactory.create(
                 'Hero',
-                EntityOp.QUERY_ALL_ERROR
+                NxaEntityOp.QUERY_ALL_ERROR
             );
             actions$.next(heroErrorAction);
             expect(actionsReceived.length).toBe(1, 'only one hero action');
@@ -278,13 +278,13 @@ describe('EntitySelectors$', () => {
 
 function createHeroState(state: Partial<HeroCollection>): HeroCollection {
     return {
-        ...createEmptyEntityCollection<Hero>('Hero'),
+        ...createEmptyNxaEntityCollection<Hero>('Hero'),
         ...state,
     } as HeroCollection;
 }
 
 function nameFilter<T>(entities: T[], pattern: string) {
-    return PropsFilterFnFactory<any>(['name'])(entities, pattern);
+    return NxaPropsFilterFnFactory<any>(['name'])(entities, pattern);
 }
 
 /// Hero
@@ -294,19 +294,19 @@ interface Hero {
 }
 
 /** HeroCollection is EntityCollection<Hero> with extra collection properties */
-interface HeroCollection extends EntityCollection<Hero> {
+interface HeroCollection extends NxaEntityCollection<Hero> {
     foo: string;
     bar: number;
 }
 
 /** HeroSelectors identifies the extra selectors for the extra collection properties */
-interface HeroSelectors extends EntitySelectors<Hero> {
+interface HeroSelectors extends NxaEntitySelectors<Hero> {
     selectFoo: MemoizedSelector<Object, string>;
     selectBar: MemoizedSelector<Object, number>;
 }
 
 /** HeroSelectors identifies the extra selectors for the extra collection properties */
-interface HeroSelectors$ extends EntitySelectors$<Hero> {
+interface HeroSelectors$ extends NxaEntitySelectors$<Hero> {
     foo$: Observable<string> | Store<string>;
     bar$: Observable<number> | Store<number>;
 }

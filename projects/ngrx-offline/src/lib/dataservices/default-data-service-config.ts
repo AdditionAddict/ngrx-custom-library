@@ -1,10 +1,10 @@
-import { EntityHttpResourceUrls } from './http-url-generator';
+import { NxaEntityHttpResourceUrls } from './http-url-generator';
 
 /**
  * Optional configuration settings for an entity collection data service
- * such as the `DefaultDataService<T>`.
+ * such as the `NxaDefaultDataService<T>`.
  */
-export abstract class DefaultDataServiceConfig {
+export abstract class NxaDefaultDataServiceConfig {
     /**
      * root path of the web api.  may also include protocol, domain, and port
      * for remote api, e.g.: `'https://api-domain.com:8000/api/v1'` (default: 'api')
@@ -12,9 +12,9 @@ export abstract class DefaultDataServiceConfig {
     root?: string;
     /**
      * Known entity HttpResourceUrls.
-     * HttpUrlGenerator will create these URLs for entity types not listed here.
+     * NxaHttpUrlGenerator will create these URLs for entity types not listed here.
      */
-    entityHttpResourceUrls?: EntityHttpResourceUrls;
+    entityHttpResourceUrls?: NxaEntityHttpResourceUrls;
     /** Is a DELETE 404 really OK? (default: true) */
     delete404OK?: boolean;
     /** Simulate GET latency in a demo (default: 0) */

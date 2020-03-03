@@ -1,7 +1,7 @@
 import { EntityState, Dictionary } from '@ngrx/entity';
 
-/** Types of change in a ChangeState instance */
-export enum ChangeType {
+/** Types of change in a NxaChangeState instance */
+export enum NxaChangeType {
     /** The entity has not changed from its last known server state. */
     Unchanged = 0,
     /** The entity was added to the collection */
@@ -16,26 +16,26 @@ export enum ChangeType {
  * Change state for an entity with unsaved changes;
  * an entry in an EntityCollection.changeState map
  */
-export interface ChangeState<T> {
-    changeType: ChangeType;
+export interface NxaChangeState<T> {
+    changeType: NxaChangeType;
     originalValue?: T | undefined;
 }
 
 /**
- * Map of entity primary keys to entity ChangeStates.
+ * Map of entity primary keys to entity NxaChangeStates.
  * Each entry represents an entity with unsaved changes.
  */
-export type ChangeStateMap<T> = Dictionary<ChangeState<T>>;
+export type NxaChangeStateMap<T> = Dictionary<NxaChangeState<T>>;
 
 /**
  * Data and information about a collection of entities of a single type.
- * EntityCollections are maintained in the EntityCache within the ngrx store.
+ * EntityCollections are maintained in the NxaEntityCache within the ngrx store.
  */
-export interface EntityCollection<T = any> extends EntityState<T> {
+export interface NxaEntityCollection<T = any> extends EntityState<T> {
     /** Name of the entity type for this collection */
     entityName: string;
-    /** A map of ChangeStates, keyed by id, for entities with unsaved changes */
-    changeState: ChangeStateMap<T>;
+    /** A map of NxaChangeStates, keyed by id, for entities with unsaved changes */
+    changeState: NxaChangeStateMap<T>;
     /** The user's current collection filter pattern */
     filter?: string;
     /** true if collection was ever filled by QueryAll; forced false if cleared */

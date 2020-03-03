@@ -1,28 +1,28 @@
 // EntityCollectionReducer tests - tests of reducers for entity collections in the entity cache
-// Tests for EntityCache-level reducers (e.g., SET_ENTITY_CACHE) are in `entity-cache-reducer.spec.ts`
+// Tests for NxaEntityCache-level reducers (e.g., SET_NXA_ENTITY_CACHE) are in `entity-cache-reducer.spec.ts`
 import { Action } from '@ngrx/store';
 import { EntityAdapter, Update, IdSelector } from '@ngrx/entity';
 
 import {
-    EntityMetadataMap,
-    EntityActionFactory,
-    EntityOp,
-    EntityActionOptions,
-    EntityAction,
+    NxaEntityMetadataMap,
+    NxaEntityActionFactory,
+    NxaEntityOp,
+    NxaEntityActionOptions,
+    NxaEntityAction,
     toUpdateFactory,
-    EntityCollectionReducerRegistry,
-    EntityCache,
-    EntityCollectionCreator,
-    EntityDefinitionService,
-    EntityCollectionReducerMethodsFactory,
-    EntityCollectionReducerFactory,
-    EntityCacheReducerFactory,
+    NxaEntityCollectionReducerRegistry,
+    NxaEntityCache,
+    NxaEntityCollectionCreator,
+    NxaEntityDefinitionService,
+    NxaEntityCollectionReducerMethodsFactory,
+    NxaEntityCollectionReducerFactory,
+    NxaEntityCacheReducerFactory,
     EntityCollection,
-    ChangeStateMap,
-    EntityActionDataServiceError,
-    DataServiceError,
-    ChangeType,
-    ChangeState,
+    NxaChangeStateMap,
+    NxaEntityActionDataServiceError,
+    NxaDataServiceError,
+    NxaChangeType,
+    NxaChangeState,
     Logger,
 } from '../../lib';
 
@@ -40,46 +40,46 @@ class Villain {
     name!: string;
 }
 
-const metadata: EntityMetadataMap = {
+const metadata: NxaEntityMetadataMap = {
     Hero: {},
     Villain: { selectId: villain => villain.key },
 };
 
 describe('EntityCollectionReducer', () => {
     // action factory never changes in these tests
-    const entityActionFactory = new EntityActionFactory();
+    const nxaEntityActionFactory = new NxaEntityActionFactory();
     const createAction: (
         entityName: string,
-        op: EntityOp,
+        op: NxaEntityOp,
         data?: any,
-        options?: EntityActionOptions
-    ) => EntityAction = entityActionFactory.create.bind(entityActionFactory);
+        options?: NxaEntityActionOptions
+    ) => NxaEntityAction = nxaEntityActionFactory.create.bind(NxaEntityActionFactory);
 
     const toHeroUpdate = toUpdateFactory<Hero>();
 
-    let entityReducerRegistry: EntityCollectionReducerRegistry;
-    let entityReducer: (state: EntityCache, action: Action) => EntityCache;
+    let entityReducerRegistry: NxaEntityCollectionReducerRegistry;
+    let entityReducer: (state: NxaEntityCache, action: Action) => NxaEntityCache;
 
     let initialHeroes: Hero[];
-    let initialCache: EntityCache;
+    let initialCache: NxaEntityCache;
     let logger: Logger;
-    let collectionCreator: EntityCollectionCreator;
+    let collectionCreator: NxaEntityCollectionCreator;
 
     beforeEach(() => {
-        const eds = new EntityDefinitionService([metadata]);
-        collectionCreator = new EntityCollectionCreator(eds);
-        const collectionReducerMethodsFactory = new EntityCollectionReducerMethodsFactory(
+        const eds = new NxaEntityDefinitionService([metadata]);
+        collectionCreator = new NxaEntityCollectionCreator(eds);
+        const collectionReducerMethodsFactory = new NxaEntityCollectionReducerMethodsFactory(
             eds
         );
-        const collectionReducerFactory = new EntityCollectionReducerFactory(
+        const collectionReducerFactory = new NxaEntityCollectionReducerFactory(
             collectionReducerMethodsFactory
         );
         logger = jasmine.createSpyObj('Logger', ['error', 'log', 'warn']);
 
-        entityReducerRegistry = new EntityCollectionReducerRegistry(
+        entityReducerRegistry = new NxaEntityCollectionReducerRegistry(
             collectionReducerFactory
         );
-        const entityCacheReducerFactory = new EntityCacheReducerFactory(
+        const entityCacheReducerFactory = new NxaEntityCacheReducerFactory(
             collectionCreator,
             entityReducerRegistry,
             logger
@@ -93,7 +93,7 @@ describe('EntityCollectionReducer', () => {
         initialCache = createInitialCache({ Hero: initialHeroes });
     });
 
-    it('should ignore an action without an EntityOp', () => {
+    it('should ignore an action without an NxaEntityOp', () => {
         // should not throw
         const action = {
             type: 'does-not-matter',
@@ -108,7 +108,7 @@ describe('EntityCollectionReducer', () => {
 
     // #region queries
     describe('QUERY_ALL', () => {
-        const queryAction = createAction('Hero', EntityOp.QUERY_ALL);
+        const queryAction = createAction('Hero', NxaEntityOp.QUERY_ALL);
 
         it('QUERY_ALL sets loading flag but does not fill collection', () => {
             const state = entityReducer({}, queryAction);
@@ -121,7 +121,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_ALL_SUCCESS can create the initial collection', () => {
             let state = entityReducer({}, queryAction);
             const heroes: Hero[] = [{ id: 2, name: 'B' }, { id: 1, name: 'A' }];
-            const action = createAction('Hero', EntityOp.QUERY_ALL_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_ALL_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
             expect(collection.ids).toEqual(
@@ -135,7 +135,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_ALL_SUCCESS sets the loaded flag and clears loading flag', () => {
             let state = entityReducer({}, queryAction);
             const heroes: Hero[] = [{ id: 2, name: 'B' }, { id: 1, name: 'A' }];
-            const action = createAction('Hero', EntityOp.QUERY_ALL_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_ALL_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
             expect(collection.loaded).toBe(true, 'should be loaded');
@@ -144,7 +144,7 @@ describe('EntityCollectionReducer', () => {
 
         it('QUERY_ALL_ERROR clears loading flag and does not fill collection', () => {
             let state = entityReducer({}, queryAction);
-            const action = createAction('Hero', EntityOp.QUERY_ALL_ERROR);
+            const action = createAction('Hero', NxaEntityOp.QUERY_ALL_ERROR);
             state = entityReducer(state, action);
             const collection = state['Hero'];
             expect(collection.loading).toBe(false, 'should not be loading');
@@ -160,7 +160,7 @@ describe('EntityCollectionReducer', () => {
             ];
             const action = createAction(
                 'Villain',
-                EntityOp.QUERY_ALL_SUCCESS,
+                NxaEntityOp.QUERY_ALL_SUCCESS,
                 villains
             );
             state = entityReducer(state, action);
@@ -178,7 +178,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_ALL_SUCCESS can add to existing collection', () => {
             let state = entityReducer(initialCache, queryAction);
             const heroes: Hero[] = [{ id: 3, name: 'C' }];
-            const action = createAction('Hero', EntityOp.QUERY_ALL_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_ALL_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -191,7 +191,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_ALL_SUCCESS can update existing collection', () => {
             let state = entityReducer(initialCache, queryAction);
             const heroes: Hero[] = [{ id: 1, name: 'A+' }];
-            const action = createAction('Hero', EntityOp.QUERY_ALL_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_ALL_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -205,7 +205,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_ALL_SUCCESS can add and update existing collection', () => {
             let state = entityReducer(initialCache, queryAction);
             const heroes: Hero[] = [{ id: 3, name: 'C' }, { id: 1, name: 'A+' }];
-            const action = createAction('Hero', EntityOp.QUERY_ALL_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_ALL_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -228,7 +228,7 @@ describe('EntityCollectionReducer', () => {
             const queryResults: Hero[] = [{ id: 100, name: 'X' }, queriedUpdate];
             const action = createAction(
                 'Hero',
-                EntityOp.QUERY_ALL_SUCCESS,
+                NxaEntityOp.QUERY_ALL_SUCCESS,
                 queryResults
             );
             const collection = entityReducer(entityCache, action)['Hero'];
@@ -256,7 +256,7 @@ describe('EntityCollectionReducer', () => {
 
         it('QUERY_ALL_SUCCESS works when the query results are empty', () => {
             let state = entityReducer(initialCache, queryAction);
-            const action = createAction('Hero', EntityOp.QUERY_ALL_SUCCESS, []);
+            const action = createAction('Hero', NxaEntityOp.QUERY_ALL_SUCCESS, []);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -277,7 +277,7 @@ describe('EntityCollectionReducer', () => {
     });
 
     describe('QUERY_BY_KEY', () => {
-        const queryAction = createAction('Hero', EntityOp.QUERY_BY_KEY);
+        const queryAction = createAction('Hero', NxaEntityOp.QUERY_BY_KEY);
 
         it('QUERY_BY_KEY sets loading flag but does not touch the collection', () => {
             const state = entityReducer({}, queryAction);
@@ -290,7 +290,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_BY_KEY_SUCCESS can create the initial collection', () => {
             let state = entityReducer({}, queryAction);
             const hero: Hero = { id: 3, name: 'C' };
-            const action = createAction('Hero', EntityOp.QUERY_BY_KEY_SUCCESS, hero);
+            const action = createAction('Hero', NxaEntityOp.QUERY_BY_KEY_SUCCESS, hero);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -305,7 +305,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_BY_KEY_SUCCESS can add to existing collection', () => {
             let state = entityReducer(initialCache, queryAction);
             const hero: Hero = { id: 3, name: 'C' };
-            const action = createAction('Hero', EntityOp.QUERY_BY_KEY_SUCCESS, hero);
+            const action = createAction('Hero', NxaEntityOp.QUERY_BY_KEY_SUCCESS, hero);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -318,7 +318,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_BY_KEY_SUCCESS can update existing collection', () => {
             let state = entityReducer(initialCache, queryAction);
             const hero: Hero = { id: 1, name: 'A+' };
-            const action = createAction('Hero', EntityOp.QUERY_BY_KEY_SUCCESS, hero);
+            const action = createAction('Hero', NxaEntityOp.QUERY_BY_KEY_SUCCESS, hero);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -338,7 +338,7 @@ describe('EntityCollectionReducer', () => {
             const queriedUpdate = { ...updatedEntity, name: 'Queried update' };
             const action = createAction(
                 'Hero',
-                EntityOp.QUERY_BY_KEY_SUCCESS,
+                NxaEntityOp.QUERY_BY_KEY_SUCCESS,
                 queriedUpdate
             );
             const collection = entityReducer(entityCache, action)['Hero'];
@@ -369,7 +369,7 @@ describe('EntityCollectionReducer', () => {
             let state = entityReducer(initialCache, queryAction);
             const action = createAction(
                 'Hero',
-                EntityOp.QUERY_BY_KEY_SUCCESS,
+                NxaEntityOp.QUERY_BY_KEY_SUCCESS,
                 undefined
             );
             state = entityReducer(state, action);
@@ -388,7 +388,7 @@ describe('EntityCollectionReducer', () => {
     });
 
     describe('QUERY_MANY', () => {
-        const queryAction = createAction('Hero', EntityOp.QUERY_MANY);
+        const queryAction = createAction('Hero', NxaEntityOp.QUERY_MANY);
 
         it('QUERY_MANY sets loading flag but does not touch the collection', () => {
             const state = entityReducer({}, queryAction);
@@ -401,7 +401,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_MANY_SUCCESS can create the initial collection', () => {
             let state = entityReducer({}, queryAction);
             const heroes: Hero[] = [{ id: 3, name: 'C' }];
-            const action = createAction('Hero', EntityOp.QUERY_MANY_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_MANY_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -416,7 +416,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_MANY_SUCCESS can add to existing collection', () => {
             let state = entityReducer(initialCache, queryAction);
             const heroes: Hero[] = [{ id: 3, name: 'C' }];
-            const action = createAction('Hero', EntityOp.QUERY_MANY_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_MANY_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -429,7 +429,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_MANY_SUCCESS can update existing collection', () => {
             let state = entityReducer(initialCache, queryAction);
             const heroes: Hero[] = [{ id: 1, name: 'A+' }];
-            const action = createAction('Hero', EntityOp.QUERY_MANY_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_MANY_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -443,7 +443,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_MANY_SUCCESS can add and update existing collection', () => {
             let state = entityReducer(initialCache, queryAction);
             const heroes: Hero[] = [{ id: 3, name: 'C' }, { id: 1, name: 'A+' }];
-            const action = createAction('Hero', EntityOp.QUERY_MANY_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_MANY_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -466,7 +466,7 @@ describe('EntityCollectionReducer', () => {
             const queryResults: Hero[] = [{ id: 100, name: 'X' }, queriedUpdate];
             const action = createAction(
                 'Hero',
-                EntityOp.QUERY_MANY_SUCCESS,
+                NxaEntityOp.QUERY_MANY_SUCCESS,
                 queryResults
             );
             const collection = entityReducer(entityCache, action)['Hero'];
@@ -494,7 +494,7 @@ describe('EntityCollectionReducer', () => {
 
         it('QUERY_MANY_SUCCESS works when the query results are empty', () => {
             let state = entityReducer(initialCache, queryAction);
-            const action = createAction('Hero', EntityOp.QUERY_MANY_SUCCESS, []);
+            const action = createAction('Hero', NxaEntityOp.QUERY_MANY_SUCCESS, []);
             state = entityReducer(state, action);
             const collection = state['Hero'];
 
@@ -519,12 +519,12 @@ describe('EntityCollectionReducer', () => {
             const { entityCache } = createTestTrackedEntities();
             let cache = entityReducer(
                 entityCache,
-                createAction('Hero', EntityOp.SET_LOADING, true)
+                createAction('Hero', NxaEntityOp.SET_LOADING, true)
             );
             expect(cache['Hero'].loading).toBe(true, 'loading flag on at start');
             cache = entityReducer(
                 cache,
-                createAction('Hero', EntityOp.CANCEL_PERSIST, undefined, {
+                createAction('Hero', NxaEntityOp.CANCEL_PERSIST, undefined, {
                     correlationId: 42,
                 })
             );
@@ -534,7 +534,7 @@ describe('EntityCollectionReducer', () => {
     });
 
     describe('QUERY_LOAD', () => {
-        const queryAction = createAction('Hero', EntityOp.QUERY_LOAD);
+        const queryAction = createAction('Hero', NxaEntityOp.QUERY_LOAD);
 
         it('QUERY_LOAD sets loading flag but does not fill collection', () => {
             const state = entityReducer({}, queryAction);
@@ -547,7 +547,7 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_LOAD_SUCCESS fills collection, clears loading flag, and sets loaded flag', () => {
             let state = entityReducer({}, queryAction);
             const heroes: Hero[] = [{ id: 2, name: 'B' }, { id: 1, name: 'A' }];
-            const action = createAction('Hero', EntityOp.QUERY_LOAD_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_LOAD_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
             expect(collection.ids).toEqual(
@@ -572,18 +572,18 @@ describe('EntityCollectionReducer', () => {
                 { id: 1000, name: 'X' },
                 { ...updatedEntity, name: 'Queried update' },
             ];
-            const action = createAction('Hero', EntityOp.QUERY_LOAD_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_LOAD_SUCCESS, heroes);
             const collection: EntityCollection<Hero> = entityReducer(
                 entityCache,
                 action
             )['Hero'];
             const { ids, changeState } = collection;
-            expect(changeState).toEqual({} as ChangeStateMap<Hero>);
+            expect(changeState).toEqual({} as NxaChangeStateMap<Hero>);
             expect(ids).toEqual([1000, updatedEntity.id]); // no sort so in load order
         });
 
         it('QUERY_LOAD_SUCCESS replaces collection contents with queried entities', () => {
-            let state: EntityCache = {
+            let state: NxaEntityCache = {
                 Hero: {
                     entityName: 'Hero',
                     ids: [42],
@@ -596,7 +596,7 @@ describe('EntityCollectionReducer', () => {
             };
             state = entityReducer(state, queryAction);
             const heroes: Hero[] = [{ id: 2, name: 'B' }, { id: 1, name: 'A' }];
-            const action = createAction('Hero', EntityOp.QUERY_LOAD_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_LOAD_SUCCESS, heroes);
             state = entityReducer(state, action);
             const collection = state['Hero'];
             expect(collection.ids).toEqual(
@@ -609,7 +609,7 @@ describe('EntityCollectionReducer', () => {
 
         it('QUERY_LOAD_ERROR clears loading flag and does not fill collection', () => {
             let state = entityReducer({}, queryAction);
-            const action = createAction('Hero', EntityOp.QUERY_LOAD_ERROR);
+            const action = createAction('Hero', NxaEntityOp.QUERY_LOAD_ERROR);
             state = entityReducer(state, action);
             const collection = state['Hero'];
             expect(collection.loading).toBe(false, 'should not be loading');
@@ -625,7 +625,7 @@ describe('EntityCollectionReducer', () => {
             ];
             const action = createAction(
                 'Villain',
-                EntityOp.QUERY_LOAD_SUCCESS,
+                NxaEntityOp.QUERY_LOAD_SUCCESS,
                 villains
             );
             state = entityReducer(state, action);
@@ -645,7 +645,7 @@ describe('EntityCollectionReducer', () => {
     // #region saves
     describe('SAVE_ADD_ONE (Optimistic)', () => {
         function createTestAction(hero: Hero) {
-            return createAction('Hero', EntityOp.SAVE_ADD_ONE, hero, {
+            return createAction('Hero', NxaEntityOp.SAVE_ADD_ONE, hero, {
                 isOptimistic: true,
             });
         }
@@ -686,14 +686,14 @@ describe('EntityCollectionReducer', () => {
     describe('SAVE_ADD_ONE (Pessimistic)', () => {
         it('should only set the loading flag', () => {
             const addedEntity = { id: 42, name: 'New Guy' };
-            const action = createAction('Hero', EntityOp.SAVE_ADD_ONE, addedEntity);
+            const action = createAction('Hero', NxaEntityOp.SAVE_ADD_ONE, addedEntity);
             expectOnlySetLoadingFlag(action, initialCache);
         });
     });
 
     describe('SAVE_ADD_ONE_SUCCESS (Optimistic)', () => {
         function createTestAction(hero: Hero) {
-            return createAction('Hero', EntityOp.SAVE_ADD_ONE_SUCCESS, hero, {
+            return createAction('Hero', NxaEntityOp.SAVE_ADD_ONE_SUCCESS, hero, {
                 isOptimistic: true,
             });
         }
@@ -756,7 +756,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_ADD_ONE_SUCCESS (Pessimistic)', () => {
         function createTestAction(hero: Hero) {
-            return createAction('Hero', EntityOp.SAVE_ADD_ONE_SUCCESS, hero);
+            return createAction('Hero', NxaEntityOp.SAVE_ADD_ONE_SUCCESS, hero);
         }
 
         it('should add a new hero to collection', () => {
@@ -795,24 +795,24 @@ describe('EntityCollectionReducer', () => {
             const { entityCache, addedEntity } = createTestTrackedEntities();
             const originalAction = createAction(
                 'Hero',
-                EntityOp.SAVE_ADD_ONE,
+                NxaEntityOp.SAVE_ADD_ONE,
                 addedEntity
             );
-            const error: EntityActionDataServiceError = {
-                error: new DataServiceError(new Error('Test Error'), {
+            const error: NxaEntityActionDataServiceError = {
+                error: new NxaDataServiceError(new Error('Test Error'), {
                     method: 'POST',
                     url: 'foo',
                 }),
                 originalAction,
             };
-            const action = createAction('Hero', EntityOp.SAVE_ADD_MANY_ERROR, error);
+            const action = createAction('Hero', NxaEntityOp.SAVE_ADD_MANY_ERROR, error);
             expectOnlySetLoadingFlag(action, entityCache);
         });
     });
 
     describe('SAVE_ADD_MANY (Optimistic)', () => {
         function createTestAction(heroes: Hero[]) {
-            return createAction('Hero', EntityOp.SAVE_ADD_MANY, heroes, {
+            return createAction('Hero', NxaEntityOp.SAVE_ADD_MANY, heroes, {
                 isOptimistic: true,
             });
         }
@@ -865,14 +865,14 @@ describe('EntityCollectionReducer', () => {
                 { id: 13, name: 'New A', power: 'Strong' },
                 { id: 14, name: 'New B', power: 'Swift' },
             ];
-            const action = createAction('Hero', EntityOp.SAVE_ADD_MANY, heroes);
+            const action = createAction('Hero', NxaEntityOp.SAVE_ADD_MANY, heroes);
             expectOnlySetLoadingFlag(action, initialCache);
         });
     });
 
     describe('SAVE_ADD_MANY_SUCCESS (Optimistic)', () => {
         function createTestAction(heroes: Hero[]) {
-            return createAction('Hero', EntityOp.SAVE_ADD_MANY_SUCCESS, heroes, {
+            return createAction('Hero', NxaEntityOp.SAVE_ADD_MANY_SUCCESS, heroes, {
                 isOptimistic: true,
             });
         }
@@ -929,7 +929,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_ADD_MANY_SUCCESS (Pessimistic)', () => {
         function createTestAction(heroes: Hero[]) {
-            return createAction('Hero', EntityOp.SAVE_ADD_MANY_SUCCESS, heroes, {
+            return createAction('Hero', NxaEntityOp.SAVE_ADD_MANY_SUCCESS, heroes, {
                 isOptimistic: false,
             });
         }
@@ -984,17 +984,17 @@ describe('EntityCollectionReducer', () => {
     describe('SAVE_ADD_MANY_ERROR', () => {
         it('should only clear the loading flag', () => {
             const { entityCache, addedEntity } = createTestTrackedEntities();
-            const originalAction = createAction('Hero', EntityOp.SAVE_ADD_MANY, [
+            const originalAction = createAction('Hero', NxaEntityOp.SAVE_ADD_MANY, [
                 addedEntity,
             ]);
-            const error: EntityActionDataServiceError = {
-                error: new DataServiceError(new Error('Test Error'), {
+            const error: NxaEntityActionDataServiceError = {
+                error: new NxaDataServiceError(new Error('Test Error'), {
                     method: 'POST',
                     url: 'foo',
                 }),
                 originalAction,
             };
-            const action = createAction('Hero', EntityOp.SAVE_ADD_MANY_ERROR, error);
+            const action = createAction('Hero', NxaEntityOp.SAVE_ADD_MANY_ERROR, error);
             expectOnlySetLoadingFlag(action, entityCache);
         });
     });
@@ -1007,7 +1007,7 @@ describe('EntityCollectionReducer', () => {
                 'exists before delete'
             );
 
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, hero, {
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, hero, {
                 isOptimistic: true,
             });
 
@@ -1023,7 +1023,7 @@ describe('EntityCollectionReducer', () => {
                 'exists before delete'
             );
 
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, hero.id, {
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, hero.id, {
                 isOptimistic: true,
             });
 
@@ -1035,7 +1035,7 @@ describe('EntityCollectionReducer', () => {
         it('should immediately remove an unsaved added hero', () => {
             const { entityCache, addedEntity } = createTestTrackedEntities();
             const id = addedEntity.id;
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, id, {
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, id, {
                 isOptimistic: true,
             });
             const { entities, changeState } = entityReducer(entityCache, action)[
@@ -1049,7 +1049,7 @@ describe('EntityCollectionReducer', () => {
         it('should reclassify change of an unsaved updated hero to "deleted"', () => {
             const { entityCache, updatedEntity } = createTestTrackedEntities();
             const id = updatedEntity.id;
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, id, {
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, id, {
                 isOptimistic: true,
             });
             const collection = entityReducer(entityCache, action)['Hero'];
@@ -1057,9 +1057,9 @@ describe('EntityCollectionReducer', () => {
             expect(collection.entities[id]).toBeUndefined(
                 'updated entity removed from collection'
             );
-            const entityChangeState = collection.changeState[id];
-            expect(entityChangeState).toBeDefined('updated entity still tracked');
-            expect(entityChangeState!.changeType).toBe(ChangeType.Deleted);
+            const entityNxaChangeState = collection.changeState[id];
+            expect(entityNxaChangeState).toBeDefined('updated entity still tracked');
+            expect(entityNxaChangeState!.changeType).toBe(NxaChangeType.Deleted);
         });
 
         it('should be ok when the id is not in the collection', () => {
@@ -1069,7 +1069,7 @@ describe('EntityCollectionReducer', () => {
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE,
+                NxaEntityOp.SAVE_DELETE_ONE,
                 1000, // id of entity that is not in the collection
                 { isOptimistic: true }
             );
@@ -1083,7 +1083,7 @@ describe('EntityCollectionReducer', () => {
     describe('SAVE_DELETE_ONE (Pessimistic)', () => {
         it('should NOT remove the existing hero', () => {
             const hero = initialHeroes[0];
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, hero);
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, hero);
 
             const state = entityReducer(initialCache, action);
             const collection = state['Hero'];
@@ -1094,7 +1094,7 @@ describe('EntityCollectionReducer', () => {
         it('should immediately remove an unsaved added hero', () => {
             const { entityCache, addedEntity } = createTestTrackedEntities();
             const id = addedEntity.id;
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, id);
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, id);
             const { entities, changeState } = entityReducer(entityCache, action)[
                 'Hero'
             ];
@@ -1106,15 +1106,15 @@ describe('EntityCollectionReducer', () => {
         it('should reclassify change of an unsaved updated hero to "deleted"', () => {
             const { entityCache, updatedEntity } = createTestTrackedEntities();
             const id = updatedEntity.id;
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, id);
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, id);
             const collection = entityReducer(entityCache, action)['Hero'];
 
             expect(collection.entities[id]).toBeDefined(
                 'updated entity still in collection'
             );
-            const entityChangeState = collection.changeState[id];
-            expect(entityChangeState).toBeDefined('updated entity still tracked');
-            expect(entityChangeState!.changeType).toBe(ChangeType.Deleted);
+            const entityNxaChangeState = collection.changeState[id];
+            expect(entityNxaChangeState).toBeDefined('updated entity still tracked');
+            expect(entityNxaChangeState!.changeType).toBe(NxaChangeType.Deleted);
         });
     });
 
@@ -1125,22 +1125,22 @@ describe('EntityCollectionReducer', () => {
             // the action that would have saved the delete
             const saveAction = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE,
+                NxaEntityOp.SAVE_DELETE_ONE,
                 removedEntity.id,
                 { isOptimistic: true }
             );
 
             const {
                 entities: initialEntities,
-                changeState: initialChangeState,
+                changeState: initialNxaChangeState,
             } = entityCache['Hero'];
-            expect(initialChangeState[removedEntity.id]).toBeDefined(
+            expect(initialNxaChangeState[removedEntity.id]).toBeDefined(
                 'removed is tracked before save success'
             );
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE_SUCCESS,
+                NxaEntityOp.SAVE_DELETE_ONE_SUCCESS,
                 removedEntity.id, // Pretend optimistically deleted this hero
                 { isOptimistic: true }
             );
@@ -1160,7 +1160,7 @@ describe('EntityCollectionReducer', () => {
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE_SUCCESS,
+                NxaEntityOp.SAVE_DELETE_ONE_SUCCESS,
                 1000, // id of entity that is not in the collection
                 { isOptimistic: true }
             );
@@ -1183,7 +1183,7 @@ describe('EntityCollectionReducer', () => {
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE_SUCCESS,
+                NxaEntityOp.SAVE_DELETE_ONE_SUCCESS,
                 hero.id
             );
 
@@ -1200,7 +1200,7 @@ describe('EntityCollectionReducer', () => {
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE_SUCCESS,
+                NxaEntityOp.SAVE_DELETE_ONE_SUCCESS,
                 1000
             );
 
@@ -1216,11 +1216,11 @@ describe('EntityCollectionReducer', () => {
             const { entityCache, removedEntity } = createTestTrackedEntities();
             const originalAction = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE,
+                NxaEntityOp.SAVE_DELETE_ONE,
                 removedEntity.id
             );
-            const error: EntityActionDataServiceError = {
-                error: new DataServiceError(new Error('Test Error'), {
+            const error: NxaEntityActionDataServiceError = {
+                error: new NxaDataServiceError(new Error('Test Error'), {
                     method: 'DELETE',
                     url: 'foo',
                 }),
@@ -1228,7 +1228,7 @@ describe('EntityCollectionReducer', () => {
             };
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE_ERROR,
+                NxaEntityOp.SAVE_DELETE_ONE_ERROR,
                 error
             );
             expectOnlySetLoadingFlag(action, entityCache);
@@ -1239,7 +1239,7 @@ describe('EntityCollectionReducer', () => {
             const initialEntities = initialCache['Hero'].entities;
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_ONE_ERROR,
+                NxaEntityOp.SAVE_DELETE_ONE_ERROR,
                 { id: 13, name: 'Deleted' }, // Pretend optimistically deleted this hero
                 { isOptimistic: true }
             );
@@ -1252,7 +1252,7 @@ describe('EntityCollectionReducer', () => {
 
         it('should NOT remove the hero', () => {
             const hero = initialHeroes[0];
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE_ERROR, hero);
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE_ERROR, hero);
 
             const state = entityReducer(initialCache, action);
             const collection = state['Hero'];
@@ -1273,7 +1273,7 @@ describe('EntityCollectionReducer', () => {
                 'heroes[1] exists before delete'
             );
 
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_MANY, ids, {
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_MANY, ids, {
                 isOptimistic: true,
             });
 
@@ -1286,7 +1286,7 @@ describe('EntityCollectionReducer', () => {
         it('should immediately remove an unsaved added hero', () => {
             const { entityCache, addedEntity } = createTestTrackedEntities();
             const id = addedEntity.id;
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_MANY, [id], {
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_MANY, [id], {
                 isOptimistic: true,
             });
             const { entities, changeState } = entityReducer(entityCache, action)[
@@ -1299,7 +1299,7 @@ describe('EntityCollectionReducer', () => {
         it('should reclassify change of an unsaved updated hero to "deleted"', () => {
             const { entityCache, updatedEntity } = createTestTrackedEntities();
             const id = updatedEntity.id;
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_MANY, [id], {
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_MANY, [id], {
                 isOptimistic: true,
             });
             const collection = entityReducer(entityCache, action)['Hero'];
@@ -1307,9 +1307,9 @@ describe('EntityCollectionReducer', () => {
             expect(collection.entities[id]).toBeUndefined(
                 'updated entity removed from collection'
             );
-            const entityChangeState = collection.changeState[id];
-            expect(entityChangeState).toBeDefined('updated entity still tracked');
-            expect(entityChangeState!.changeType).toBe(ChangeType.Deleted);
+            const entityNxaChangeState = collection.changeState[id];
+            expect(entityNxaChangeState).toBeDefined('updated entity still tracked');
+            expect(entityNxaChangeState!.changeType).toBe(NxaChangeType.Deleted);
         });
 
         it('should be ok when the id is not in the collection', () => {
@@ -1319,7 +1319,7 @@ describe('EntityCollectionReducer', () => {
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY,
+                NxaEntityOp.SAVE_DELETE_MANY,
                 [1000], // id of entity that is not in the collection
                 { isOptimistic: true }
             );
@@ -1333,7 +1333,7 @@ describe('EntityCollectionReducer', () => {
     describe('SAVE_DELETE_MANY (Pessimistic)', () => {
         it('should NOT remove the existing hero', () => {
             const hero = initialHeroes[0];
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, hero);
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, hero);
 
             const state = entityReducer(initialCache, action);
             const collection = state['Hero'];
@@ -1344,7 +1344,7 @@ describe('EntityCollectionReducer', () => {
         it('should immediately remove an unsaved added hero', () => {
             const { entityCache, addedEntity } = createTestTrackedEntities();
             const id = addedEntity.id;
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, id);
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, id);
             const { entities, changeState } = entityReducer(entityCache, action)[
                 'Hero'
             ];
@@ -1356,15 +1356,15 @@ describe('EntityCollectionReducer', () => {
         it('should reclassify change of an unsaved updated hero to "deleted"', () => {
             const { entityCache, updatedEntity } = createTestTrackedEntities();
             const id = updatedEntity.id;
-            const action = createAction('Hero', EntityOp.SAVE_DELETE_ONE, id);
+            const action = createAction('Hero', NxaEntityOp.SAVE_DELETE_ONE, id);
             const collection = entityReducer(entityCache, action)['Hero'];
 
             expect(collection.entities[id]).toBeDefined(
                 'updated entity still in collection'
             );
-            const entityChangeState = collection.changeState[id];
-            expect(entityChangeState).toBeDefined('updated entity still tracked');
-            expect(entityChangeState!.changeType).toBe(ChangeType.Deleted);
+            const entityNxaChangeState = collection.changeState[id];
+            expect(entityNxaChangeState).toBeDefined('updated entity still tracked');
+            expect(entityNxaChangeState!.changeType).toBe(NxaChangeType.Deleted);
         });
     });
 
@@ -1377,7 +1377,7 @@ describe('EntityCollectionReducer', () => {
             } = createTestTrackedEntities();
             const ids = [removedEntity.id, updatedEntity.id];
 
-            let action = createAction('Hero', EntityOp.SAVE_DELETE_MANY, ids, {
+            let action = createAction('Hero', NxaEntityOp.SAVE_DELETE_MANY, ids, {
                 isOptimistic: true,
             });
 
@@ -1393,7 +1393,7 @@ describe('EntityCollectionReducer', () => {
 
             action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY_SUCCESS,
+                NxaEntityOp.SAVE_DELETE_MANY_SUCCESS,
                 ids, // After optimistically deleted this hero
                 { isOptimistic: true }
             );
@@ -1416,7 +1416,7 @@ describe('EntityCollectionReducer', () => {
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY_SUCCESS,
+                NxaEntityOp.SAVE_DELETE_MANY_SUCCESS,
                 [1000], // id of entity that is not in the collection
                 { isOptimistic: true }
             );
@@ -1445,7 +1445,7 @@ describe('EntityCollectionReducer', () => {
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY_SUCCESS,
+                NxaEntityOp.SAVE_DELETE_MANY_SUCCESS,
                 ids,
                 { isOptimistic: false }
             );
@@ -1465,7 +1465,7 @@ describe('EntityCollectionReducer', () => {
 
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY_SUCCESS,
+                NxaEntityOp.SAVE_DELETE_MANY_SUCCESS,
                 ids,
                 { isOptimistic: false }
             );
@@ -1485,11 +1485,11 @@ describe('EntityCollectionReducer', () => {
             const { entityCache, removedEntity } = createTestTrackedEntities();
             const originalAction = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY,
+                NxaEntityOp.SAVE_DELETE_MANY,
                 removedEntity.id
             );
-            const error: EntityActionDataServiceError = {
-                error: new DataServiceError(new Error('Test Error'), {
+            const error: NxaEntityActionDataServiceError = {
+                error: new NxaDataServiceError(new Error('Test Error'), {
                     method: 'DELETE',
                     url: 'foo',
                 }),
@@ -1497,7 +1497,7 @@ describe('EntityCollectionReducer', () => {
             };
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY_ERROR,
+                NxaEntityOp.SAVE_DELETE_MANY_ERROR,
                 error
             );
             expectOnlySetLoadingFlag(action, entityCache);
@@ -1508,7 +1508,7 @@ describe('EntityCollectionReducer', () => {
             const initialEntities = initialCache['Hero'].entities;
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY_ERROR,
+                NxaEntityOp.SAVE_DELETE_MANY_ERROR,
                 { id: 13, name: 'Deleted' }, // Pretend optimistically deleted this hero
                 { isOptimistic: true }
             );
@@ -1523,7 +1523,7 @@ describe('EntityCollectionReducer', () => {
             const hero = initialHeroes[0];
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_DELETE_MANY_ERROR,
+                NxaEntityOp.SAVE_DELETE_MANY_ERROR,
                 hero
             );
 
@@ -1536,7 +1536,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPDATE_ONE (Optimistic)', () => {
         function createTestAction(hero: Update<Hero>) {
-            return createAction('Hero', EntityOp.SAVE_UPDATE_ONE, hero, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPDATE_ONE, hero, {
                 isOptimistic: true,
             });
         }
@@ -1582,7 +1582,7 @@ describe('EntityCollectionReducer', () => {
         it('should only set the loading flag', () => {
             const updatedEntity = { ...initialHeroes[0], name: 'Updated' };
             const update = { id: updatedEntity.id, changes: updatedEntity };
-            const action = createAction('Hero', EntityOp.SAVE_UPDATE_ONE, update);
+            const action = createAction('Hero', NxaEntityOp.SAVE_UPDATE_ONE, update);
             expectOnlySetLoadingFlag(action, initialCache);
         });
     });
@@ -1591,7 +1591,7 @@ describe('EntityCollectionReducer', () => {
         function createTestAction(update: Update<Hero>, changed: boolean) {
             return createAction(
                 'Hero',
-                EntityOp.SAVE_UPDATE_ONE_SUCCESS,
+                NxaEntityOp.SAVE_UPDATE_ONE_SUCCESS,
                 { ...update, changed },
                 { isOptimistic: true }
             );
@@ -1657,7 +1657,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPDATE_ONE_SUCCESS (Pessimistic)', () => {
         function createTestAction(update: Update<Hero>, changed: boolean) {
-            return createAction('Hero', EntityOp.SAVE_UPDATE_ONE_SUCCESS, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPDATE_ONE_SUCCESS, {
                 ...update,
                 changed,
             });
@@ -1705,11 +1705,11 @@ describe('EntityCollectionReducer', () => {
             const { entityCache, updatedEntity } = createTestTrackedEntities();
             const originalAction = createAction(
                 'Hero',
-                EntityOp.SAVE_UPDATE_ONE,
+                NxaEntityOp.SAVE_UPDATE_ONE,
                 updatedEntity
             );
-            const error: EntityActionDataServiceError = {
-                error: new DataServiceError(new Error('Test Error'), {
+            const error: NxaEntityActionDataServiceError = {
+                error: new NxaDataServiceError(new Error('Test Error'), {
                     method: 'PUT',
                     url: 'foo',
                 }),
@@ -1717,7 +1717,7 @@ describe('EntityCollectionReducer', () => {
             };
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_UPDATE_ONE_ERROR,
+                NxaEntityOp.SAVE_UPDATE_ONE_ERROR,
                 error
             );
             expectOnlySetLoadingFlag(action, entityCache);
@@ -1726,7 +1726,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPDATE_MANY (Optimistic)', () => {
         function createTestAction(heroes: Update<Hero>[]) {
-            return createAction('Hero', EntityOp.SAVE_UPDATE_MANY, heroes, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPDATE_MANY, heroes, {
                 isOptimistic: true,
             });
         }
@@ -1779,19 +1779,19 @@ describe('EntityCollectionReducer', () => {
         it('should only set the loading flag', () => {
             const updatedEntity = { ...initialHeroes[0], name: 'Updated' };
             const update = { id: updatedEntity.id, changes: updatedEntity };
-            const action = createAction('Hero', EntityOp.SAVE_UPDATE_MANY, [update]);
+            const action = createAction('Hero', NxaEntityOp.SAVE_UPDATE_MANY, [update]);
             expectOnlySetLoadingFlag(action, initialCache);
         });
     });
 
     describe('SAVE_UPDATE_MANY_SUCCESS (Optimistic)', () => {
         function createInitialAction(updates: Update<Hero>[]) {
-            return createAction('Hero', EntityOp.SAVE_UPDATE_MANY, updates, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPDATE_MANY, updates, {
                 isOptimistic: true,
             });
         }
         function createTestAction(updates: Update<Hero>[]) {
-            return createAction('Hero', EntityOp.SAVE_UPDATE_MANY_SUCCESS, updates, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPDATE_MANY_SUCCESS, updates, {
                 isOptimistic: true,
             });
         }
@@ -1851,7 +1851,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPDATE_MANY_SUCCESS (Pessimistic)', () => {
         function createTestAction(updates: Update<Hero>[]) {
-            return createAction('Hero', EntityOp.SAVE_UPDATE_MANY_SUCCESS, updates, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPDATE_MANY_SUCCESS, updates, {
                 isOptimistic: false,
             });
         }
@@ -1899,11 +1899,11 @@ describe('EntityCollectionReducer', () => {
     describe('SAVE_UPDATE_MANY_ERROR', () => {
         it('should only clear the loading flag', () => {
             const { entityCache, updatedEntity } = createTestTrackedEntities();
-            const originalAction = createAction('Hero', EntityOp.SAVE_UPDATE_MANY, [
+            const originalAction = createAction('Hero', NxaEntityOp.SAVE_UPDATE_MANY, [
                 updatedEntity,
             ]);
-            const error: EntityActionDataServiceError = {
-                error: new DataServiceError(new Error('Test Error'), {
+            const error: NxaEntityActionDataServiceError = {
+                error: new NxaDataServiceError(new Error('Test Error'), {
                     method: 'PUT',
                     url: 'foo',
                 }),
@@ -1911,7 +1911,7 @@ describe('EntityCollectionReducer', () => {
             };
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_UPDATE_MANY_ERROR,
+                NxaEntityOp.SAVE_UPDATE_MANY_ERROR,
                 error
             );
             expectOnlySetLoadingFlag(action, entityCache);
@@ -1920,7 +1920,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPSERT_ONE (Optimistic)', () => {
         function createTestAction(hero: Hero) {
-            return createAction('Hero', EntityOp.SAVE_UPSERT_ONE, hero, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPSERT_ONE, hero, {
                 isOptimistic: true,
             });
         }
@@ -1963,7 +1963,7 @@ describe('EntityCollectionReducer', () => {
             const addedEntity = { id: 42, name: 'New Guy' };
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_UPSERT_ONE,
+                NxaEntityOp.SAVE_UPSERT_ONE,
                 addedEntity
             );
             expectOnlySetLoadingFlag(action, initialCache);
@@ -1972,7 +1972,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPSERT_ONE_SUCCESS (Optimistic)', () => {
         function createTestAction(hero: Hero) {
-            return createAction('Hero', EntityOp.SAVE_UPSERT_ONE_SUCCESS, hero, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPSERT_ONE_SUCCESS, hero, {
                 isOptimistic: true,
             });
         }
@@ -2034,7 +2034,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPSERT_ONE_SUCCESS (Pessimistic)', () => {
         function createTestAction(heroes: Hero) {
-            return createAction('Hero', EntityOp.SAVE_UPSERT_ONE_SUCCESS, heroes, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPSERT_ONE_SUCCESS, heroes, {
                 isOptimistic: false,
             });
         }
@@ -2081,11 +2081,11 @@ describe('EntityCollectionReducer', () => {
             const { entityCache, addedEntity } = createTestTrackedEntities();
             const originalAction = createAction(
                 'Hero',
-                EntityOp.SAVE_UPSERT_ONE,
+                NxaEntityOp.SAVE_UPSERT_ONE,
                 addedEntity
             );
-            const error: EntityActionDataServiceError = {
-                error: new DataServiceError(new Error('Test Error'), {
+            const error: NxaEntityActionDataServiceError = {
+                error: new NxaDataServiceError(new Error('Test Error'), {
                     method: 'POST',
                     url: 'foo',
                 }),
@@ -2093,7 +2093,7 @@ describe('EntityCollectionReducer', () => {
             };
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_UPSERT_ONE_ERROR,
+                NxaEntityOp.SAVE_UPSERT_ONE_ERROR,
                 error
             );
             expectOnlySetLoadingFlag(action, entityCache);
@@ -2102,7 +2102,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPSERT_MANY (Optimistic)', () => {
         function createTestAction(heroes: Hero[]) {
-            return createAction('Hero', EntityOp.SAVE_UPSERT_MANY, heroes, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPSERT_MANY, heroes, {
                 isOptimistic: true,
             });
         }
@@ -2155,14 +2155,14 @@ describe('EntityCollectionReducer', () => {
                 { id: 13, name: 'New A', power: 'Strong' },
                 { id: 14, name: 'New B', power: 'Swift' },
             ];
-            const action = createAction('Hero', EntityOp.SAVE_UPSERT_MANY, heroes);
+            const action = createAction('Hero', NxaEntityOp.SAVE_UPSERT_MANY, heroes);
             expectOnlySetLoadingFlag(action, initialCache);
         });
     });
 
     describe('SAVE_UPSERT_MANY_SUCCESS (Optimistic)', () => {
         function createTestAction(heroes: Hero[]) {
-            return createAction('Hero', EntityOp.SAVE_UPSERT_MANY_SUCCESS, heroes, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPSERT_MANY_SUCCESS, heroes, {
                 isOptimistic: true,
             });
         }
@@ -2235,7 +2235,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('SAVE_UPSERT_MANY_SUCCESS (Pessimistic)', () => {
         function createTestAction(heroes: Hero[]) {
-            return createAction('Hero', EntityOp.SAVE_UPSERT_MANY_SUCCESS, heroes, {
+            return createAction('Hero', NxaEntityOp.SAVE_UPSERT_MANY_SUCCESS, heroes, {
                 isOptimistic: false,
             });
         }
@@ -2286,12 +2286,12 @@ describe('EntityCollectionReducer', () => {
                 addedEntity,
                 updatedEntity,
             } = createTestTrackedEntities();
-            const originalAction = createAction('Hero', EntityOp.SAVE_UPSERT_MANY, [
+            const originalAction = createAction('Hero', NxaEntityOp.SAVE_UPSERT_MANY, [
                 addedEntity,
                 updatedEntity,
             ]);
-            const error: EntityActionDataServiceError = {
-                error: new DataServiceError(new Error('Test Error'), {
+            const error: NxaEntityActionDataServiceError = {
+                error: new NxaDataServiceError(new Error('Test Error'), {
                     method: 'POST',
                     url: 'foo',
                 }),
@@ -2299,7 +2299,7 @@ describe('EntityCollectionReducer', () => {
             };
             const action = createAction(
                 'Hero',
-                EntityOp.SAVE_UPSERT_MANY_ERROR,
+                NxaEntityOp.SAVE_UPSERT_MANY_ERROR,
                 error
             );
             expectOnlySetLoadingFlag(action, entityCache);
@@ -2311,7 +2311,7 @@ describe('EntityCollectionReducer', () => {
     // #region cache-only
     describe('ADD_ONE', () => {
         function createTestAction(hero: Hero) {
-            return createAction('Hero', EntityOp.ADD_ONE, hero);
+            return createAction('Hero', NxaEntityOp.ADD_ONE, hero);
         }
 
         it('should add a new hero to collection', () => {
@@ -2349,7 +2349,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('UPDATE_MANY', () => {
         function createTestAction(heroes: Update<Hero>[]) {
-            return createAction('Hero', EntityOp.UPDATE_MANY, heroes);
+            return createAction('Hero', NxaEntityOp.UPDATE_MANY, heroes);
         }
 
         it('should not add new hero to collection', () => {
@@ -2410,7 +2410,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('UPDATE_ONE', () => {
         function createTestAction(hero: Update<Hero>) {
-            return createAction('Hero', EntityOp.UPDATE_ONE, hero);
+            return createAction('Hero', NxaEntityOp.UPDATE_ONE, hero);
         }
 
         it('should not add a new hero to collection', () => {
@@ -2462,7 +2462,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('UPSERT_MANY', () => {
         function createTestAction(heroes: Hero[]) {
-            return createAction('Hero', EntityOp.UPSERT_MANY, heroes);
+            return createAction('Hero', NxaEntityOp.UPSERT_MANY, heroes);
         }
 
         it('should add new hero to collection', () => {
@@ -2510,7 +2510,7 @@ describe('EntityCollectionReducer', () => {
 
     describe('UPSERT_ONE', () => {
         function createTestAction(hero: Hero) {
-            return createAction('Hero', EntityOp.UPSERT_ONE, hero);
+            return createAction('Hero', NxaEntityOp.UPSERT_ONE, hero);
         }
 
         it('should add new hero to collection', () => {
@@ -2541,7 +2541,7 @@ describe('EntityCollectionReducer', () => {
         it('should set filter value with SET_FILTER', () => {
             const action = createAction(
                 'Hero',
-                EntityOp.SET_FILTER,
+                NxaEntityOp.SET_FILTER,
                 'test filter value'
             );
             const state = entityReducer(initialCache, action);
@@ -2553,7 +2553,7 @@ describe('EntityCollectionReducer', () => {
         it('should set loaded flag with SET_LOADED', () => {
             const beforeLoaded = initialCache['Hero'].loaded;
             const expectedLoaded = !beforeLoaded;
-            const action = createAction('Hero', EntityOp.SET_LOADED, expectedLoaded);
+            const action = createAction('Hero', NxaEntityOp.SET_LOADED, expectedLoaded);
             const state = entityReducer(initialCache, action);
             const collection = state['Hero'];
 
@@ -2565,7 +2565,7 @@ describe('EntityCollectionReducer', () => {
             const expectedLoading = !beforeLoading;
             const action = createAction(
                 'Hero',
-                EntityOp.SET_LOADING,
+                NxaEntityOp.SET_LOADING,
                 expectedLoading
             );
             const state = entityReducer(initialCache, action);
@@ -2585,10 +2585,10 @@ describe('EntityCollectionReducer', () => {
      ***/
 
     describe('reducer override', () => {
-        const queryLoadAction = createAction('Hero', EntityOp.QUERY_LOAD);
+        const queryLoadAction = createAction('Hero', NxaEntityOp.QUERY_LOAD);
 
         beforeEach(() => {
-            const eds = new EntityDefinitionService([metadata]);
+            const eds = new NxaEntityDefinitionService([metadata]);
             const def = eds.getDefinition<Hero>('Hero');
             const reducer = createReadOnlyHeroReducer(def.entityAdapter);
             // override regular Hero reducer
@@ -2603,7 +2603,7 @@ describe('EntityCollectionReducer', () => {
             expect(collection.loading).toBe(true, 'should be loading at first');
 
             const heroes: Hero[] = [{ id: 2, name: 'B' }, { id: 1, name: 'A' }];
-            const action = createAction('Hero', EntityOp.QUERY_LOAD_SUCCESS, heroes);
+            const action = createAction('Hero', NxaEntityOp.QUERY_LOAD_SUCCESS, heroes);
             state = entityReducer(state, action);
             collection = state['Hero'];
             expect(collection.ids).toEqual(
@@ -2618,7 +2618,7 @@ describe('EntityCollectionReducer', () => {
 
         it('QUERY_LOAD_ERROR clears loading flag and does not fill collection', () => {
             let state = entityReducer({}, queryLoadAction);
-            const action = createAction('Hero', EntityOp.QUERY_LOAD_ERROR);
+            const action = createAction('Hero', NxaEntityOp.QUERY_LOAD_ERROR);
             state = entityReducer(state, action);
             const collection = state['Hero'];
             expect(collection.loading).toBe(false, 'should not be loading');
@@ -2633,7 +2633,7 @@ describe('EntityCollectionReducer', () => {
             ];
             const action = createAction(
                 'Villain',
-                EntityOp.QUERY_LOAD_SUCCESS,
+                NxaEntityOp.QUERY_LOAD_SUCCESS,
                 villains
             );
             state = entityReducer(state, action);
@@ -2650,11 +2650,11 @@ describe('EntityCollectionReducer', () => {
         it('QUERY_MANY is illegal for "Hero" collection', () => {
             const initialState = entityReducer({}, queryLoadAction);
 
-            const action = createAction('Hero', EntityOp.QUERY_MANY);
+            const action = createAction('Hero', NxaEntityOp.QUERY_MANY);
             const state = entityReducer(initialState, action);
 
             // Expect override reducer to throw error and for
-            // EntityReducer to catch it and set the `EntityAction.payload.error`
+            // EntityReducer to catch it and set the `NxaEntityAction.payload.error`
             expect(action.payload.error!.message).toMatch(
                 /illegal operation for the "Hero" collection/
             );
@@ -2662,7 +2662,7 @@ describe('EntityCollectionReducer', () => {
         });
 
         it('QUERY_MANY still works for "Villain" collection', () => {
-            const action = createAction('Villain', EntityOp.QUERY_MANY);
+            const action = createAction('Villain', NxaEntityOp.QUERY_MANY);
             const state = entityReducer({}, action);
             const collection = state['Villain'];
             expect(collection.loading).toBe(true, 'should be loading');
@@ -2672,15 +2672,15 @@ describe('EntityCollectionReducer', () => {
         function createReadOnlyHeroReducer(adapter: EntityAdapter<Hero>) {
             return function heroReducer(
                 collection: EntityCollection<Hero>,
-                action: EntityAction
+                action: NxaEntityAction
             ): EntityCollection<Hero> {
                 switch (action.payload.entityOp) {
-                    case EntityOp.QUERY_LOAD:
+                    case NxaEntityOp.QUERY_LOAD:
                         return collection.loading
                             ? collection
                             : { ...collection, loading: true };
 
-                    case EntityOp.QUERY_LOAD_SUCCESS:
+                    case NxaEntityOp.QUERY_LOAD_SUCCESS:
                         return {
                             ...adapter.addAll(action.payload.data, collection),
                             loaded: true,
@@ -2688,7 +2688,7 @@ describe('EntityCollectionReducer', () => {
                             changeState: {},
                         };
 
-                    case EntityOp.QUERY_LOAD_ERROR: {
+                    case NxaEntityOp.QUERY_LOAD_ERROR: {
                         return collection.loading
                             ? { ...collection, loading: false }
                             : collection;
@@ -2725,7 +2725,7 @@ describe('EntityCollectionReducer', () => {
     }
 
     function createInitialCache(entityMap: { [entityName: string]: any[] }) {
-        const cache: EntityCache = {};
+        const cache: NxaEntityCache = {};
         // tslint:disable-next-line:forin
         for (const entityName in entityMap) {
             const selectId =
@@ -2752,18 +2752,18 @@ describe('EntityCollectionReducer', () => {
         ];
 
         const [removedEntity, preUpdatedEntity] = startingHeroes;
-        let action = createAction('Hero', EntityOp.ADD_ALL, startingHeroes);
+        let action = createAction('Hero', NxaEntityOp.ADD_ALL, startingHeroes);
         let entityCache = entityReducer({}, action);
 
         const addedEntity = { id: 42, name: 'E', power: 'Smart' };
-        action = createAction('Hero', EntityOp.ADD_ONE, addedEntity);
+        action = createAction('Hero', NxaEntityOp.ADD_ONE, addedEntity);
         entityCache = entityReducer(entityCache, action);
 
-        action = createAction('Hero', EntityOp.REMOVE_ONE, removedEntity.id);
+        action = createAction('Hero', NxaEntityOp.REMOVE_ONE, removedEntity.id);
         entityCache = entityReducer(entityCache, action);
 
         const updatedEntity = { ...preUpdatedEntity, name: 'A Updated' };
-        action = createAction('Hero', EntityOp.UPDATE_ONE, {
+        action = createAction('Hero', NxaEntityOp.UPDATE_ONE, {
             id: updatedEntity.id,
             changes: updatedEntity,
         });
@@ -2779,22 +2779,22 @@ describe('EntityCollectionReducer', () => {
         };
     }
 
-    /** Test for ChangeState with expected ChangeType */
-    function expectChangeType(
-        change: ChangeState<any>,
-        expectedChangeType: ChangeType,
+    /** Test for NxaChangeState with expected NxaChangeType */
+    function expectNxaChangeType(
+        change: NxaChangeState<any>,
+        expectedNxaChangeType: NxaChangeType,
         msg?: string
     ) {
-        expect(ChangeType[change.changeType]).toEqual(
-            ChangeType[expectedChangeType],
+        expect(NxaChangeType[change.changeType]).toEqual(
+            NxaChangeType[expectedNxaChangeType],
             msg
         );
     }
 
     /** Test that loading flag changed in expected way and the rest of the collection stayed the same. */
     function expectOnlySetLoadingFlag(
-        action: EntityAction,
-        entityCache: EntityCache
+        action: NxaEntityAction,
+        entityCache: NxaEntityCache
     ) {
         // Flag should be true when op starts, false after error or success
         const expectedLoadingFlag = !/error|success/i.test(action.payload.entityOp);

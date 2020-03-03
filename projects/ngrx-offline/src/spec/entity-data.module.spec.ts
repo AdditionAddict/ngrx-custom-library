@@ -15,35 +15,35 @@ import { Observable } from 'rxjs';
 import { map, skip } from 'rxjs/operators';
 
 import {
-    EntityCache,
-    ofEntityOp,
-    persistOps,
-    EntityAction,
-    EntityActionFactory,
+    NxaEntityCache,
+    ofNxaEntityOp,
+    persistNxaOps,
+    NxaEntityAction,
+    NxaEntityActionFactory,
     EntityDataModule,
-    EntityCacheEffects,
-    EntityEffects,
-    EntityOp,
-    EntityCollectionCreator,
+    NxaEntityCacheEffects,
+    NxaEntityEffects,
+    NxaEntityOp,
+    NxaEntityCollectionCreator,
     EntityCollection,
 } from '../lib';
 
 const TEST_ACTION = 'test/get-everything-succeeded';
 const EC_METAREDUCER_TOKEN = new InjectionToken<
-    MetaReducer<EntityCache, Action>
+    MetaReducer<NxaEntityCache, Action>
 >('EC MetaReducer');
 
 @Injectable()
-class TestEntityEffects {
+class TestNxaEntityEffects {
     test$: Observable<Action> = createEffect(() =>
         this.actions.pipe(
             // tap(action => console.log('test$ effect', action)),
-            ofEntityOp(persistOps),
+            ofNxaEntityOp(persistNxaOps),
             map(this.testHook)
         )
     );
 
-    testHook(action: EntityAction) {
+    testHook(action: NxaEntityAction) {
         return {
             type: 'test-action',
             payload: action, // the incoming action
@@ -51,7 +51,7 @@ class TestEntityEffects {
         };
     }
 
-    constructor(private actions: Actions<EntityAction>) { }
+    constructor(private actions: Actions<NxaEntityAction>) { }
 }
 
 class Hero {
@@ -73,13 +73,13 @@ const entityMetadata = {
 //////// Tests begin ////////
 
 describe('EntityDataModule', () => {
-    describe('with replaced EntityEffects', () => {
+    describe('with replaced NxaEntityEffects', () => {
         // factory never changes in these tests
-        const entityActionFactory = new EntityActionFactory();
+        const nxaEntityActionFactory = new NxaEntityActionFactory();
 
         let actions$: Actions;
-        let store: Store<EntityCache>;
-        let testEffects: TestEntityEffects;
+        let store: Store<NxaEntityCache>;
+        let testEffects: TestNxaEntityEffects;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -91,19 +91,19 @@ describe('EntityDataModule', () => {
                     }),
                 ],
                 providers: [
-                    { provide: EntityCacheEffects, useValue: {} },
-                    { provide: EntityEffects, useClass: TestEntityEffects },
+                    { provide: NxaEntityCacheEffects, useValue: {} },
+                    { provide: NxaEntityEffects, useClass: TestNxaEntityEffects },
                 ],
             });
 
             actions$ = TestBed.get(Actions);
             store = TestBed.get(Store);
 
-            testEffects = TestBed.get(EntityEffects);
+            testEffects = TestBed.get(NxaEntityEffects);
             spyOn(testEffects, 'testHook').and.callThrough();
         });
 
-        it('should invoke test effect with an EntityAction', () => {
+        it('should invoke test effect with an NxaEntityAction', () => {
             const actions: Action[] = [];
 
             // listen for actions after the next dispatched action
@@ -114,13 +114,13 @@ describe('EntityDataModule', () => {
                 )
                 .subscribe(act => actions.push(act));
 
-            const action = entityActionFactory.create('Hero', EntityOp.QUERY_ALL);
+            const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL);
             store.dispatch(action);
             expect(actions.length).toBe(1, 'expect one effect action');
             expect(actions[0].type).toBe('test-action');
         });
 
-        it('should not invoke test effect with non-EntityAction', () => {
+        it('should not invoke test effect with non-NxaEntityAction', () => {
             const actions: Action[] = [];
 
             // listen for actions after the next dispatched action
@@ -131,15 +131,15 @@ describe('EntityDataModule', () => {
         });
     });
 
-    describe('with EntityCacheMetaReducer', () => {
-        let cacheSelector$: Observable<EntityCache>;
-        let eaFactory: EntityActionFactory;
+    describe('with NxaEntityCacheMetaReducer', () => {
+        let cacheSelector$: Observable<NxaEntityCache>;
+        let eaFactory: NxaEntityActionFactory;
         let metaReducerLog: string[];
-        let store: Store<{ entityCache: EntityCache }>;
+        let store: Store<{ entityCache: NxaEntityCache }>;
 
-        function loggingEntityCacheMetaReducer(
-            reducer: ActionReducer<EntityCache>
-        ): ActionReducer<EntityCache> {
+        function loggingNxaEntityCacheMetaReducer(
+            reducer: ActionReducer<NxaEntityCache>
+        ): ActionReducer<NxaEntityCache> {
             return (state, action) => {
                 metaReducerLog.push(`MetaReducer saw "${action.type}"`);
                 return reducer(state, action);
@@ -156,38 +156,38 @@ describe('EntityDataModule', () => {
                     EntityDataModule.forRoot({
                         entityMetadata: entityMetadata,
                         entityCacheMetaReducers: [
-                            loggingEntityCacheMetaReducer,
+                            loggingNxaEntityCacheMetaReducer,
                             EC_METAREDUCER_TOKEN,
                         ],
                     }),
                 ],
                 providers: [
-                    { provide: EntityCacheEffects, useValue: {} },
-                    { provide: EntityEffects, useValue: {} },
+                    { provide: NxaEntityCacheEffects, useValue: {} },
+                    { provide: NxaEntityEffects, useValue: {} },
                     {
-                        // Here's how you add an EntityCache metareducer with an injected service
+                        // Here's how you add an NxaEntityCache metareducer with an injected service
                         provide: EC_METAREDUCER_TOKEN,
                         useFactory: entityCacheMetaReducerFactory,
-                        deps: [EntityCollectionCreator],
+                        deps: [NxaEntityCollectionCreator],
                     },
                 ],
             });
 
             store = TestBed.get(Store);
             cacheSelector$ = <any>store.select(state => state.entityCache);
-            eaFactory = TestBed.get(EntityActionFactory);
+            eaFactory = TestBed.get(NxaEntityActionFactory);
         });
 
         it('should log an ordinary entity action', () => {
-            const action = eaFactory.create('Hero', EntityOp.SET_LOADING);
+            const action = eaFactory.create('Hero', NxaEntityOp.SET_LOADING);
             store.dispatch(action);
             expect(metaReducerLog.join('|')).toContain(
-                EntityOp.SET_LOADING,
+                NxaEntityOp.SET_LOADING,
                 'logged entity action'
             );
         });
 
-        it('should respond to action handled by custom EntityCacheMetaReducer', () => {
+        it('should respond to action handled by custom NxaEntityCacheMetaReducer', () => {
             const data = {
                 Hero: [
                     { id: 2, name: 'B', power: 'Fast' },
@@ -226,10 +226,10 @@ describe('EntityDataModule', () => {
 
 /** Create the test entityCacheMetaReducer, injected in tests */
 function entityCacheMetaReducerFactory(
-    collectionCreator: EntityCollectionCreator
+    collectionCreator: NxaEntityCollectionCreator
 ) {
-    return (reducer: ActionReducer<EntityCache, Action>) => {
-        return (state: EntityCache, action: { type: string; payload?: any }) => {
+    return (reducer: ActionReducer<NxaEntityCache, Action>) => {
+        return (state: NxaEntityCache, action: { type: string; payload?: any }) => {
             switch (action.type) {
                 case TEST_ACTION: {
                     const mergeState = {

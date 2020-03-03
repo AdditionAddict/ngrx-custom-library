@@ -9,23 +9,23 @@ import { delay, filter, mergeMap, tap, withLatestFrom } from 'rxjs/operators';
 
 import { commandDispatchTest } from '../dispatchers/entity-dispatcher.spec';
 import {
-    EntityCollectionService,
-    EntityActionOptions,
-    PersistanceCanceled,
-    EntityDispatcherDefaultOptions,
-    EntityAction,
-    EntityActionFactory,
-    EntityCache,
-    EntityOp,
-    EntityMetadataMap,
+    NxaEntityCollectionService,
+    NxaEntityActionOptions,
+    NxaPersistanceCanceled,
+    NxaEntityDispatcherDefaultOptions,
+    NxaEntityAction,
+    NxaEntityActionFactory,
+    NxaEntityCache,
+    NxaEntityOp,
+    NxaEntityMetadataMap,
     EntityDataModule,
-    EntityCacheEffects,
-    EntityDataService,
-    EntityDispatcherFactory,
+    NxaEntityCacheEffects,
+    NxaEntityDataService,
+    NxaEntityDispatcherFactory,
     EntityServices,
-    OP_SUCCESS,
-    HttpMethods,
-    DataServiceError,
+    OP_NXA_SUCCESS,
+    NxaHttpMethods,
+    NxaDataServiceError,
     Logger,
 } from '../../lib';
 
@@ -42,10 +42,10 @@ describe('EntityCollectionService', () => {
         }
     });
 
-    // TODO: test the effect of MergeStrategy when there are entities in cache with changes
+    // TODO: test the effect of NxaMergeStrategy when there are entities in cache with changes
     // This concern is largely met by EntityChangeTracker tests but integration tests would be reassuring.
     describe('queries', () => {
-        let heroCollectionService: EntityCollectionService<Hero>;
+        let heroCollectionService: NxaEntityCollectionService<Hero>;
         let dataService: TestDataService;
         let reducedActions$Snoop: () => void;
 
@@ -90,7 +90,7 @@ describe('EntityCollectionService', () => {
 
         it('getAll observable should emit expected error when data service fails', (done: DoneFn) => {
             const httpError = { error: new Error('Test Failure'), status: 501 };
-            const error = makeDataServiceError('GET', httpError);
+            const error = makeNxaDataServiceError('GET', httpError);
             dataService.setErrorResponse('getAll', error);
             heroCollectionService.getAll().subscribe(expectErrorToBe(error, done));
         });
@@ -113,7 +113,7 @@ describe('EntityCollectionService', () => {
             // For test purposes, the following would have been effectively the same thing
             // const httpError = { error: new Error('Entity not found'), status: 404 };
 
-            const error = makeDataServiceError('GET', httpError);
+            const error = makeNxaDataServiceError('GET', httpError);
             dataService.setErrorResponse('getById', error);
             heroCollectionService
                 .getByKey(42)
@@ -134,7 +134,7 @@ describe('EntityCollectionService', () => {
 
         it('getWithQuery observable should emit expected error when data service fails', (done: DoneFn) => {
             const httpError = { error: new Error('Test Failure'), status: 501 };
-            const error = makeDataServiceError('GET', httpError);
+            const error = makeNxaDataServiceError('GET', httpError);
             dataService.setErrorResponse('getWithQuery', error);
             heroCollectionService
                 .getWithQuery({ name: 'foo' })
@@ -151,7 +151,7 @@ describe('EntityCollectionService', () => {
 
         it('load observable should emit expected error when data service fails', (done: DoneFn) => {
             const httpError = { error: new Error('Test Failure'), status: 501 };
-            const error = makeDataServiceError('GET', httpError);
+            const error = makeNxaDataServiceError('GET', httpError);
             dataService.setErrorResponse('getAll', error);
             heroCollectionService.load().subscribe(expectErrorToBe(error, done));
         });
@@ -162,7 +162,7 @@ describe('EntityCollectionService', () => {
         const hero2 = { id: 2, name: 'B' } as Hero;
         const heroes = [hero1, hero2];
 
-        let heroCollectionService: EntityCollectionService<Hero>;
+        let heroCollectionService: NxaEntityCollectionService<Hero>;
         let dataService: TestDataService;
         let reducedActions$Snoop: () => void;
 
@@ -182,13 +182,13 @@ describe('EntityCollectionService', () => {
 
             // Create the correlation id yourself to know which action to cancel.
             const correlationId = 'CRID007';
-            const options: EntityActionOptions = { correlationId };
+            const options: NxaEntityActionOptions = { correlationId };
             heroCollectionService.getAll(options).subscribe(
                 data => fail('should not have data but got data'),
                 error => {
-                    expect(error instanceof PersistanceCanceled).toBe(
+                    expect(error instanceof NxaPersistanceCanceled).toBe(
                         true,
-                        'is PersistanceCanceled'
+                        'is NxaPersistanceCanceled'
                     );
                     expect(error.message).toBe('Test cancel');
                     done();
@@ -205,7 +205,7 @@ describe('EntityCollectionService', () => {
             );
 
             const correlationId = 'CRID007';
-            const options: EntityActionOptions = { correlationId };
+            const options: NxaEntityActionOptions = { correlationId };
             heroCollectionService.getAll(options).subscribe(data => {
                 expect(data).toEqual(heroes);
                 done();
@@ -221,7 +221,7 @@ describe('EntityCollectionService', () => {
             );
 
             const correlationId = 'CRID007';
-            const options: EntityActionOptions = { correlationId };
+            const options: NxaEntityActionOptions = { correlationId };
             heroCollectionService
                 .getAll(options)
                 .subscribe(data => expect(data).toEqual(heroes), fail);
@@ -240,7 +240,7 @@ describe('EntityCollectionService', () => {
                 /* tslint:disable-next-line:no-use-before-declare */
                 providers: [
                     {
-                        provide: EntityDispatcherDefaultOptions,
+                        provide: NxaEntityDispatcherDefaultOptions,
                         useClass: OptimisticDispatcherDefaultOptions,
                     },
                 ],
@@ -256,7 +256,7 @@ describe('EntityCollectionService', () => {
                 /* tslint:disable-next-line:no-use-before-declare */
                 providers: [
                     {
-                        provide: EntityDispatcherDefaultOptions,
+                        provide: NxaEntityDispatcherDefaultOptions,
                         useClass: PessimisticDispatcherDefaultOptions,
                     },
                 ],
@@ -268,11 +268,11 @@ describe('EntityCollectionService', () => {
 
     /** Save tests to be run both optimistically and pessimistically */
     function combinedSaveTests(isOptimistic: boolean) {
-        let heroCollectionService: EntityCollectionService<Hero>;
+        let heroCollectionService: NxaEntityCollectionService<Hero>;
         let dataService: TestDataService;
         let expectOptimisticSuccess: (expect: boolean) => () => void;
         let reducedActions$Snoop: () => void;
-        let successActions$: Observable<EntityAction>;
+        let successActions$: Observable<NxaEntityAction>;
 
         beforeEach(() => {
             ({
@@ -296,7 +296,7 @@ describe('EntityCollectionService', () => {
         it('add() observable should emit expected error when data service fails', (done: DoneFn) => {
             const hero = { id: 1, name: 'A' } as Hero;
             const httpError = { error: new Error('Test Failure'), status: 501 };
-            const error = makeDataServiceError('PUT', httpError);
+            const error = makeNxaDataServiceError('PUT', httpError);
             dataService.setErrorResponse('add', error);
             heroCollectionService.add(hero).subscribe(expectErrorToBe(error, done));
         });
@@ -313,7 +313,7 @@ describe('EntityCollectionService', () => {
             // reducedActions$Snoop();
             let wasSkipped: boolean;
             successActions$.subscribe(
-                (act: EntityAction) => (wasSkipped = act.payload.skip === true)
+                (act: NxaEntityAction) => (wasSkipped = act.payload.skip === true)
             );
             const extra = () =>
                 expect(wasSkipped).toBe(true, 'expected to be skipped');
@@ -328,7 +328,7 @@ describe('EntityCollectionService', () => {
 
         it('delete() observable should emit expected error when data service fails', (done: DoneFn) => {
             const httpError = { error: new Error('Test Failure'), status: 501 };
-            const error = makeDataServiceError('DELETE', httpError);
+            const error = makeNxaDataServiceError('DELETE', httpError);
             dataService.setErrorResponse('delete', error);
             heroCollectionService.delete(42).subscribe(expectErrorToBe(error, done));
         });
@@ -365,7 +365,7 @@ describe('EntityCollectionService', () => {
             heroCollectionService.addAllToCache([preUpdate]); // populate cache
             const update = { ...preUpdate, name: 'Updated A' };
             const httpError = { error: new Error('Test Failure'), status: 501 };
-            const error = makeDataServiceError('PUT', httpError);
+            const error = makeNxaDataServiceError('PUT', httpError);
             dataService.setErrorResponse('update', error);
             heroCollectionService
                 .update(update)
@@ -413,22 +413,22 @@ describe('EntityCollectionService', () => {
     }
 
     describe('selectors$', () => {
-        let entityActionFactory: EntityActionFactory;
-        let heroCollectionService: EntityCollectionService<Hero>;
-        let store: Store<EntityCache>;
+        let nxaEntityActionFactory: NxaEntityActionFactory;
+        let heroCollectionService: NxaEntityCollectionService<Hero>;
+        let store: Store<NxaEntityCache>;
 
         function dispatchedAction() {
-            return <EntityAction>(<jasmine.Spy>store.dispatch).calls.argsFor(0)[0];
+            return <NxaEntityAction>(<jasmine.Spy>store.dispatch).calls.argsFor(0)[0];
         }
 
         beforeEach(() => {
             const setup = entityServicesSetup();
-            ({ entityActionFactory, heroCollectionService, store } = setup);
+            ({ nxaEntityActionFactory, heroCollectionService, store } = setup);
             spyOn(store, 'dispatch').and.callThrough();
         });
 
         it('can get collection from collection$', () => {
-            const action = entityActionFactory.create('Hero', EntityOp.ADD_ALL, [
+            const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.ADD_ALL, [
                 { id: 1, name: 'A' },
             ]);
             store.dispatch(action);
@@ -450,7 +450,7 @@ class Villain {
     name!: string;
 }
 
-const entityMetadata: EntityMetadataMap = {
+const entityMetadata: NxaEntityMetadataMap = {
     Hero: {},
     Villain: { selectId: villain => villain.key },
 };
@@ -467,20 +467,20 @@ function entityServicesSetup() {
             }),
         ],
         providers: [
-            { provide: EntityCacheEffects, useValue: {} },
+            { provide: NxaEntityCacheEffects, useValue: {} },
             /* tslint:disable-next-line:no-use-before-declare */
-            { provide: EntityDataService, useClass: TestDataService },
+            { provide: NxaEntityDataService, useClass: TestDataService },
             { provide: Logger, useValue: logger },
         ],
     });
 
     const actions$: Observable<Action> = TestBed.get(Actions);
-    const dataService: TestDataService = TestBed.get(EntityDataService);
-    const entityActionFactory: EntityActionFactory = TestBed.get(
-        EntityActionFactory
+    const dataService: TestDataService = TestBed.get(NxaEntityDataService);
+    const nxaEntityActionFactory: NxaEntityActionFactory = TestBed.get(
+        NxaEntityActionFactory
     );
-    const entityDispatcherFactory: EntityDispatcherFactory = TestBed.get(
-        EntityDispatcherFactory
+    const entityDispatcherFactory: NxaEntityDispatcherFactory = TestBed.get(
+        NxaEntityDispatcherFactory
     );
     const entityServices: EntityServices = TestBed.get(EntityServices);
     const heroCollectionService = entityServices.getEntityCollectionService<Hero>(
@@ -488,19 +488,19 @@ function entityServicesSetup() {
     );
     const reducedActions$: Observable<Action> =
         entityDispatcherFactory.reducedActions$;
-    const store: Store<EntityCache> = TestBed.get(Store);
-    const successActions$: Observable<EntityAction> = reducedActions$.pipe(
+    const store: Store<NxaEntityCache> = TestBed.get(Store);
+    const successActions$: Observable<NxaEntityAction> = reducedActions$.pipe(
         filter(
-            (act: any) => act.payload && act.payload.entityOp.endsWith(OP_SUCCESS)
+            (act: any) => act.payload && act.payload.entityOp.endsWith(OP_NXA_SUCCESS)
         )
     );
 
-    /** Returns fn that confirms EntityAction was (or was not Optimistic) after success */
+    /** Returns fn that confirms NxaEntityAction was (or was not Optimistic) after success */
     function expectOptimisticSuccess(expected: boolean) {
         let wasOptimistic: boolean;
         const msg = `${expected ? 'Optimistic' : 'Pessimistic'} save `;
         successActions$.subscribe(
-            (act: EntityAction) => (wasOptimistic = act.payload.isOptimistic === true)
+            (act: NxaEntityAction) => (wasOptimistic = act.payload.isOptimistic === true)
         );
         return () => expect(wasOptimistic).toBe(expected, msg);
     }
@@ -515,7 +515,7 @@ function entityServicesSetup() {
     return {
         actions$,
         dataService,
-        entityActionFactory,
+        nxaEntityActionFactory,
         entityServices,
         expectOptimisticSuccess,
         heroCollectionService,
@@ -557,10 +557,10 @@ function expectErrorToBe(expected: any, done: DoneFn, message?: string) {
     };
 }
 
-/** make error produced by the EntityDataService */
-function makeDataServiceError(
+/** make error produced by the NxaEntityDataService */
+function makeNxaDataServiceError(
     /** Http method for that action */
-    method: HttpMethods,
+    method: NxaHttpMethods,
     /** Http error from the web api */
     httpError?: any,
     /** Options sent with the request */
@@ -572,7 +572,7 @@ function makeDataServiceError(
     } else {
         httpError = { error: new Error('Test error'), status: 500, url };
     }
-    return new DataServiceError(httpError, { method, url, options });
+    return new NxaDataServiceError(httpError, { method, url, options });
 }
 
 @Injectable()

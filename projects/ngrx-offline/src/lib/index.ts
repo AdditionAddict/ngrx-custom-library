@@ -1,194 +1,194 @@
 // actions
-export { EntityActionFactory } from './actions/entity-action-factory';
-export { EntityActionGuard } from './actions/entity-action-guard';
-export { ofEntityOp, ofEntityType } from './actions/entity-action-operators';
+export { NxaEntityActionFactory } from './actions/entity-action-factory';
+export { NxaEntityActionGuard } from './actions/entity-action-guard';
+export { ofNxaEntityOp, ofNxaEntityType } from './actions/entity-action-operators';
 export {
-    EntityAction,
-    EntityActionOptions,
-    EntityActionPayload,
+    NxaEntityAction,
+    NxaEntityActionOptions,
+    NxaEntityActionPayload,
 } from './actions/entity-action';
 export {
-    EntityCacheAction,
-    EntityCacheQuerySet,
-    ClearCollections,
-    LoadCollections,
-    MergeQuerySet,
-    SetEntityCache,
-    SaveEntities,
-    SaveEntitiesCancel,
-    SaveEntitiesCanceled,
-    SaveEntitiesError,
-    SaveEntitiesSuccess,
+    NxaEntityCacheAction,
+    NxaEntityCacheQuerySet,
+    NxaClearCollections,
+    NxaLoadCollections,
+    NxaMergeQuerySet,
+    NxaSetEntityCache,
+    NxaSaveEntities,
+    NxaSaveEntitiesCancel,
+    NxaSaveEntitiesCanceled,
+    NxaSaveEntitiesError,
+    NxaSaveEntitiesSuccess,
 } from './actions/entity-cache-action';
 export {
-    ChangeSetOperation,
-    ChangeSetAdd,
-    ChangeSetDelete,
-    ChangeSetUpdate,
-    ChangeSetUpsert,
-    ChangeSetItem,
-    ChangeSet,
-    ChangeSetItemFactory,
-    changeSetItemFactory,
-    excludeEmptyChangeSetItems,
+    NxaChangeSetOperation,
+    NxaChangeSetAdd,
+    NxaChangeSetDelete,
+    NxaChangeSetUpdate,
+    NxaChangeSetUpsert,
+    NxaChangeSetItem,
+    NxaChangeSet,
+    NxaChangeSetItemFactory,
+    nxaChangeSetItemFactory,
+    excludeEmptyNxaChangeSetItems,
 } from './actions/entity-cache-change-set';
 
 export {
-    EntityOp,
-    OP_SUCCESS,
-    OP_ERROR,
-    makeErrorOp,
-    makeSuccessOp,
+    NxaEntityOp,
+    OP_NXA_SUCCESS,
+    OP_NXA_ERROR,
+    makeNxaErrorOp,
+    makeNxaSuccessOp,
 } from './actions/entity-op';
-export { MergeStrategy } from './actions/merge-strategy';
-export { UpdateResponseData } from './actions/update-response-data';
+export { NxaMergeStrategy } from './actions/merge-strategy';
+export { NxaUpdateResponseData } from './actions/update-response-data';
 
 // // dataservices
-export { DataServiceError } from './dataservices/data-service-error';
+export { NxaDataServiceError } from './dataservices/data-service-error';
 export {
-    EntityActionDataServiceError,
+    NxaEntityActionDataServiceError,
 } from './dataservices/data-service-error';
 export {
-    DefaultDataServiceConfig,
+    NxaDefaultDataServiceConfig,
 } from './dataservices/default-data-service-config';
-export { DefaultDataService } from './dataservices/default-data.service';
-export { DefaultDataServiceFactory } from './dataservices/default-data.service';
+export { NxaDefaultDataService } from './dataservices/default-data.service';
+export { NxaDefaultDataServiceFactory } from './dataservices/default-data.service';
 export {
-    EntityCacheDataService,
+    NxaEntityCacheDataService,
 } from './dataservices/entity-cache-data.service';
-export { EntityDataService } from './dataservices/entity-data.service';
-export { EntityHttpResourceUrls } from './dataservices/http-url-generator';
-export { HttpResourceUrls } from './dataservices/http-url-generator';
-export { HttpUrlGenerator } from './dataservices/http-url-generator';
-export { DefaultHttpUrlGenerator } from './dataservices/http-url-generator';
-export { normalizeRoot } from './dataservices/http-url-generator';
+export { NxaEntityDataService } from './dataservices/entity-data.service';
+export { NxaEntityHttpResourceUrls } from './dataservices/http-url-generator';
+export { NxaHttpResourceUrls } from './dataservices/http-url-generator';
+export { NxaHttpUrlGenerator } from './dataservices/http-url-generator';
+export { NxaDefaultHttpUrlGenerator } from './dataservices/http-url-generator';
+export { NxaNormalizeRoot } from './dataservices/http-url-generator';
 export {
-    EntityCollectionDataService,
-    HttpMethods,
-    RequestData,
-    QueryParams,
+    NxaEntityCollectionDataService,
+    NxaHttpMethods,
+    NxaRequestData,
+    NxaQueryParams,
 } from './dataservices/interfaces';
 export {
-    PersistenceResultHandler,
-    DefaultPersistenceResultHandler,
+    NxaPersistenceResultHandler,
+    DefaultNxaPersistenceResultHandler,
 } from './dataservices/persistence-result-handler.service';
 
 // // dispatchers
-export { EntityCacheDispatcher } from './dispatchers/entity-cache-dispatcher';
+export { NxaEntityCacheDispatcher } from './dispatchers/entity-cache-dispatcher';
 export {
-    EntityServerCommands,
-    EntityCacheCommands,
-    EntityCommands,
+    NxaEntityServerCommands,
+    NxaEntityCacheCommands,
+    NxaEntityCommands,
 } from './dispatchers/entity-commands';
-export { EntityDispatcherBase } from './dispatchers/entity-dispatcher-base';
+export { NxaEntityDispatcherBase } from './dispatchers/entity-dispatcher-base';
 export {
-    EntityDispatcherDefaultOptions,
+    NxaEntityDispatcherDefaultOptions,
 } from './dispatchers/entity-dispatcher-default-options';
 export {
-    EntityDispatcherFactory,
+    NxaEntityDispatcherFactory,
 } from './dispatchers/entity-dispatcher-factory';
 export {
-    EntityDispatcher,
-    PersistanceCanceled,
+    NxaEntityDispatcher,
+    NxaPersistanceCanceled,
 } from './dispatchers/entity-dispatcher';
 
 // // effects
-export { EntityCacheEffects } from './effects/entity-cache-effects';
-export { persistOps, EntityEffects } from './effects/entity-effects';
+export { NxaEntityCacheEffects } from './effects/entity-cache-effects';
+export { persistNxaOps, NxaEntityEffects } from './effects/entity-effects';
 
 // // entity-metadata
 export {
-    EntityDefinitions,
-    EntityDefinitionService,
+    NxaEntityDefinitions,
+    NxaEntityDefinitionService,
 } from './entity-metadata/entity-definition.service';
 export {
-    EntityDefinition,
-    createEntityDefinition,
+    NxaEntityDefinition,
+    createNxaEntityDefinition,
 } from './entity-metadata/entity-definition';
 export {
-    EntityFilterFn,
-    PropsFilterFnFactory,
+    NxaEntityFilterFn,
+    NxaPropsFilterFnFactory,
 } from './entity-metadata/entity-filters';
 export {
-    ENTITY_METADATA_TOKEN,
-    EntityMetadata,
-    EntityMetadataMap,
+    NXA_ENTITY_METADATA_TOKEN,
+    NxaEntityMetadata,
+    NxaEntityMetadataMap,
 } from './entity-metadata/entity-metadata';
 
 // // entity-services
 export {
-    EntityCollectionServiceBase,
+    NxaEntityCollectionServiceBase,
 } from './entity-services/entity-collection-service-base';
 export {
-    EntityCollectionServiceElements,
-    EntityCollectionServiceElementsFactory,
+    NxaEntityCollectionServiceElements,
+    NxaEntityCollectionServiceElementsFactory,
 } from './entity-services/entity-collection-service-elements-factory';
 export {
-    EntityCollectionServiceFactory,
+    NxaEntityCollectionServiceFactory,
 } from './entity-services/entity-collection-service-factory';
 export {
-    EntityCollectionService,
+    NxaEntityCollectionService,
 } from './entity-services/entity-collection-service';
-export { EntityServicesBase } from './entity-services/entity-services-base';
+export { NxaEntityServicesBase } from './entity-services/entity-services-base';
 export {
-    EntityServicesElements,
+    NxaEntityServicesElements,
 } from './entity-services/entity-services-elements';
 export {
-    EntityServices,
-    EntityCollectionServiceMap,
+    NxaEntityServices,
+    NxaEntityCollectionServiceMap,
 } from './entity-services/entity-services';
 
 // // reducers
 export {
-    ENTITY_CACHE_NAME,
-    ENTITY_CACHE_NAME_TOKEN,
-    ENTITY_CACHE_META_REDUCERS,
-    ENTITY_COLLECTION_META_REDUCERS,
-    INITIAL_ENTITY_CACHE_STATE,
+    NXA_ENTITY_CACHE_NAME,
+    NXA_ENTITY_CACHE_NAME_TOKEN,
+    NXA_ENTITY_CACHE_META_REDUCERS,
+    NXA_ENTITY_COLLECTION_META_REDUCERS,
+    INITIAL_NXA_ENTITY_CACHE_STATE,
 } from './reducers/constants';
-export { EntityCacheReducerFactory } from './reducers/entity-cache-reducer';
-export { EntityCache } from './reducers/entity-cache';
-export { EntityChangeTrackerBase } from './reducers/entity-change-tracker-base';
-export { EntityChangeTracker } from './reducers/entity-change-tracker';
+export { NxaEntityCacheReducerFactory } from './reducers/entity-cache-reducer';
+export { NxaEntityCache } from './reducers/entity-cache';
+export { NxaEntityChangeTrackerBase } from './reducers/entity-change-tracker-base';
+export { NxaEntityChangeTracker } from './reducers/entity-change-tracker';
 export {
-    EntityCollectionCreator,
-    createEmptyEntityCollection,
+    NxaEntityCollectionCreator,
+    createEmptyNxaEntityCollection,
 } from './reducers/entity-collection-creator';
 export {
-    EntityCollectionReducerMethodMap,
-    EntityCollectionReducerMethods,
-    EntityCollectionReducerMethodsFactory,
+    NxaEntityCollectionReducerMethodMap,
+    NxaEntityCollectionReducerMethods,
+    NxaEntityCollectionReducerMethodsFactory,
 } from './reducers/entity-collection-reducer-methods';
 export {
-    EntityCollectionReducers,
-    EntityCollectionReducerRegistry,
+    NxaEntityCollectionReducers,
+    NxaEntityCollectionReducerRegistry,
 } from './reducers/entity-collection-reducer-registry';
 export {
-    EntityCollectionReducer,
-    EntityCollectionReducerFactory,
+    NxaEntityCollectionReducer,
+    NxaEntityCollectionReducerFactory,
 } from './reducers/entity-collection-reducer';
 export {
-    ChangeType,
-    ChangeState,
-    ChangeStateMap,
-    EntityCollection,
+    NxaChangeType,
+    NxaChangeState,
+    NxaChangeStateMap,
+    NxaEntityCollection,
 } from './reducers/entity-collection';
 
 // // selectors
 export {
-    ENTITY_CACHE_SELECTOR_TOKEN,
-    entityCacheSelectorProvider,
-    EntityCacheSelector,
-    createEntityCacheSelector,
+    NXA_ENTITY_CACHE_SELECTOR_TOKEN,
+    nxaEntityCacheSelectorProvider,
+    NxaEntityCacheSelector,
+    createNxaEntityCacheSelector,
 } from './selectors/entity-cache-selector';
 export {
-    CollectionSelectors,
-    EntitySelectors,
-    EntitySelectorsFactory,
+    NxaCollectionSelectors,
+    NxaEntitySelectors,
+    NxaEntitySelectorsFactory,
 } from './selectors/entity-selectors';
 export {
-    EntitySelectors$,
-    EntitySelectors$Factory,
+    NxaEntitySelectors$,
+    NxaEntitySelectors$Factory,
 } from './selectors/entity-selectors$';
 
 // // Utils
@@ -210,7 +210,7 @@ export {
 
 // // EntityDataModule
 export {
-    EntityDataModuleConfig,
-    EntityDataModuleWithoutEffects,
+    NxaEntityDataModuleConfig,
+    NxaEntityDataModuleWithoutEffects,
 } from './entity-data-without-effects.module';
-export { EntityDataModule } from './entity-data.module';
+export { NxaEntityDataModule } from './entity-data.module';

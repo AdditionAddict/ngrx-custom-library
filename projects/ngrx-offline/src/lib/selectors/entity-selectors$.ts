@@ -6,24 +6,24 @@ import { Dictionary } from '@ngrx/entity';
 import { Observable } from 'rxjs';
 import { filter, shareReplay } from 'rxjs/operators';
 
-import { EntityAction } from '../actions/entity-action';
-import { OP_ERROR } from '../actions/entity-op';
-import { ofEntityType } from '../actions/entity-action-operators';
+import { NxaEntityAction } from '../actions/entity-action';
+import { OP_NXA_ERROR } from '../actions/entity-op';
+import { ofNxaEntityType } from '../actions/entity-action-operators';
 import {
-    ENTITY_CACHE_SELECTOR_TOKEN,
-    EntityCacheSelector,
+    NXA_ENTITY_CACHE_SELECTOR_TOKEN,
+    NxaEntityCacheSelector,
 } from './entity-cache-selector';
-import { EntitySelectors } from './entity-selectors';
-import { EntityCache } from '../reducers/entity-cache';
+import { NxaEntitySelectors } from './entity-selectors';
+import { NxaEntityCache } from '../reducers/entity-cache';
 import {
-    EntityCollection,
-    ChangeStateMap,
+    NxaEntityCollection,
+    NxaChangeStateMap,
 } from '../reducers/entity-collection';
 
 /**
  * The selector observable functions for entity collection members.
  */
-export interface EntitySelectors$<T> {
+export interface NxaEntitySelectors$<T> {
     /** Name of the entity collection for these selectors$ */
     readonly entityName: string;
 
@@ -31,7 +31,7 @@ export interface EntitySelectors$<T> {
     readonly [name: string]: Observable<any> | Store<any> | any;
 
     /** Observable of the collection as a whole */
-    readonly collection$: Observable<EntityCollection> | Store<EntityCollection>;
+    readonly collection$: Observable<NxaEntityCollection> | Store<NxaEntityCollection>;
 
     /** Observable of count of entities in the cached collection. */
     readonly count$: Observable<number> | Store<number>;
@@ -40,13 +40,13 @@ export interface EntitySelectors$<T> {
     readonly entities$: Observable<T[]> | Store<T[]>;
 
     /** Observable of actions related to this entity type. */
-    readonly entityActions$: Observable<EntityAction>;
+    readonly NxaEntityActions$: Observable<NxaEntityAction>;
 
     /** Observable of the map of entity keys to entities */
     readonly entityMap$: Observable<Dictionary<T>> | Store<Dictionary<T>>;
 
     /** Observable of error actions related to this entity type. */
-    readonly errors$: Observable<EntityAction>;
+    readonly errors$: Observable<NxaEntityAction>;
 
     /** Observable of the filter pattern applied by the entity collection's filter function */
     readonly filter$: Observable<string> | Store<string>;
@@ -63,35 +63,35 @@ export interface EntitySelectors$<T> {
     /** Observable true when a multi-entity query command is in progress. */
     readonly loading$: Observable<boolean> | Store<boolean>;
 
-    /** ChangeState (including original values) of entities with unsaved changes */
+    /** NxaChangeState (including original values) of entities with unsaved changes */
     readonly changeState$:
-    | Observable<ChangeStateMap<T>>
-    | Store<ChangeStateMap<T>>;
+    | Observable<NxaChangeStateMap<T>>
+    | Store<NxaChangeStateMap<T>>;
 }
 
-/** Creates observable EntitySelectors$ for entity collections. */
+/** Creates observable NxaEntitySelectors$ for entity collections. */
 @Injectable()
-export class EntitySelectors$Factory {
-    /** Observable of the EntityCache */
-    entityCache$: Observable<EntityCache>;
+export class NxaEntitySelectors$Factory {
+    /** Observable of the NxaEntityCache */
+    entityCache$: Observable<NxaEntityCache>;
 
-    /** Observable of error EntityActions (e.g. QUERY_ALL_ERROR) for all entity types */
-    entityActionErrors$: Observable<EntityAction>;
+    /** Observable of error NxaEntityActions (e.g. QUERY_ALL_ERROR) for all entity types */
+    NxaEntityActionErrors$: Observable<NxaEntityAction>;
 
     constructor(
         private store: Store<any>,
-        private actions: Actions<EntityAction>,
-        @Inject(ENTITY_CACHE_SELECTOR_TOKEN)
-        private selectEntityCache: EntityCacheSelector
+        private actions: Actions<NxaEntityAction>,
+        @Inject(NXA_ENTITY_CACHE_SELECTOR_TOKEN)
+        private selectNxaEntityCache: NxaEntityCacheSelector
     ) {
         // This service applies to the cache in ngrx/store named `cacheName`
-        this.entityCache$ = this.store.select(this.selectEntityCache);
-        this.entityActionErrors$ = actions.pipe(
+        this.entityCache$ = this.store.select(this.selectNxaEntityCache);
+        this.NxaEntityActionErrors$ = actions.pipe(
             filter(
-                (ea: EntityAction) =>
+                (ea: NxaEntityAction) =>
                     ea.payload &&
                     ea.payload.entityOp &&
-                    ea.payload.entityOp.endsWith(OP_ERROR)
+                    ea.payload.entityOp.endsWith(OP_NXA_ERROR)
             ),
             shareReplay(1)
         );
@@ -103,9 +103,9 @@ export class EntitySelectors$Factory {
      * @param entityName - is also the name of the collection.
      * @param selectors - selector functions for this collection.
      **/
-    create<T, S$ extends EntitySelectors$<T> = EntitySelectors$<T>>(
+    create<T, S$ extends NxaEntitySelectors$<T> = NxaEntitySelectors$<T>>(
         entityName: string,
-        selectors: EntitySelectors<T>
+        selectors: NxaEntitySelectors<T>
     ): S$ {
         const selectors$: { [prop: string]: any } = {
             entityName,
@@ -119,9 +119,9 @@ export class EntitySelectors$Factory {
                 selectors$[name$] = this.store.select((<any>selectors)[name]);
             }
         });
-        selectors$.entityActions$ = this.actions.pipe(ofEntityType(entityName));
-        selectors$.errors$ = this.entityActionErrors$.pipe(
-            ofEntityType(entityName)
+        selectors$.NxaEntityActions$ = this.actions.pipe(ofNxaEntityType(entityName));
+        selectors$.errors$ = this.NxaEntityActionErrors$.pipe(
+            ofNxaEntityType(entityName)
         );
         return selectors$ as S$;
     }

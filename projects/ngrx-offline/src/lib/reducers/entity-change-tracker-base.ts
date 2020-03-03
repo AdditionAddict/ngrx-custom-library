@@ -1,18 +1,18 @@
 import { EntityAdapter, IdSelector, Update } from '@ngrx/entity';
 
-import { ChangeType, EntityCollection } from './entity-collection';
+import { NxaChangeType, NxaEntityCollection } from './entity-collection';
 import { defaultSelectId } from '../utils/utilities';
-import { EntityChangeTracker } from './entity-change-tracker';
-import { MergeStrategy } from '../actions/merge-strategy';
-import { UpdateResponseData } from '../actions/update-response-data';
+import { NxaEntityChangeTracker } from './entity-change-tracker';
+import { NxaMergeStrategy } from '../actions/merge-strategy';
+import { NxaUpdateResponseData } from '../actions/update-response-data';
 
 /**
- * The default implementation of EntityChangeTracker with
+ * The default implementation of NxaEntityChangeTracker with
  * methods for tracking, committing, and reverting/undoing unsaved entity changes.
- * Used by EntityCollectionReducerMethods which should call tracker methods BEFORE modifying the collection.
- * See EntityChangeTracker docs.
+ * Used by NxaEntityCollectionReducerMethods which should call tracker methods BEFORE modifying the collection.
+ * See NxaEntityChangeTracker docs.
  */
-export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
+export class NxaEntityChangeTrackerBase<T> implements NxaEntityChangeTracker<T> {
     constructor(
         private adapter: EntityAdapter<T>,
         private selectId: IdSelector<T>
@@ -27,7 +27,7 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Harmless when there are no entity changes to commit.
      * @param collection The entity collection
      */
-    commitAll(collection: EntityCollection<T>): EntityCollection<T> {
+    commitAll(collection: NxaEntityCollection<T>): NxaEntityCollection<T> {
         return Object.keys(collection.changeState).length === 0
             ? collection
             : { ...collection, changeState: {} };
@@ -41,8 +41,8 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      */
     commitMany(
         entityOrIdList: (number | string | T)[],
-        collection: EntityCollection<T>
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>
+    ): NxaEntityCollection<T> {
         if (entityOrIdList == null || entityOrIdList.length === 0) {
             return collection; // nothing to commit
         }
@@ -73,8 +73,8 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      */
     commitOne(
         entityOrId: number | string | T,
-        collection: EntityCollection<T>
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>
+    ): NxaEntityCollection<T> {
         return entityOrId == null
             ? collection
             : this.commitMany([entityOrId], collection);
@@ -84,22 +84,22 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
 
     // #region merge query
     /**
-     * Merge query results into the collection, adjusting the ChangeState per the mergeStrategy.
+     * Merge query results into the collection, adjusting the NxaChangeState per the mergeStrategy.
      * @param entities Entities returned from querying the server.
      * @param collection The entity collection
      * @param [mergeStrategy] How to merge a queried entity when the corresponding entity in the collection has an unsaved change.
-     * Defaults to MergeStrategy.PreserveChanges.
+     * Defaults to NxaMergeStrategy.PreserveChanges.
      * @returns The merged EntityCollection.
      */
     mergeQueryResults(
         entities: T[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         return this.mergeServerUpserts(
             entities,
             collection,
-            MergeStrategy.PreserveChanges,
+            NxaMergeStrategy.PreserveChanges,
             mergeStrategy
         );
     }
@@ -107,70 +107,70 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
 
     // #region merge save results
     /**
-     * Merge result of saving new entities into the collection, adjusting the ChangeState per the mergeStrategy.
-     * The default is MergeStrategy.OverwriteChanges.
+     * Merge result of saving new entities into the collection, adjusting the NxaChangeState per the mergeStrategy.
+     * The default is NxaMergeStrategy.OverwriteChanges.
      * @param entities Entities returned from saving new entities to the server.
      * @param collection The entity collection
      * @param [mergeStrategy] How to merge a saved entity when the corresponding entity in the collection has an unsaved change.
-     * Defaults to MergeStrategy.OverwriteChanges.
+     * Defaults to NxaMergeStrategy.OverwriteChanges.
      * @returns The merged EntityCollection.
      */
     mergeSaveAdds(
         entities: T[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         return this.mergeServerUpserts(
             entities,
             collection,
-            MergeStrategy.OverwriteChanges,
+            NxaMergeStrategy.OverwriteChanges,
             mergeStrategy
         );
     }
 
     /**
      * Merge successful result of deleting entities on the server that have the given primary keys
-     * Clears the entity changeState for those keys unless the MergeStrategy is ignoreChanges.
+     * Clears the entity changeState for those keys unless the NxaMergeStrategy is ignoreChanges.
      * @param entities keys primary keys of the entities to remove/delete.
      * @param collection The entity collection
      * @param [mergeStrategy] How to adjust change tracking when the corresponding entity in the collection has an unsaved change.
-     * Defaults to MergeStrategy.OverwriteChanges.
+     * Defaults to NxaMergeStrategy.OverwriteChanges.
      * @returns The merged EntityCollection.
      */
     mergeSaveDeletes(
         keys: (number | string)[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         mergeStrategy =
-            mergeStrategy == null ? MergeStrategy.OverwriteChanges : mergeStrategy;
+            mergeStrategy == null ? NxaMergeStrategy.OverwriteChanges : mergeStrategy;
         // same logic for all non-ignore merge strategies: always clear (commit) the changes
         const deleteIds = keys as string[]; // make TypeScript happy
         collection =
-            mergeStrategy === MergeStrategy.IgnoreChanges
+            mergeStrategy === NxaMergeStrategy.IgnoreChanges
                 ? collection
                 : this.commitMany(deleteIds, collection);
         return this.adapter.removeMany(deleteIds, collection);
     }
 
     /**
-     * Merge result of saving updated entities into the collection, adjusting the ChangeState per the mergeStrategy.
-     * The default is MergeStrategy.OverwriteChanges.
+     * Merge result of saving updated entities into the collection, adjusting the NxaChangeState per the mergeStrategy.
+     * The default is NxaMergeStrategy.OverwriteChanges.
      * @param updateResponseData Entity response data returned from saving updated entities to the server.
      * @param collection The entity collection
      * @param [mergeStrategy] How to merge a saved entity when the corresponding entity in the collection has an unsaved change.
-     * Defaults to MergeStrategy.OverwriteChanges.
+     * Defaults to NxaMergeStrategy.OverwriteChanges.
      * @param [skipUnchanged] True means skip update if server didn't change it. False by default.
      * If the update was optimistic and the server didn't make more changes of its own
      * then the updates are already in the collection and shouldn't make them again.
      * @returns The merged EntityCollection.
      */
     mergeSaveUpdates(
-        updateResponseData: UpdateResponseData<T>[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy,
+        updateResponseData: NxaUpdateResponseData<T>[],
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy,
         skipUnchanged = false
-    ): EntityCollection<T> {
+    ): NxaEntityCollection<T> {
         if (updateResponseData == null || updateResponseData.length === 0) {
             return collection; // nothing to merge.
         }
@@ -178,15 +178,15 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
         let didMutate = false;
         let changeState = collection.changeState;
         mergeStrategy =
-            mergeStrategy == null ? MergeStrategy.OverwriteChanges : mergeStrategy;
+            mergeStrategy == null ? NxaMergeStrategy.OverwriteChanges : mergeStrategy;
         let updates: Update<T>[];
 
         switch (mergeStrategy) {
-            case MergeStrategy.IgnoreChanges:
+            case NxaMergeStrategy.IgnoreChanges:
                 updates = filterChanged(updateResponseData);
                 return this.adapter.updateMany(updates, collection);
 
-            case MergeStrategy.OverwriteChanges:
+            case NxaMergeStrategy.OverwriteChanges:
                 changeState = updateResponseData.reduce((chgState, update) => {
                     const oldId = update.id;
                     const change = chgState[oldId];
@@ -205,8 +205,8 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
                 updates = filterChanged(updateResponseData);
                 return this.adapter.updateMany(updates, collection);
 
-            case MergeStrategy.PreserveChanges: {
-                const updateableEntities = [] as UpdateResponseData<T>[];
+            case NxaMergeStrategy.PreserveChanges: {
+                const updateableEntities = [] as NxaUpdateResponseData<T>[];
                 changeState = updateResponseData.reduce((chgState, update) => {
                     const oldId = update.id;
                     const change = chgState[oldId];
@@ -217,18 +217,18 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
                             didMutate = true;
                         }
                         const newId = this.selectId(update.changes as T);
-                        const oldChangeState = change;
+                        const oldNxaChangeState = change;
                         // If the server changed the id, register the new "originalValue" under the new id
                         // and remove the change tracked under the old id.
                         if (newId !== oldId) {
                             delete chgState[oldId];
                         }
                         const newOrigValue = {
-                            ...(oldChangeState!.originalValue as any),
+                            ...(oldNxaChangeState!.originalValue as any),
                             ...(update.changes as any),
                         };
                         (chgState as any)[newId] = {
-                            ...oldChangeState,
+                            ...oldNxaChangeState,
                             originalValue: newOrigValue,
                         };
                     } else {
@@ -248,12 +248,12 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
          * (e.g., for optimistic saves because they updates are already in the current collection)
          * Strip off the `changed` property.
          * @responseData Entity response data from server.
-         * May be an UpdateResponseData<T>, a subclass of Update<T> with a 'changed' flag.
+         * May be an NxaUpdateResponseData<T>, a subclass of Update<T> with a 'changed' flag.
          * @returns Update<T> (without the changed flag)
          */
-        function filterChanged(responseData: UpdateResponseData<T>[]): Update<T>[] {
+        function filterChanged(responseData: NxaUpdateResponseData<T>[]): Update<T>[] {
             if (skipUnchanged === true) {
-                // keep only those updates that the server changed (knowable if is UpdateResponseData<T>)
+                // keep only those updates that the server changed (knowable if is NxaUpdateResponseData<T>)
                 responseData = responseData.filter(r => r.changed === true);
             }
             // Strip unchanged property from responseData, leaving just the pure Update<T>
@@ -263,23 +263,23 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
     }
 
     /**
-     * Merge result of saving upserted entities into the collection, adjusting the ChangeState per the mergeStrategy.
-     * The default is MergeStrategy.OverwriteChanges.
+     * Merge result of saving upserted entities into the collection, adjusting the NxaChangeState per the mergeStrategy.
+     * The default is NxaMergeStrategy.OverwriteChanges.
      * @param entities Entities returned from saving upserts to the server.
      * @param collection The entity collection
      * @param [mergeStrategy] How to merge a saved entity when the corresponding entity in the collection has an unsaved change.
-     * Defaults to MergeStrategy.OverwriteChanges.
+     * Defaults to NxaMergeStrategy.OverwriteChanges.
      * @returns The merged EntityCollection.
      */
     mergeSaveUpserts(
         entities: T[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         return this.mergeServerUpserts(
             entities,
             collection,
-            MergeStrategy.OverwriteChanges,
+            NxaMergeStrategy.OverwriteChanges,
             mergeStrategy
         );
     }
@@ -290,15 +290,15 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      *
      * @param entities Entities to merge
      * @param collection Collection into which entities are merged
-     * @param defaultMergeStrategy How to merge when action's MergeStrategy is unspecified
-     * @param [mergeStrategy] The action's MergeStrategy
+     * @param defaultNxaMergeStrategy How to merge when action's NxaMergeStrategy is unspecified
+     * @param [mergeStrategy] The action's NxaMergeStrategy
      */
     private mergeServerUpserts(
         entities: T[],
-        collection: EntityCollection<T>,
-        defaultMergeStrategy: MergeStrategy,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        defaultNxaMergeStrategy: NxaMergeStrategy,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         if (entities == null || entities.length === 0) {
             return collection; // nothing to merge.
         }
@@ -306,13 +306,13 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
         let didMutate = false;
         let changeState = collection.changeState;
         mergeStrategy =
-            mergeStrategy == null ? defaultMergeStrategy : mergeStrategy;
+            mergeStrategy == null ? defaultNxaMergeStrategy : mergeStrategy;
 
         switch (mergeStrategy) {
-            case MergeStrategy.IgnoreChanges:
+            case NxaMergeStrategy.IgnoreChanges:
                 return this.adapter.upsertMany(entities, collection);
 
-            case MergeStrategy.OverwriteChanges:
+            case NxaMergeStrategy.OverwriteChanges:
                 collection = this.adapter.upsertMany(entities, collection);
 
                 changeState = entities.reduce((chgState, entity) => {
@@ -330,7 +330,7 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
 
                 return didMutate ? { ...collection, changeState } : collection;
 
-            case MergeStrategy.PreserveChanges: {
+            case NxaMergeStrategy.PreserveChanges: {
                 const upsertEntities = [] as T[];
                 changeState = entities.reduce((chgState, entity) => {
                     const id = this.selectId(entity);
@@ -365,15 +365,15 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Does NOT add to the collection (the reducer's job).
      * @param entities The entities to add. They must all have their ids.
      * @param collection The entity collection
-     * @param [mergeStrategy] Track by default. Don't track if is MergeStrategy.IgnoreChanges.
+     * @param [mergeStrategy] Track by default. Don't track if is NxaMergeStrategy.IgnoreChanges.
      */
     trackAddMany(
         entities: T[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         if (
-            mergeStrategy === MergeStrategy.IgnoreChanges ||
+            mergeStrategy === NxaMergeStrategy.IgnoreChanges ||
             entities == null ||
             entities.length === 0
         ) {
@@ -394,7 +394,7 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
                     didMutate = true;
                     chgState = { ...chgState };
                 }
-                chgState[id] = { changeType: ChangeType.Added };
+                chgState[id] = { changeType: NxaChangeType.Added };
             }
             return chgState;
         }, collection.changeState);
@@ -406,14 +406,14 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Does NOT add to the collection (the reducer's job).
      * @param entity The entity to add. It must have an id.
      * @param collection The entity collection
-     * @param [mergeStrategy] Track by default. Don't track if is MergeStrategy.IgnoreChanges.
+     * @param [mergeStrategy] Track by default. Don't track if is NxaMergeStrategy.IgnoreChanges.
      * If not specified, implementation supplies a default strategy.
      */
     trackAddOne(
         entity: T,
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         return entity == null
             ? collection
             : this.trackAddMany([entity], collection, mergeStrategy);
@@ -424,15 +424,15 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Does NOT remove from the collection (the reducer's job).
      * @param keys The primary keys of the entities to delete.
      * @param collection The entity collection
-     * @param [mergeStrategy] Track by default. Don't track if is MergeStrategy.IgnoreChanges.
+     * @param [mergeStrategy] Track by default. Don't track if is NxaMergeStrategy.IgnoreChanges.
      */
     trackDeleteMany(
         keys: (number | string)[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         if (
-            mergeStrategy === MergeStrategy.IgnoreChanges ||
+            mergeStrategy === NxaMergeStrategy.IgnoreChanges ||
             keys == null ||
             keys.length === 0
         ) {
@@ -445,21 +445,21 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
             if (originalValue) {
                 const trackedChange = chgState[id];
                 if (trackedChange) {
-                    if (trackedChange.changeType === ChangeType.Added) {
+                    if (trackedChange.changeType === NxaChangeType.Added) {
                         // Special case: stop tracking an added entity that you delete
                         // The caller must also detect this, remove it immediately from the collection
                         // and skip attempt to delete on the server.
                         cloneChgStateOnce();
                         delete chgState[id];
-                    } else if (trackedChange.changeType === ChangeType.Updated) {
+                    } else if (trackedChange.changeType === NxaChangeType.Updated) {
                         // Special case: switch change type from Updated to Deleted.
                         cloneChgStateOnce();
-                        trackedChange.changeType = ChangeType.Deleted;
+                        trackedChange.changeType = NxaChangeType.Deleted;
                     }
                 } else {
                     // Start tracking this entity
                     cloneChgStateOnce();
-                    chgState[id] = { changeType: ChangeType.Deleted, originalValue };
+                    chgState[id] = { changeType: NxaChangeType.Deleted, originalValue };
                 }
             }
             return chgState;
@@ -480,13 +480,13 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Does NOT remove from the collection (the reducer's job).
      * @param key The primary key of the entity to delete.
      * @param collection The entity collection
-     * @param [mergeStrategy] Track by default. Don't track if is MergeStrategy.IgnoreChanges.
+     * @param [mergeStrategy] Track by default. Don't track if is NxaMergeStrategy.IgnoreChanges.
      */
     trackDeleteOne(
         key: number | string,
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         return key == null
             ? collection
             : this.trackDeleteMany([key], collection, mergeStrategy);
@@ -497,15 +497,15 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Does NOT update the collection (the reducer's job).
      * @param updates The entities to update.
      * @param collection The entity collection
-     * @param [mergeStrategy] Track by default. Don't track if is MergeStrategy.IgnoreChanges.
+     * @param [mergeStrategy] Track by default. Don't track if is NxaMergeStrategy.IgnoreChanges.
      */
     trackUpdateMany(
         updates: Update<T>[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         if (
-            mergeStrategy === MergeStrategy.IgnoreChanges ||
+            mergeStrategy === NxaMergeStrategy.IgnoreChanges ||
             updates == null ||
             updates.length === 0
         ) {
@@ -531,7 +531,7 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
                         didMutate = true;
                         chgState = { ...chgState };
                     }
-                    chgState[id] = { changeType: ChangeType.Updated, originalValue };
+                    chgState[id] = { changeType: NxaChangeType.Updated, originalValue };
                 }
             }
             return chgState;
@@ -544,13 +544,13 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Does NOT update the collection (the reducer's job).
      * @param update The entity to update.
      * @param collection The entity collection
-     * @param [mergeStrategy] Track by default. Don't track if is MergeStrategy.IgnoreChanges.
+     * @param [mergeStrategy] Track by default. Don't track if is NxaMergeStrategy.IgnoreChanges.
      */
     trackUpdateOne(
         update: Update<T>,
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         return update == null
             ? collection
             : this.trackUpdateMany([update], collection, mergeStrategy);
@@ -561,15 +561,15 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Does NOT update the collection (the reducer's job).
      * @param entities The entities to add or update. They must be complete entities with ids.
      * @param collection The entity collection
-     * @param [mergeStrategy] Track by default. Don't track if is MergeStrategy.IgnoreChanges.
+     * @param [mergeStrategy] Track by default. Don't track if is NxaMergeStrategy.IgnoreChanges.
      */
     trackUpsertMany(
         entities: T[],
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         if (
-            mergeStrategy === MergeStrategy.IgnoreChanges ||
+            mergeStrategy === NxaMergeStrategy.IgnoreChanges ||
             entities == null ||
             entities.length === 0
         ) {
@@ -595,8 +595,8 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
                 const originalValue = entityMap[id];
                 chgState[id] =
                     originalValue == null
-                        ? { changeType: ChangeType.Added }
-                        : { changeType: ChangeType.Updated, originalValue };
+                        ? { changeType: NxaChangeType.Added }
+                        : { changeType: NxaChangeType.Updated, originalValue };
             }
             return chgState;
         }, collection.changeState);
@@ -608,13 +608,13 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Does NOT update the collection (the reducer's job).
      * @param entities The entity to add or update. It must be a complete entity with its id.
      * @param collection The entity collection
-     * @param [mergeStrategy] Track by default. Don't track if is MergeStrategy.IgnoreChanges.
+     * @param [mergeStrategy] Track by default. Don't track if is NxaMergeStrategy.IgnoreChanges.
      */
     trackUpsertOne(
         entity: T,
-        collection: EntityCollection<T>,
-        mergeStrategy?: MergeStrategy
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>,
+        mergeStrategy?: NxaMergeStrategy
+    ): NxaEntityCollection<T> {
         return entity == null
             ? collection
             : this.trackUpsertMany([entity], collection, mergeStrategy);
@@ -627,23 +627,23 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      * Harmless when there are no entity changes to undo.
      * @param collection The entity collection
      */
-    undoAll(collection: EntityCollection<T>): EntityCollection<T> {
+    undoAll(collection: NxaEntityCollection<T>): NxaEntityCollection<T> {
         const ids = Object.keys(collection.changeState);
 
         const { remove, upsert } = ids.reduce(
             (acc, id) => {
                 const changeState = acc.chgState[id]!;
                 switch (changeState.changeType) {
-                    case ChangeType.Added:
+                    case NxaChangeType.Added:
                         acc.remove.push(id);
                         break;
-                    case ChangeType.Deleted:
+                    case NxaChangeType.Deleted:
                         const removed = changeState!.originalValue;
                         if (removed) {
                             acc.upsert.push(removed);
                         }
                         break;
-                    case ChangeType.Updated:
+                    case NxaChangeType.Updated:
                         acc.upsert.push(changeState!.originalValue!);
                         break;
                 }
@@ -671,8 +671,8 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      */
     undoMany(
         entityOrIdList: (number | string | T)[],
-        collection: EntityCollection<T>
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>
+    ): NxaEntityCollection<T> {
         if (entityOrIdList == null || entityOrIdList.length === 0) {
             return collection; // nothing to undo
         }
@@ -694,16 +694,16 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
                     delete chgState[id]; // clear tracking of this entity
                     acc.changeState = chgState;
                     switch (change.changeType) {
-                        case ChangeType.Added:
+                        case NxaChangeType.Added:
                             acc.remove.push(id);
                             break;
-                        case ChangeType.Deleted:
+                        case NxaChangeType.Deleted:
                             const removed = change!.originalValue;
                             if (removed) {
                                 acc.upsert.push(removed);
                             }
                             break;
-                        case ChangeType.Updated:
+                        case NxaChangeType.Updated:
                             acc.upsert.push(change!.originalValue!);
                             break;
                     }
@@ -731,8 +731,8 @@ export class EntityChangeTrackerBase<T> implements EntityChangeTracker<T> {
      */
     undoOne(
         entityOrId: number | string | T,
-        collection: EntityCollection<T>
-    ): EntityCollection<T> {
+        collection: NxaEntityCollection<T>
+    ): NxaEntityCollection<T> {
         return entityOrId == null
             ? collection
             : this.undoMany([entityOrId], collection);

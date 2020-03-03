@@ -1,25 +1,25 @@
 import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { Comparer, IdSelector } from '@ngrx/entity';
 
-import { EntityDispatcherDefaultOptions } from '../dispatchers/entity-dispatcher-default-options';
+import { NxaEntityDispatcherDefaultOptions } from '../dispatchers/entity-dispatcher-default-options';
 import { defaultSelectId } from '../utils/utilities';
-import { EntityCollection } from '../reducers/entity-collection';
-import { EntityMetadata } from './entity-metadata';
+import { NxaEntityCollection } from '../reducers/entity-collection';
+import { NxaEntityMetadata } from './entity-metadata';
 
-export interface EntityDefinition<T = any> {
+export interface NxaEntityDefinition<T = any> {
     entityName: string;
     entityAdapter: EntityAdapter<T>;
-    entityDispatcherOptions?: Partial<EntityDispatcherDefaultOptions>;
-    initialState: EntityCollection<T>;
-    metadata: EntityMetadata<T>;
+    entityDispatcherOptions?: Partial<NxaEntityDispatcherDefaultOptions>;
+    initialState: NxaEntityCollection<T>;
+    metadata: NxaEntityMetadata<T>;
     noChangeTracking: boolean;
     selectId: IdSelector<T>;
     sortComparer: false | Comparer<T>;
 }
 
-export function createEntityDefinition<T, S extends object>(
-    metadata: EntityMetadata<T, S>
-): EntityDefinition<T> {
+export function createNxaEntityDefinition<T, S extends object>(
+    metadata: NxaEntityMetadata<T, S>
+): NxaEntityDefinition<T> {
     let entityName = metadata.entityName;
     if (!entityName) {
         throw new Error('Missing required entityName');
@@ -30,10 +30,10 @@ export function createEntityDefinition<T, S extends object>(
 
     const entityAdapter = createEntityAdapter<T>({ selectId, sortComparer });
 
-    const entityDispatcherOptions: Partial<EntityDispatcherDefaultOptions> =
+    const entityDispatcherOptions: Partial<NxaEntityDispatcherDefaultOptions> =
         metadata.entityDispatcherOptions || {};
 
-    const initialState: EntityCollection<T> = entityAdapter.getInitialState({
+    const initialState: NxaEntityCollection<T> = entityAdapter.getInitialState({
         entityName,
         filter: '',
         loaded: false,

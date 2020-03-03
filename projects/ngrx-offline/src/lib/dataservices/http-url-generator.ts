@@ -5,17 +5,17 @@ import { Pluralizer } from '../utils/interfaces';
  * Known resource URLS for specific entity types.
  * Each entity's resource URLS are endpoints that
  * target single entity and multi-entity HTTP operations.
- * Used by the `DefaultHttpUrlGenerator`.
+ * Used by the `NxaDefaultHttpUrlGenerator`.
  */
-export abstract class EntityHttpResourceUrls {
-    [entityName: string]: HttpResourceUrls;
+export abstract class NxaEntityHttpResourceUrls {
+    [entityName: string]: NxaHttpResourceUrls;
 }
 
 /**
  * Resource URLS for HTTP operations that target single entity
  * and multi-entity endpoints.
  */
-export interface HttpResourceUrls {
+export interface NxaHttpResourceUrls {
     /**
      * The URL path for a single entity endpoint, e.g, `some-api-root/hero/`
      * such as you'd use to add a hero.
@@ -36,7 +36,7 @@ export interface HttpResourceUrls {
  * Generate the base part of an HTTP URL for
  * single entity or entity collection resource
  */
-export abstract class HttpUrlGenerator {
+export abstract class NxaHttpUrlGenerator {
     /**
      * Return the base URL for a single entity resource,
      * e.g., the base URL to get a single hero by its id
@@ -51,22 +51,22 @@ export abstract class HttpUrlGenerator {
 
     /**
      * Register known single-entity and collection resource URLs for HTTP calls
-     * @param entityHttpResourceUrls {EntityHttpResourceUrls} resource urls for specific entity type names
+     * @param entityNxaHttpResourceUrls {NxaEntityHttpResourceUrls} resource urls for specific entity type names
      */
     abstract registerHttpResourceUrls(
-        entityHttpResourceUrls?: EntityHttpResourceUrls
+        entityHttpResourceUrls?: NxaEntityHttpResourceUrls
     ): void;
 }
 
 @Injectable()
-export class DefaultHttpUrlGenerator implements HttpUrlGenerator {
+export class NxaDefaultHttpUrlGenerator implements NxaHttpUrlGenerator {
     /**
      * Known single-entity and collection resource URLs for HTTP calls.
      * Generator methods returns these resource URLs for a given entity type name.
      * If the resources for an entity type name are not know, it generates
      * and caches a resource name for future use
      */
-    protected knownHttpResourceUrls: EntityHttpResourceUrls = {};
+    protected knownHttpResourceUrls: NxaEntityHttpResourceUrls = {};
 
     constructor(private pluralizer: Pluralizer) { }
 
@@ -78,10 +78,10 @@ export class DefaultHttpUrlGenerator implements HttpUrlGenerator {
     protected getResourceUrls(
         entityName: string,
         root: string
-    ): HttpResourceUrls {
+    ): NxaHttpResourceUrls {
         let resourceUrls = this.knownHttpResourceUrls[entityName];
         if (!resourceUrls) {
-            const nRoot = normalizeRoot(root);
+            const nRoot = NxaNormalizeRoot(root);
             resourceUrls = {
                 entityResourceUrl: `${nRoot}/${entityName}/`.toLowerCase(),
                 collectionResourceUrl: `${nRoot}/${this.pluralizer.pluralize(
@@ -115,12 +115,12 @@ export class DefaultHttpUrlGenerator implements HttpUrlGenerator {
 
     /**
      * Register known single-entity and collection resource URLs for HTTP calls
-     * @param entityHttpResourceUrls {EntityHttpResourceUrls} resource urls for specific entity type names
+     * @param entityNxaHttpResourceUrls {NxaEntityHttpResourceUrls} resource urls for specific entity type names
      * Well-formed resource urls end in a '/';
      * Note: this method does not ensure that resource urls are well-formed.
      */
     registerHttpResourceUrls(
-        entityHttpResourceUrls: EntityHttpResourceUrls
+        entityHttpResourceUrls: NxaEntityHttpResourceUrls
     ): void {
         this.knownHttpResourceUrls = {
             ...this.knownHttpResourceUrls,
@@ -130,6 +130,6 @@ export class DefaultHttpUrlGenerator implements HttpUrlGenerator {
 }
 
 /** Remove leading & trailing spaces or slashes */
-export function normalizeRoot(root: string) {
+export function NxaNormalizeRoot(root: string) {
     return root.replace(/^[\/\s]+|[\/\s]+$/g, '');
 }

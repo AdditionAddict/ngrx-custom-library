@@ -3,16 +3,16 @@
  * or a new filtered array of entities.
  * NEVER mutate the original `entities` array itself.
  **/
-export type EntityFilterFn<T> = (entities: T[], pattern?: any) => T[];
+export type NxaEntityFilterFn<T> = (entities: T[], pattern?: any) => T[];
 
 /**
- * Creates an {EntityFilterFn} that matches RegExp or RegExp string pattern
+ * Creates an {NxaEntityFilterFn} that matches RegExp or RegExp string pattern
  * anywhere in any of the given props of an entity.
  * If pattern is a string, spaces are significant and ignores case.
  */
-export function PropsFilterFnFactory<T = any>(
+export function NxaPropsFilterFnFactory<T = any>(
     props: (keyof T)[] = []
-): EntityFilterFn<T> {
+): NxaEntityFilterFn<T> {
     if (props.length === 0) {
         // No properties -> nothing could match -> return unfiltered
         return (entities: T[], pattern: string) => entities;

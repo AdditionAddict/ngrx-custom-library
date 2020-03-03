@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
-import { EntityActionOptions } from '../actions/entity-action';
-import { QueryParams } from '../dataservices/interfaces';
+import { NxaEntityActionOptions } from '../actions/entity-action';
+import { NxaQueryParams } from '../dataservices/interfaces';
 
 /** Commands that update the remote server. */
-export interface EntityServerCommands<T> {
+export interface NxaEntityServerCommands<T> {
     /**
      * Dispatch action to save a new entity to remote storage.
      * @param entity entity to add, which may omit its key if pessimistic and the server creates the key;
@@ -11,18 +11,18 @@ export interface EntityServerCommands<T> {
      * @returns A terminating Observable of the entity
      * after server reports successful save or the save error.
      */
-    add(entity: T, options?: EntityActionOptions): Observable<T>;
+    add(entity: T, options?: NxaEntityActionOptions): Observable<T>;
 
     /**
      * Dispatch action to cancel the persistence operation (query or save) with the given correlationId.
-     * @param correlationId The correlation id for the corresponding EntityAction
+     * @param correlationId The correlation id for the corresponding NxaEntityAction
      * @param [reason] explains why canceled and by whom.
      * @param [options] options such as the tag
      */
     cancel(
         correlationId: any,
         reason?: string,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void;
 
     /**
@@ -32,7 +32,7 @@ export interface EntityServerCommands<T> {
      * @returns A terminating Observable of the deleted key
      * after server reports successful save or the save error.
      */
-    delete(entity: T, options?: EntityActionOptions): Observable<number | string>;
+    delete(entity: T, options?: NxaEntityActionOptions): Observable<number | string>;
 
     /**
      * Dispatch action to delete entity from remote storage by key.
@@ -43,7 +43,7 @@ export interface EntityServerCommands<T> {
      */
     delete(
         key: number | string,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): Observable<number | string>;
 
     /**
@@ -54,7 +54,7 @@ export interface EntityServerCommands<T> {
      * after server reports successful query or the query error.
      * @see load()
      */
-    getAll(options?: EntityActionOptions): Observable<T[]>;
+    getAll(options?: NxaEntityActionOptions): Observable<T[]>;
 
     /**
      * Dispatch action to query remote storage for the entity with this primary key.
@@ -65,7 +65,7 @@ export interface EntityServerCommands<T> {
      * @returns A terminating Observable of the queried entities that are in the collection
      * after server reports success or the query error.
      */
-    getByKey(key: any, options?: EntityActionOptions): Observable<T>;
+    getByKey(key: any, options?: NxaEntityActionOptions): Observable<T>;
 
     /**
      * Dispatch action to query remote storage for the entities that satisfy a query expressed
@@ -77,8 +77,8 @@ export interface EntityServerCommands<T> {
      * after server reports successful query or the query error.
      */
     getWithQuery(
-        queryParams: QueryParams | string,
-        options?: EntityActionOptions
+        queryParams: NxaQueryParams | string,
+        options?: NxaEntityActionOptions
     ): Observable<T[]>;
 
     /**
@@ -89,7 +89,7 @@ export interface EntityServerCommands<T> {
      * after server reports successful query or the query error.
      * @see getAll
      */
-    load(options?: EntityActionOptions): Observable<T[]>;
+    load(options?: NxaEntityActionOptions): Observable<T[]>;
 
     /**
      * Dispatch action to save the updated entity (or partial entity) in remote storage.
@@ -100,7 +100,7 @@ export interface EntityServerCommands<T> {
      * @returns A terminating Observable of the updated entity
      * after server reports successful save or the save error.
      */
-    update(entity: Partial<T>, options?: EntityActionOptions): Observable<T>;
+    update(entity: Partial<T>, options?: NxaEntityActionOptions): Observable<T>;
 
     /**
      * Dispatch action to save a new or update an existing entity to remote storage.
@@ -110,19 +110,19 @@ export interface EntityServerCommands<T> {
      * @returns A terminating Observable of the entity
      * after server reports successful save or the save error.
      */
-    upsert(entity: T, options?: EntityActionOptions): Observable<T>;
+    upsert(entity: T, options?: NxaEntityActionOptions): Observable<T>;
 }
 
 /*** A collection's cache-only commands, which do not update remote storage ***/
 
-export interface EntityCacheCommands<T> {
+export interface NxaEntityCacheCommands<T> {
     /**
      * Replace all entities in the cached collection.
      * Does not save to remote storage.
      * @param entities to add directly to cache.
      * @param [options] options such as mergeStrategy
      */
-    addAllToCache(entities: T[], options?: EntityActionOptions): void;
+    addAllToCache(entities: T[], options?: NxaEntityActionOptions): void;
 
     /**
      * Add a new entity directly to the cache.
@@ -131,7 +131,7 @@ export interface EntityCacheCommands<T> {
      * @param entity to add directly to cache.
      * @param [options] options such as mergeStrategy
      */
-    addOneToCache(entity: T, options?: EntityActionOptions): void;
+    addOneToCache(entity: T, options?: NxaEntityActionOptions): void;
 
     /**
      * Add multiple new entities directly to the cache.
@@ -140,10 +140,10 @@ export interface EntityCacheCommands<T> {
      * @param entities to add directly to cache.
      * @param [options] options such as mergeStrategy
      */
-    addManyToCache(entities: T[], options?: EntityActionOptions): void;
+    addManyToCache(entities: T[], options?: NxaEntityActionOptions): void;
 
     /** Clear the cached entity collection */
-    clearCache(options?: EntityActionOptions): void;
+    clearCache(options?: NxaEntityActionOptions): void;
 
     /**
      * Remove an entity directly from the cache.
@@ -151,7 +151,7 @@ export interface EntityCacheCommands<T> {
      * @param entity The entity to remove
      * @param [options] options such as mergeStrategy
      */
-    removeOneFromCache(entity: T, options?: EntityActionOptions): void;
+    removeOneFromCache(entity: T, options?: NxaEntityActionOptions): void;
 
     /**
      * Remove an entity directly from the cache.
@@ -159,7 +159,7 @@ export interface EntityCacheCommands<T> {
      * @param key The primary key of the entity to remove
      * @param [options] options such as mergeStrategy
      */
-    removeOneFromCache(key: number | string, options?: EntityActionOptions): void;
+    removeOneFromCache(key: number | string, options?: NxaEntityActionOptions): void;
 
     /**
      * Remove multiple entities directly from the cache.
@@ -167,7 +167,7 @@ export interface EntityCacheCommands<T> {
      * @param entity The entities to remove
      * @param [options] options such as mergeStrategy
      */
-    removeManyFromCache(entities: T[], options?: EntityActionOptions): void;
+    removeManyFromCache(entities: T[], options?: NxaEntityActionOptions): void;
 
     /**
      * Remove multiple entities directly from the cache.
@@ -177,7 +177,7 @@ export interface EntityCacheCommands<T> {
      */
     removeManyFromCache(
         keys: (number | string)[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void;
 
     /**
@@ -189,7 +189,7 @@ export interface EntityCacheCommands<T> {
      * @param entity to update directly in cache.
      * @param [options] options such as mergeStrategy
      */
-    updateOneInCache(entity: Partial<T>, options?: EntityActionOptions): void;
+    updateOneInCache(entity: Partial<T>, options?: NxaEntityActionOptions): void;
 
     /**
      * Update multiple cached entities directly.
@@ -202,7 +202,7 @@ export interface EntityCacheCommands<T> {
      */
     updateManyInCache(
         entities: Partial<T>[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void;
 
     /**
@@ -213,7 +213,7 @@ export interface EntityCacheCommands<T> {
      * @param entity to upsert directly in cache.
      * @param [options] options such as mergeStrategy
      */
-    upsertOneInCache(entity: Partial<T>, options?: EntityActionOptions): void;
+    upsertOneInCache(entity: Partial<T>, options?: NxaEntityActionOptions): void;
 
     /**
      * Insert or update multiple cached entities directly.
@@ -225,23 +225,23 @@ export interface EntityCacheCommands<T> {
      */
     upsertManyInCache(
         entities: Partial<T>[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void;
 
     /**
      * Set the pattern that the collection's filter applies
      * when using the `filteredEntities` selector.
      */
-    setFilter(pattern: any, options?: EntityActionOptions): void;
+    setFilter(pattern: any, options?: NxaEntityActionOptions): void;
 
     /** Set the loaded flag */
-    setLoaded(isLoaded: boolean, options?: EntityActionOptions): void;
+    setLoaded(isLoaded: boolean, options?: NxaEntityActionOptions): void;
 
     /** Set the loading flag */
-    setLoading(isLoading: boolean, options?: EntityActionOptions): void;
+    setLoading(isLoading: boolean, options?: NxaEntityActionOptions): void;
 }
 
 /** Commands that dispatch entity actions for a collection */
-export interface EntityCommands<T>
-    extends EntityServerCommands<T>,
-    EntityCacheCommands<T> { }
+export interface NxaEntityCommands<T>
+    extends NxaEntityServerCommands<T>,
+    NxaEntityCacheCommands<T> { }

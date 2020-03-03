@@ -1,14 +1,14 @@
 import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { EntityAction } from '../actions/entity-action';
-import { EntityCache } from '../reducers/entity-cache';
+import { NxaEntityAction } from '../actions/entity-action';
+import { NxaEntityCache } from '../reducers/entity-cache';
 import { EntityCollectionService } from './entity-collection-service';
 
 // tslint:disable:member-ordering
 
 /**
- * Class-Interface for EntityCache and EntityCollection services.
+ * Class-Interface for NxaEntityCache and EntityCollection services.
  * Serves as an Angular provider token for this service class.
  * Includes a registry of EntityCollectionServices for all entity types.
  * Creates a new default EntityCollectionService for any entity type not in the registry.
@@ -18,11 +18,11 @@ export abstract class EntityServices {
     /** Dispatch any action to the store */
     abstract dispatch(action: Action): void;
 
-    /** Observable of error EntityActions (e.g. QUERY_ALL_ERROR) for all entity types */
-    abstract readonly entityActionErrors$: Observable<EntityAction>;
+    /** Observable of error NxaEntityActions (e.g. QUERY_ALL_ERROR) for all entity types */
+    abstract readonly NxaEntityActionErrors$: Observable<NxaEntityAction>;
 
     /** Observable of the entire entity cache */
-    abstract readonly entityCache$: Observable<EntityCache> | Store<EntityCache>;
+    abstract readonly entityCache$: Observable<NxaEntityCache> | Store<NxaEntityCache>;
 
     /** Get (or create) the singleton instance of an EntityCollectionService
      * @param entityName {string} Name of the entity type of the service
@@ -33,7 +33,7 @@ export abstract class EntityServices {
 
     /**
      * Actions scanned by the store after it processed them with reducers.
-     * A replay observable of the most recent Action (not just EntityAction) reduced by the store.
+     * A replay observable of the most recent Action (not just NxaEntityAction) reduced by the store.
      */
     abstract readonly reducedActions$: Observable<Action>;
 
@@ -61,7 +61,7 @@ export abstract class EntityServices {
      */
     abstract registerEntityCollectionServices(
         // tslint:disable-next-line:unified-signatures
-        entityCollectionServiceMap: EntityCollectionServiceMap
+        entityCollectionServiceMap: NxaEntityCollectionServiceMap
     ): void;
     // #endregion EntityCollectionService creation and registration API
 }
@@ -69,6 +69,6 @@ export abstract class EntityServices {
 /**
  * A map of service or entity names to their corresponding EntityCollectionServices.
  */
-export interface EntityCollectionServiceMap {
+export interface NxaEntityCollectionServiceMap {
     [entityName: string]: EntityCollectionService<any>;
 }

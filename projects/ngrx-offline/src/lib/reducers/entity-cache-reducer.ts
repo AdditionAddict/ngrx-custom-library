@@ -1,40 +1,40 @@
 import { Injectable } from '@angular/core';
 import { Action, ActionReducer } from '@ngrx/store';
 
-import { EntityAction } from '../actions/entity-action';
-import { EntityCache } from './entity-cache';
+import { NxaEntityAction } from '../actions/entity-action';
+import { NxaEntityCache } from './entity-cache';
 
 import {
-    EntityCacheAction,
-    ClearCollections,
-    LoadCollections,
-    MergeQuerySet,
-    SaveEntities,
-    SaveEntitiesCancel,
-    SaveEntitiesError,
-    SaveEntitiesSuccess,
+    NxaEntityCacheAction,
+    NxaClearCollections,
+    NxaLoadCollections,
+    NxaMergeQuerySet,
+    NxaSaveEntities,
+    NxaSaveEntitiesCancel,
+    NxaSaveEntitiesError,
+    NxaSaveEntitiesSuccess,
 } from '../actions/entity-cache-action';
 
 import {
-    ChangeSetOperation,
-    ChangeSetItem,
+    NxaChangeSetOperation,
+    NxaChangeSetItem,
 } from '../actions/entity-cache-change-set';
 
-import { EntityCollection } from './entity-collection';
-import { EntityCollectionCreator } from './entity-collection-creator';
-import { EntityCollectionReducerRegistry } from './entity-collection-reducer-registry';
-import { EntityOp } from '../actions/entity-op';
+import { NxaEntityCollection } from './entity-collection';
+import { NxaEntityCollectionCreator } from './entity-collection-creator';
+import { NxaEntityCollectionReducerRegistry } from './entity-collection-reducer-registry';
+import { NxaEntityOp } from '../actions/entity-op';
 import { Logger } from '../utils/interfaces';
-import { MergeStrategy } from '../actions/merge-strategy';
+import { NxaMergeStrategy } from '../actions/merge-strategy';
 
 /**
- * Creates the EntityCacheReducer via its create() method
+ * Creates the NxaEntityCacheReducer via its create() method
  */
 @Injectable()
-export class EntityCacheReducerFactory {
+export class NxaEntityCacheReducerFactory {
     constructor(
-        private entityCollectionCreator: EntityCollectionCreator,
-        private entityCollectionReducerRegistry: EntityCollectionReducerRegistry,
+        private entityCollectionCreator: NxaEntityCollectionCreator,
+        private entityCollectionReducerRegistry: NxaEntityCollectionReducerRegistry,
         private logger: Logger
     ) { }
 
@@ -42,76 +42,76 @@ export class EntityCacheReducerFactory {
      * Create the @@ngrx/action entity cache reducer which either responds to entity cache level actions
      * or (more commonly) delegates to an EntityCollectionReducer based on the action.payload.entityName.
      */
-    create(): ActionReducer<EntityCache, Action> {
+    create(): ActionReducer<NxaEntityCache, Action> {
         // This technique ensures a named function appears in the debugger
         return entityCacheReducer.bind(this);
 
         function entityCacheReducer(
-            this: EntityCacheReducerFactory,
-            entityCache: EntityCache = {},
+            this: NxaEntityCacheReducerFactory,
+            entityCache: NxaEntityCache = {},
             action: { type: string; payload?: any }
-        ): EntityCache {
-            // EntityCache actions
+        ): NxaEntityCache {
+            // NxaEntityCache actions
             switch (action.type) {
-                case EntityCacheAction.CLEAR_COLLECTIONS: {
-                    return this.clearCollectionsReducer(
+                case NxaEntityCacheAction.CLEAR_COLLECTIONS: {
+                    return this.NxaClearCollectionsReducer(
                         entityCache,
-                        action as ClearCollections
+                        action as NxaClearCollections
                     );
                 }
 
-                case EntityCacheAction.LOAD_COLLECTIONS: {
-                    return this.loadCollectionsReducer(
+                case NxaEntityCacheAction.LOAD_COLLECTIONS: {
+                    return this.NxaLoadCollectionsReducer(
                         entityCache,
-                        action as LoadCollections
+                        action as NxaLoadCollections
                     );
                 }
 
-                case EntityCacheAction.MERGE_QUERY_SET: {
-                    return this.mergeQuerySetReducer(
+                case NxaEntityCacheAction.MERGE_QUERY_SET: {
+                    return this.NxaMergeQuerySetReducer(
                         entityCache,
-                        action as MergeQuerySet
+                        action as NxaMergeQuerySet
                     );
                 }
 
-                case EntityCacheAction.SAVE_ENTITIES: {
-                    return this.saveEntitiesReducer(entityCache, action as SaveEntities);
+                case NxaEntityCacheAction.SAVE_ENTITIES: {
+                    return this.NxaSaveEntitiesReducer(entityCache, action as NxaSaveEntities);
                 }
 
-                case EntityCacheAction.SAVE_ENTITIES_CANCEL: {
-                    return this.saveEntitiesCancelReducer(
+                case NxaEntityCacheAction.SAVE_ENTITIES_CANCEL: {
+                    return this.NxaSaveEntitiesCancelReducer(
                         entityCache,
-                        action as SaveEntitiesCancel
+                        action as NxaSaveEntitiesCancel
                     );
                 }
 
-                case EntityCacheAction.SAVE_ENTITIES_ERROR: {
-                    return this.saveEntitiesErrorReducer(
+                case NxaEntityCacheAction.SAVE_ENTITIES_ERROR: {
+                    return this.NxaSaveEntitiesErrorReducer(
                         entityCache,
-                        action as SaveEntitiesError
+                        action as NxaSaveEntitiesError
                     );
                 }
 
-                case EntityCacheAction.SAVE_ENTITIES_SUCCESS: {
-                    return this.saveEntitiesSuccessReducer(
+                case NxaEntityCacheAction.SAVE_ENTITIES_SUCCESS: {
+                    return this.NxaSaveEntitiesSuccessReducer(
                         entityCache,
-                        action as SaveEntitiesSuccess
+                        action as NxaSaveEntitiesSuccess
                     );
                 }
 
-                case EntityCacheAction.SET_ENTITY_CACHE: {
-                    // Completely replace the EntityCache. Be careful!
+                case NxaEntityCacheAction.SET_NXA_ENTITY_CACHE: {
+                    // Completely replace the NxaEntityCache. Be careful!
                     return action.payload.cache;
                 }
             }
 
-            // Apply entity collection reducer if this is a valid EntityAction for a collection
+            // Apply entity collection reducer if this is a valid NxaEntityAction for a collection
             const payload = action.payload;
             if (payload && payload.entityName && payload.entityOp && !payload.error) {
-                return this.applyCollectionReducer(entityCache, action as EntityAction);
+                return this.applyCollectionReducer(entityCache, action as NxaEntityAction);
             }
 
-            // Not a valid EntityAction
+            // Not a valid NxaEntityAction
             return entityCache;
         }
     }
@@ -119,16 +119,16 @@ export class EntityCacheReducerFactory {
     /**
      * Reducer to clear multiple collections at the same time.
      * @param entityCache the entity cache
-     * @param action a ClearCollections action whose payload is an array of collection names.
+     * @param action a NxaClearCollections action whose payload is an array of collection names.
      * If empty array, does nothing. If no array, clears all the collections.
      */
-    protected clearCollectionsReducer(
-        entityCache: EntityCache,
-        action: ClearCollections
+    protected NxaClearCollectionsReducer(
+        entityCache: NxaEntityCache,
+        action: NxaClearCollections
     ) {
         // tslint:disable-next-line:prefer-const
         let { collections, tag } = action.payload;
-        const entityOp = EntityOp.REMOVE_ALL;
+        const entityOp = NxaEntityOp.REMOVE_ALL;
 
         if (!collections) {
             // Collections is not defined. Clear all collections.
@@ -137,7 +137,7 @@ export class EntityCacheReducerFactory {
 
         entityCache = collections.reduce((newCache, entityName) => {
             const payload = { entityName, entityOp };
-            const act: EntityAction = {
+            const act: NxaEntityAction = {
                 type: `[${entityName}] ${action.type}`,
                 payload,
             };
@@ -150,14 +150,14 @@ export class EntityCacheReducerFactory {
     /**
      * Reducer to load collection in the form of a hash of entity data for multiple collections.
      * @param entityCache the entity cache
-     * @param action a LoadCollections action whose payload is the QuerySet of entity collections to load
+     * @param action a NxaLoadCollections action whose payload is the QuerySet of entity collections to load
      */
-    protected loadCollectionsReducer(
-        entityCache: EntityCache,
-        action: LoadCollections
+    protected NxaLoadCollectionsReducer(
+        entityCache: NxaEntityCache,
+        action: NxaLoadCollections
     ) {
         const { collections, tag } = action.payload;
-        const entityOp = EntityOp.ADD_ALL;
+        const entityOp = NxaEntityOp.ADD_ALL;
         const entityNames = Object.keys(collections);
         entityCache = entityNames.reduce((newCache, entityName) => {
             const payload = {
@@ -165,7 +165,7 @@ export class EntityCacheReducerFactory {
                 entityOp,
                 data: collections[entityName],
             };
-            const act: EntityAction = {
+            const act: NxaEntityAction = {
                 type: `[${entityName}] ${action.type}`,
                 payload,
             };
@@ -178,17 +178,17 @@ export class EntityCacheReducerFactory {
     /**
      * Reducer to merge query sets in the form of a hash of entity data for multiple collections.
      * @param entityCache the entity cache
-     * @param action a MergeQuerySet action with the query set and a MergeStrategy
+     * @param action a NxaMergeQuerySet action with the query set and a NxaMergeStrategy
      */
-    protected mergeQuerySetReducer(
-        entityCache: EntityCache,
-        action: MergeQuerySet
+    protected NxaMergeQuerySetReducer(
+        entityCache: NxaEntityCache,
+        action: NxaMergeQuerySet
     ) {
         // tslint:disable-next-line:prefer-const
         let { mergeStrategy, querySet, tag } = action.payload;
         mergeStrategy =
-            mergeStrategy === null ? MergeStrategy.PreserveChanges : mergeStrategy;
-        const entityOp = EntityOp.UPSERT_MANY;
+            mergeStrategy === null ? NxaMergeStrategy.PreserveChanges : mergeStrategy;
+        const entityOp = NxaEntityOp.UPSERT_MANY;
 
         const entityNames = Object.keys(querySet);
         entityCache = entityNames.reduce((newCache, entityName) => {
@@ -198,7 +198,7 @@ export class EntityCacheReducerFactory {
                 data: querySet[entityName],
                 mergeStrategy,
             };
-            const act: EntityAction = {
+            const act: NxaEntityAction = {
                 type: `[${entityName}] ${action.type}`,
                 payload,
             };
@@ -208,13 +208,13 @@ export class EntityCacheReducerFactory {
         return entityCache;
     }
 
-    // #region saveEntities reducers
-    protected saveEntitiesReducer(
-        entityCache: EntityCache,
-        action: SaveEntities
+    // #region NxaSaveEntities reducers
+    protected NxaSaveEntitiesReducer(
+        entityCache: NxaEntityCache,
+        action: NxaSaveEntities
     ) {
         const {
-            changeSet,
+            NxaChangeSet,
             correlationId,
             isOptimistic,
             mergeStrategy,
@@ -222,11 +222,11 @@ export class EntityCacheReducerFactory {
         } = action.payload;
 
         try {
-            changeSet.changes.forEach(item => {
+            NxaChangeSet.changes.forEach(item => {
                 const entityName = item.entityName;
                 const payload = {
                     entityName,
-                    entityOp: getEntityOp(item),
+                    entityOp: getNxaEntityOp(item),
                     data: item.entities,
                     correlationId,
                     isOptimistic,
@@ -234,7 +234,7 @@ export class EntityCacheReducerFactory {
                     tag,
                 };
 
-                const act: EntityAction = {
+                const act: NxaEntityAction = {
                     type: `[${entityName}] ${action.type}`,
                     payload,
                 };
@@ -248,23 +248,23 @@ export class EntityCacheReducerFactory {
         }
 
         return entityCache;
-        function getEntityOp(item: ChangeSetItem) {
+        function getNxaEntityOp(item: NxaChangeSetItem) {
             switch (item.op) {
-                case ChangeSetOperation.Add:
-                    return EntityOp.SAVE_ADD_MANY;
-                case ChangeSetOperation.Delete:
-                    return EntityOp.SAVE_DELETE_MANY;
-                case ChangeSetOperation.Update:
-                    return EntityOp.SAVE_UPDATE_MANY;
-                case ChangeSetOperation.Upsert:
-                    return EntityOp.SAVE_UPSERT_MANY;
+                case NxaChangeSetOperation.Add:
+                    return NxaEntityOp.SAVE_ADD_MANY;
+                case NxaChangeSetOperation.Delete:
+                    return NxaEntityOp.SAVE_DELETE_MANY;
+                case NxaChangeSetOperation.Update:
+                    return NxaEntityOp.SAVE_UPDATE_MANY;
+                case NxaChangeSetOperation.Upsert:
+                    return NxaEntityOp.SAVE_UPSERT_MANY;
             }
         }
     }
 
-    protected saveEntitiesCancelReducer(
-        entityCache: EntityCache,
-        action: SaveEntitiesCancel
+    protected NxaSaveEntitiesCancelReducer(
+        entityCache: NxaEntityCache,
+        action: NxaSaveEntitiesCancel
     ) {
         // This implementation can only clear the loading flag for the collections involved
         // If the save was optimistic, you'll have to compensate to fix the cache as you think necessary
@@ -274,36 +274,36 @@ export class EntityCacheReducerFactory {
         );
     }
 
-    protected saveEntitiesErrorReducer(
-        entityCache: EntityCache,
-        action: SaveEntitiesError
+    protected NxaSaveEntitiesErrorReducer(
+        entityCache: NxaEntityCache,
+        action: NxaSaveEntitiesError
     ) {
         const originalAction = action.payload.originalAction;
-        const originalChangeSet = originalAction.payload.changeSet;
+        const originalNxaChangeSet = originalAction.payload.NxaChangeSet;
 
         // This implementation can only clear the loading flag for the collections involved
         // If the save was optimistic, you'll have to compensate to fix the cache as you think necessary
-        const entityNames = originalChangeSet.changes.map(item => item.entityName);
+        const entityNames = originalNxaChangeSet.changes.map(item => item.entityName);
         return this.clearLoadingFlags(entityCache, entityNames);
     }
 
-    protected saveEntitiesSuccessReducer(
-        entityCache: EntityCache,
-        action: SaveEntitiesSuccess
+    protected NxaSaveEntitiesSuccessReducer(
+        entityCache: NxaEntityCache,
+        action: NxaSaveEntitiesSuccess
     ) {
         const {
-            changeSet,
+            NxaChangeSet,
             correlationId,
             isOptimistic,
             mergeStrategy,
             tag,
         } = action.payload;
 
-        changeSet.changes.forEach(item => {
+        NxaChangeSet.changes.forEach(item => {
             const entityName = item.entityName;
             const payload = {
                 entityName,
-                entityOp: getEntityOp(item),
+                entityOp: getNxaEntityOp(item),
                 data: item.entities,
                 correlationId,
                 isOptimistic,
@@ -311,7 +311,7 @@ export class EntityCacheReducerFactory {
                 tag,
             };
 
-            const act: EntityAction = {
+            const act: NxaEntityAction = {
                 type: `[${entityName}] ${action.type}`,
                 payload,
             };
@@ -319,26 +319,26 @@ export class EntityCacheReducerFactory {
         });
 
         return entityCache;
-        function getEntityOp(item: ChangeSetItem) {
+        function getNxaEntityOp(item: NxaChangeSetItem) {
             switch (item.op) {
-                case ChangeSetOperation.Add:
-                    return EntityOp.SAVE_ADD_MANY_SUCCESS;
-                case ChangeSetOperation.Delete:
-                    return EntityOp.SAVE_DELETE_MANY_SUCCESS;
-                case ChangeSetOperation.Update:
-                    return EntityOp.SAVE_UPDATE_MANY_SUCCESS;
-                case ChangeSetOperation.Upsert:
-                    return EntityOp.SAVE_UPSERT_MANY_SUCCESS;
+                case NxaChangeSetOperation.Add:
+                    return NxaEntityOp.SAVE_ADD_MANY_SUCCESS;
+                case NxaChangeSetOperation.Delete:
+                    return NxaEntityOp.SAVE_DELETE_MANY_SUCCESS;
+                case NxaChangeSetOperation.Update:
+                    return NxaEntityOp.SAVE_UPDATE_MANY_SUCCESS;
+                case NxaChangeSetOperation.Upsert:
+                    return NxaEntityOp.SAVE_UPSERT_MANY_SUCCESS;
             }
         }
     }
-    // #endregion saveEntities reducers
+    // #endregion NxaSaveEntities reducers
 
     // #region helpers
     /** Apply reducer for the action's EntityCollection (if the action targets a collection) */
     private applyCollectionReducer(
-        cache: EntityCache = {},
-        action: EntityAction
+        cache: NxaEntityCache = {},
+        action: NxaEntityAction
     ) {
         const entityName = action.payload.entityName;
         const collection = cache[entityName];
@@ -346,7 +346,7 @@ export class EntityCacheReducerFactory {
             entityName
         );
 
-        let newCollection: EntityCollection;
+        let newCollection: NxaEntityCollection;
         try {
             newCollection = collection
                 ? reducer(collection, action)
@@ -362,7 +362,7 @@ export class EntityCacheReducerFactory {
     }
 
     /** Ensure loading is false for every collection in entityNames */
-    private clearLoadingFlags(entityCache: EntityCache, entityNames: string[]) {
+    private clearLoadingFlags(entityCache: NxaEntityCache, entityNames: string[]) {
         let isMutated = false;
         entityNames.forEach(entityName => {
             const collection = entityCache[entityName];

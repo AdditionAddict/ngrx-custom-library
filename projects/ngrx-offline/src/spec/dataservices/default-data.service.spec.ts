@@ -11,12 +11,12 @@ import { of } from 'rxjs';
 import { Update } from '@ngrx/entity';
 
 import {
-    DefaultDataService,
-    DefaultDataServiceFactory,
-    DefaultHttpUrlGenerator,
-    HttpUrlGenerator,
-    DefaultDataServiceConfig,
-    DataServiceError,
+    NxaDefaultDataService,
+    NxaDefaultDataServiceFactory,
+    NxaDefaultHttpUrlGenerator,
+    NxaHttpUrlGenerator,
+    NxaDefaultDataServiceConfig,
+    NxaDataServiceError,
 } from '../../lib';
 
 class Hero {
@@ -26,13 +26,13 @@ class Hero {
 }
 
 ////////  Tests  /////////////
-describe('DefaultDataService', () => {
+describe('NxaDefaultDataService', () => {
     let httpClient: HttpClient;
     let httpTestingController: HttpTestingController;
     const heroUrl = 'api/hero/';
     const heroesUrl = 'api/heroes/';
-    let httpUrlGenerator: HttpUrlGenerator;
-    let service: DefaultDataService<Hero>;
+    let httpUrlGenerator: NxaHttpUrlGenerator;
+    let service: NxaDefaultDataService<Hero>;
 
     //// HttpClient testing boilerplate
     beforeEach(() => {
@@ -42,7 +42,7 @@ describe('DefaultDataService', () => {
         httpClient = TestBed.get(HttpClient);
         httpTestingController = TestBed.get(HttpTestingController);
 
-        httpUrlGenerator = new DefaultHttpUrlGenerator(null as any);
+        httpUrlGenerator = new NxaDefaultHttpUrlGenerator(null as any);
         httpUrlGenerator.registerHttpResourceUrls({
             Hero: {
                 entityResourceUrl: heroUrl,
@@ -50,7 +50,7 @@ describe('DefaultDataService', () => {
             },
         });
 
-        service = new DefaultDataService('Hero', httpClient, httpUrlGenerator);
+        service = new NxaDefaultDataService('Hero', httpClient, httpUrlGenerator);
     });
 
     afterEach(() => {
@@ -61,7 +61,7 @@ describe('DefaultDataService', () => {
 
     describe('property inspection', () => {
         // Test wrapper exposes protected properties
-        class TestService<T> extends DefaultDataService<T> {
+        class TestService<T> extends NxaDefaultDataService<T> {
             properties = {
                 entityUrl: this.entityUrl,
                 entitiesUrl: this.entitiesUrl,
@@ -80,7 +80,7 @@ describe('DefaultDataService', () => {
         });
 
         it('has expected name', () => {
-            expect(service.name).toBe('Hero DefaultDataService');
+            expect(service.name).toBe('Hero NxaDefaultDataService');
         });
 
         it('has expected single-entity url', () => {
@@ -157,16 +157,16 @@ describe('DefaultDataService', () => {
             requests[2].flush(expectedHeroes);
         });
 
-        it('should turn 404 into Observable<DataServiceError>', () => {
+        it('should turn 404 into Observable<NxaDataServiceError>', () => {
             const msg = 'deliberate 404 error';
 
             service.getAll().subscribe(
                 heroes => fail('getAll succeeded when expected it to fail with a 404'),
                 err => {
                     expect(err).toBeDefined('request should have failed');
-                    expect(err instanceof DataServiceError).toBe(
+                    expect(err instanceof NxaDataServiceError).toBe(
                         true,
-                        'is DataServiceError'
+                        'is NxaDataServiceError'
                     );
                     expect(err.error.status).toEqual(404, 'has 404 status');
                     expect(err.message).toEqual(msg, 'has expected error message');
@@ -180,7 +180,7 @@ describe('DefaultDataService', () => {
                 message: msg,
 
                 // The rest of this is optional and not used. Just showing that you could.
-                filename: 'DefaultDataService.ts',
+                filename: 'NxaDefaultDataService.ts',
                 lineno: 42,
                 colno: 21,
             } as ErrorEvent;
@@ -217,7 +217,7 @@ describe('DefaultDataService', () => {
             service.getById(1).subscribe(
                 heroes => fail('getById succeeded when expected it to fail with a 404'),
                 err => {
-                    expect(err instanceof DataServiceError).toBe(true);
+                    expect(err instanceof NxaDataServiceError).toBe(true);
                 }
             );
 
@@ -300,7 +300,7 @@ describe('DefaultDataService', () => {
             req.flush([]); // Respond with no heroes
         });
 
-        it('should turn 404 into Observable<DataServiceError>', () => {
+        it('should turn 404 into Observable<NxaDataServiceError>', () => {
             const msg = 'deliberate 404 error';
 
             service.getWithQuery({ name: 'B' }).subscribe(
@@ -308,9 +308,9 @@ describe('DefaultDataService', () => {
                     fail('getWithQuery succeeded when expected it to fail with a 404'),
                 err => {
                     expect(err).toBeDefined('request should have failed');
-                    expect(err instanceof DataServiceError).toBe(
+                    expect(err instanceof NxaDataServiceError).toBe(
                         true,
-                        'is DataServiceError'
+                        'is NxaDataServiceError'
                     );
                     expect(err.error.status).toEqual(404, 'has 404 status');
                     expect(err.message).toEqual(msg, 'has expected error message');
@@ -403,13 +403,13 @@ describe('DefaultDataService', () => {
         });
 
         it('should return 404 when id not found and delete404OK is false', () => {
-            service = new DefaultDataService('Hero', httpClient, httpUrlGenerator, {
+            service = new NxaDefaultDataService('Hero', httpClient, httpUrlGenerator, {
                 delete404OK: false,
             });
             service.delete(1).subscribe(
                 heroes => fail('delete succeeded when expected it to fail with a 404'),
                 err => {
-                    expect(err instanceof DataServiceError).toBe(true);
+                    expect(err instanceof NxaDataServiceError).toBe(true);
                 }
             );
 
@@ -470,7 +470,7 @@ describe('DefaultDataService', () => {
             service.update({ id: 1, changes: { id: 1, name: 'B' } }).subscribe(
                 update => fail('update succeeded when expected it to fail with a 404'),
                 err => {
-                    expect(err instanceof DataServiceError).toBe(true);
+                    expect(err instanceof NxaDataServiceError).toBe(true);
                 }
             );
 
@@ -526,15 +526,15 @@ describe('DefaultDataService', () => {
     });
 });
 
-describe('DefaultDataServiceFactory', () => {
+describe('NxaDefaultDataServiceFactory', () => {
     const heroUrl = 'api/hero';
     const heroesUrl = 'api/heroes';
 
     let http: any;
-    let httpUrlGenerator: HttpUrlGenerator;
+    let httpUrlGenerator: NxaHttpUrlGenerator;
 
     beforeEach(() => {
-        httpUrlGenerator = new DefaultHttpUrlGenerator(null as any);
+        httpUrlGenerator = new NxaDefaultHttpUrlGenerator(null as any);
         httpUrlGenerator.registerHttpResourceUrls({
             Hero: {
                 entityResourceUrl: heroUrl,
@@ -547,13 +547,13 @@ describe('DefaultDataServiceFactory', () => {
 
     describe('(no config)', () => {
         it('can create factory', () => {
-            const factory = new DefaultDataServiceFactory(http, httpUrlGenerator);
+            const factory = new NxaDefaultDataServiceFactory(http, httpUrlGenerator);
             const heroDS = factory.create<Hero>('Hero');
-            expect(heroDS.name).toBe('Hero DefaultDataService');
+            expect(heroDS.name).toBe('Hero NxaDefaultDataService');
         });
 
         it('should produce hero data service that gets all heroes with expected URL', () => {
-            const factory = new DefaultDataServiceFactory(http, httpUrlGenerator);
+            const factory = new NxaDefaultDataServiceFactory(http, httpUrlGenerator);
             const heroDS = factory.create<Hero>('Hero');
             heroDS.getAll();
             expect(http.get).toHaveBeenCalledWith('api/heroes', undefined);
@@ -562,19 +562,19 @@ describe('DefaultDataServiceFactory', () => {
 
     describe('(with config)', () => {
         it('can create factory', () => {
-            const config: DefaultDataServiceConfig = { root: 'api' };
-            const factory = new DefaultDataServiceFactory(
+            const config: NxaDefaultDataServiceConfig = { root: 'api' };
+            const factory = new NxaDefaultDataServiceFactory(
                 http,
                 httpUrlGenerator,
                 config
             );
             const heroDS = factory.create<Hero>('Hero');
-            expect(heroDS.name).toBe('Hero DefaultDataService');
+            expect(heroDS.name).toBe('Hero NxaDefaultDataService');
         });
 
         it('should produce hero data service that gets heroes via hero HttpResourceUrls', () => {
             const newHeroesUrl = 'some/other/api/heroes';
-            const config: DefaultDataServiceConfig = {
+            const config: NxaDefaultDataServiceConfig = {
                 root: 'api',
                 entityHttpResourceUrls: {
                     Hero: {
@@ -583,7 +583,7 @@ describe('DefaultDataServiceFactory', () => {
                     },
                 },
             };
-            const factory = new DefaultDataServiceFactory(
+            const factory = new NxaDefaultDataServiceFactory(
                 http,
                 httpUrlGenerator,
                 config

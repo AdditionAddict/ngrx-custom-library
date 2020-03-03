@@ -1,44 +1,44 @@
 import { Injectable } from '@angular/core';
-import { EntityDispatcher } from '../dispatchers/entity-dispatcher';
-import { EntityDispatcherFactory } from '../dispatchers/entity-dispatcher-factory';
-import { EntityDefinitionService } from '../entity-metadata/entity-definition.service';
+import { NxaEntityDispatcher } from '../dispatchers/entity-dispatcher';
+import { NxaEntityDispatcherFactory } from '../dispatchers/entity-dispatcher-factory';
+import { NxaEntityDefinitionService } from '../entity-metadata/entity-definition.service';
 import {
-    EntitySelectors,
-    EntitySelectorsFactory,
+    NxaEntitySelectors,
+    NxaEntitySelectorsFactory,
 } from '../selectors/entity-selectors';
 import {
-    EntitySelectors$,
-    EntitySelectors$Factory,
+    NxaEntitySelectors$,
+    NxaEntitySelectors$Factory,
 } from '../selectors/entity-selectors$';
 
 /** Core ingredients of an EntityCollectionService */
-export interface EntityCollectionServiceElements<
+export interface NxaEntityCollectionServiceElements<
     T,
-    S$ extends EntitySelectors$<T> = EntitySelectors$<T>
+    S$ extends NxaEntitySelectors$<T> = NxaEntitySelectors$<T>
     > {
-    readonly dispatcher: EntityDispatcher<T>;
+    readonly dispatcher: NxaEntityDispatcher<T>;
     readonly entityName: string;
-    readonly selectors: EntitySelectors<T>;
+    readonly selectors: NxaEntitySelectors<T>;
     readonly selectors$: S$;
 }
 
 /** Creates the core elements of the EntityCollectionService for an entity type. */
 @Injectable()
-export class EntityCollectionServiceElementsFactory {
+export class NxaEntityCollectionServiceElementsFactory {
     constructor(
-        private entityDispatcherFactory: EntityDispatcherFactory,
-        private entityDefinitionService: EntityDefinitionService,
-        private entitySelectorsFactory: EntitySelectorsFactory,
-        private entitySelectors$Factory: EntitySelectors$Factory
+        private entityDispatcherFactory: NxaEntityDispatcherFactory,
+        private entityDefinitionService: NxaEntityDefinitionService,
+        private entitySelectorsFactory: NxaEntitySelectorsFactory,
+        private entitySelectors$Factory: NxaEntitySelectors$Factory
     ) { }
 
     /**
      * Get the ingredients for making an EntityCollectionService for this entity type
      * @param entityName - name of the entity type
      */
-    create<T, S$ extends EntitySelectors$<T> = EntitySelectors$<T>>(
+    create<T, S$ extends NxaEntitySelectors$<T> = NxaEntitySelectors$<T>>(
         entityName: string
-    ): EntityCollectionServiceElements<T, S$> {
+    ): NxaEntityCollectionServiceElements<T, S$> {
         entityName = entityName.trim();
         const definition = this.entityDefinitionService.getDefinition<T>(
             entityName

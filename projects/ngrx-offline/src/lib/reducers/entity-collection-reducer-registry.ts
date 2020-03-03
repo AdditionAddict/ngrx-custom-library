@@ -1,17 +1,17 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { compose, MetaReducer } from '@ngrx/store';
 
-import { EntityAction } from '../actions/entity-action';
-import { EntityCollection } from './entity-collection';
-import { ENTITY_COLLECTION_META_REDUCERS } from './constants';
+import { NxaEntityAction } from '../actions/entity-action';
+import { NxaEntityCollection } from './entity-collection';
+import { NXA_ENTITY_COLLECTION_META_REDUCERS } from './constants';
 import {
-    EntityCollectionReducer,
-    EntityCollectionReducerFactory,
+    NxaEntityCollectionReducer,
+    NxaEntityCollectionReducerFactory,
 } from './entity-collection-reducer';
 
-/** A hash of EntityCollectionReducers */
-export interface EntityCollectionReducers {
-    [entity: string]: EntityCollectionReducer<any>;
+/** A hash of NxaEntityCollectionReducers */
+export interface NxaEntityCollectionReducers {
+    [entity: string]: NxaEntityCollectionReducer<any>;
 }
 
 /**
@@ -19,18 +19,18 @@ export interface EntityCollectionReducers {
  * Can create a new CollectionReducer, which it registers for subsequent use.
  */
 @Injectable()
-export class EntityCollectionReducerRegistry {
-    protected entityCollectionReducers: EntityCollectionReducers = {};
+export class NxaEntityCollectionReducerRegistry {
+    protected entityCollectionReducers: NxaEntityCollectionReducers = {};
     private entityCollectionMetaReducer: MetaReducer<
-        EntityCollection,
-        EntityAction
+        NxaEntityCollection,
+        NxaEntityAction
     >;
 
     constructor(
-        private entityCollectionReducerFactory: EntityCollectionReducerFactory,
+        private entityCollectionReducerFactory: NxaEntityCollectionReducerFactory,
         @Optional()
-        @Inject(ENTITY_COLLECTION_META_REDUCERS)
-        entityCollectionMetaReducers?: MetaReducer<EntityCollection, EntityAction>[]
+        @Inject(NXA_ENTITY_COLLECTION_META_REDUCERS)
+        entityCollectionMetaReducers?: MetaReducer<NxaEntityCollection, NxaEntityAction>[]
     ) {
         this.entityCollectionMetaReducer = compose.apply(
             null,
@@ -42,8 +42,8 @@ export class EntityCollectionReducerRegistry {
      * Get the registered EntityCollectionReducer<T> for this entity type or create one and register it.
      * @param entityName Name of the entity type for this reducer
      */
-    getOrCreateReducer<T>(entityName: string): EntityCollectionReducer<T> {
-        let reducer: EntityCollectionReducer<T> = this.entityCollectionReducers[
+    getOrCreateReducer<T>(entityName: string): NxaEntityCollectionReducer<T> {
+        let reducer: NxaEntityCollectionReducer<T> = this.entityCollectionReducers[
             entityName
         ];
 
@@ -66,14 +66,14 @@ export class EntityCollectionReducerRegistry {
      */
     registerReducer<T>(
         entityName: string,
-        reducer: EntityCollectionReducer<T>
-    ): EntityCollectionReducer<T> {
+        reducer: NxaEntityCollectionReducer<T>
+    ): NxaEntityCollectionReducer<T> {
         reducer = this.entityCollectionMetaReducer(reducer as any);
         return (this.entityCollectionReducers[entityName.trim()] = reducer);
     }
 
     /**
-     * Register a batch of EntityCollectionReducers.
+     * Register a batch of NxaEntityCollectionReducers.
      * @param reducers - reducers to merge into existing reducers
      *
      * Examples:
@@ -82,7 +82,7 @@ export class EntityCollectionReducerRegistry {
      *     Villain: myVillainReducer
      *   });
      */
-    registerReducers(reducers: EntityCollectionReducers) {
+    registerReducers(reducers: NxaEntityCollectionReducers) {
         const keys = reducers ? Object.keys(reducers) : [];
         keys.forEach(key => this.registerReducer(key, reducers[key]));
     }

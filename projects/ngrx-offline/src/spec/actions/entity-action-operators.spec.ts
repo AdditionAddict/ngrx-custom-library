@@ -3,11 +3,11 @@ import { Action } from '@ngrx/store';
 import { Subject } from 'rxjs';
 
 import {
-    EntityAction,
-    EntityActionFactory,
-    EntityOp,
-    ofEntityType,
-    ofEntityOp,
+    NxaEntityAction,
+    NxaEntityActionFactory,
+    NxaEntityOp,
+    ofNxaEntityType,
+    ofNxaEntityOp,
 } from '../../lib';
 
 class Hero {
@@ -16,23 +16,23 @@ class Hero {
 }
 
 // Todo: consider marble testing
-describe('EntityAction Operators', () => {
+describe('NxaEntityAction Operators', () => {
     // factory never changes in these tests
-    const entityActionFactory = new EntityActionFactory();
+    const nxaEntityActionFactory = new NxaEntityActionFactory();
 
     let results: any[];
-    let actions: Subject<EntityAction>;
+    let actions: Subject<NxaEntityAction>;
 
     const testActions = {
         foo: <Action>{ type: 'Foo' },
-        hero_query_all: entityActionFactory.create('Hero', EntityOp.QUERY_ALL),
-        villain_query_many: entityActionFactory.create(
+        hero_query_all: nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL),
+        villain_query_many: nxaEntityActionFactory.create(
             'Villain',
-            EntityOp.QUERY_MANY
+            NxaEntityOp.QUERY_MANY
         ),
-        hero_delete: entityActionFactory.create(
+        hero_delete: nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_DELETE_ONE,
+            NxaEntityOp.SAVE_DELETE_ONE,
             42
         ),
         bar: <Action>(<any>{ type: 'Bar', payload: 'bar' }),
@@ -43,15 +43,15 @@ describe('EntityAction Operators', () => {
     }
 
     beforeEach(() => {
-        actions = new Subject<EntityAction>();
+        actions = new Subject<NxaEntityAction>();
         results = [];
     });
 
     ///////////////
 
-    it('#ofEntityType()', () => {
-        // EntityActions of any kind
-        actions.pipe(ofEntityType()).subscribe(ea => results.push(ea));
+    it('#ofNxaEntityType()', () => {
+        // NxaEntityActions of any kind
+        actions.pipe(ofNxaEntityType()).subscribe(ea => results.push(ea));
 
         const expectedActions = [
             testActions.hero_query_all,
@@ -62,9 +62,9 @@ describe('EntityAction Operators', () => {
         expect(results).toEqual(expectedActions);
     });
 
-    it(`#ofEntityType('SomeType')`, () => {
-        // EntityActions of one type
-        actions.pipe(ofEntityType('Hero')).subscribe(ea => results.push(ea));
+    it(`#ofNxaEntityType('SomeType')`, () => {
+        // NxaEntityActions of one type
+        actions.pipe(ofNxaEntityType('Hero')).subscribe(ea => results.push(ea));
 
         const expectedActions = [
             testActions.hero_query_all,
@@ -74,30 +74,30 @@ describe('EntityAction Operators', () => {
         expect(results).toEqual(expectedActions);
     });
 
-    it(`#ofEntityType('Type1', 'Type2', 'Type3')`, () => {
+    it(`#ofNxaEntityType('Type1', 'Type2', 'Type3')`, () => {
         // n.b. 'Bar' is not an EntityType even though it is an action type
         actions
-            .pipe(ofEntityType('Hero', 'Villain', 'Bar'))
+            .pipe(ofNxaEntityType('Hero', 'Villain', 'Bar'))
             .subscribe(ea => results.push(ea));
 
-        ofEntityTypeTest();
+        ofNxaEntityTypeTest();
     });
 
-    it('#ofEntityType(...arrayOfTypeNames)', () => {
+    it('#ofNxaEntityType(...arrayOfTypeNames)', () => {
         const types = ['Hero', 'Villain', 'Bar'];
 
-        actions.pipe(ofEntityType(...types)).subscribe(ea => results.push(ea));
-        ofEntityTypeTest();
+        actions.pipe(ofNxaEntityType(...types)).subscribe(ea => results.push(ea));
+        ofNxaEntityTypeTest();
     });
 
-    it('#ofEntityType(arrayOfTypeNames)', () => {
+    it('#ofNxaEntityType(arrayOfTypeNames)', () => {
         const types = ['Hero', 'Villain', 'Bar'];
 
-        actions.pipe(ofEntityType(types)).subscribe(ea => results.push(ea));
-        ofEntityTypeTest();
+        actions.pipe(ofNxaEntityType(types)).subscribe(ea => results.push(ea));
+        ofNxaEntityTypeTest();
     });
 
-    function ofEntityTypeTest() {
+    function ofNxaEntityTypeTest() {
         const expectedActions = [
             testActions.hero_query_all,
             testActions.villain_query_many,
@@ -108,9 +108,9 @@ describe('EntityAction Operators', () => {
         expect(results).toEqual(expectedActions);
     }
 
-    it('#ofEntityType(...) is case sensitive', () => {
-        // EntityActions of the 'hero' type, but it's lowercase so shouldn't match
-        actions.pipe(ofEntityType('hero')).subscribe(ea => results.push(ea));
+    it('#ofNxaEntityType(...) is case sensitive', () => {
+        // NxaEntityActions of the 'hero' type, but it's lowercase so shouldn't match
+        actions.pipe(ofNxaEntityType('hero')).subscribe(ea => results.push(ea));
 
         dispatchTestActions();
         expect(results).toEqual([], 'should not match anything');
@@ -118,31 +118,31 @@ describe('EntityAction Operators', () => {
 
     ///////////////
 
-    it('#ofEntityOp with string args', () => {
+    it('#ofNxaEntityOp with string args', () => {
         actions
-            .pipe(ofEntityOp(EntityOp.QUERY_ALL, EntityOp.QUERY_MANY))
+            .pipe(ofNxaEntityOp(NxaEntityOp.QUERY_ALL, NxaEntityOp.QUERY_MANY))
             .subscribe(ea => results.push(ea));
 
-        ofEntityOpTest();
+        ofNxaEntityOpTest();
     });
 
-    it('#ofEntityOp with ...rest args', () => {
-        const ops = [EntityOp.QUERY_ALL, EntityOp.QUERY_MANY];
+    it('#ofNxaEntityOp with ...rest args', () => {
+        const ops = [NxaEntityOp.QUERY_ALL, NxaEntityOp.QUERY_MANY];
 
-        actions.pipe(ofEntityOp(...ops)).subscribe(ea => results.push(ea));
-        ofEntityOpTest();
+        actions.pipe(ofNxaEntityOp(...ops)).subscribe(ea => results.push(ea));
+        ofNxaEntityOpTest();
     });
 
-    it('#ofEntityOp with array args', () => {
-        const ops = [EntityOp.QUERY_ALL, EntityOp.QUERY_MANY];
+    it('#ofNxaEntityOp with array args', () => {
+        const ops = [NxaEntityOp.QUERY_ALL, NxaEntityOp.QUERY_MANY];
 
-        actions.pipe(ofEntityOp(ops)).subscribe(ea => results.push(ea));
-        ofEntityOpTest();
+        actions.pipe(ofNxaEntityOp(ops)).subscribe(ea => results.push(ea));
+        ofNxaEntityOpTest();
     });
 
-    it('#ofEntityOp()', () => {
-        // EntityOps of any kind
-        actions.pipe(ofEntityOp()).subscribe(ea => results.push(ea));
+    it('#ofNxaEntityOp()', () => {
+        // NxaEntityOps of any kind
+        actions.pipe(ofNxaEntityOp()).subscribe(ea => results.push(ea));
 
         const expectedActions = [
             testActions.hero_query_all,
@@ -153,7 +153,7 @@ describe('EntityAction Operators', () => {
         expect(results).toEqual(expectedActions);
     });
 
-    function ofEntityOpTest() {
+    function ofNxaEntityOpTest() {
         const expectedActions = [
             testActions.hero_query_all,
             testActions.villain_query_many,

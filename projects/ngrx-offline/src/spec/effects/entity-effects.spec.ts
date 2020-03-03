@@ -8,30 +8,30 @@ import { of, merge, ReplaySubject, throwError, timer } from 'rxjs';
 import { delay, first, mergeMap } from 'rxjs/operators';
 
 import {
-    EntityActionFactory,
-    EntityEffects,
-    EntityAction,
-    EntityDataService,
-    PersistenceResultHandler,
-    DefaultPersistenceResultHandler,
-    EntityOp,
-    HttpMethods,
-    DataServiceError,
-    makeErrorOp,
-    EntityActionDataServiceError,
+    NxaEntityActionFactory,
+    NxaEntityEffects,
+    NxaEntityAction,
+    NxaEntityDataService,
+    NxaPersistenceResultHandler,
+    DefaultNxaPersistenceResultHandler,
+    NxaEntityOp,
+    NxaHttpMethods,
+    NxaDataServiceError,
+    makeNxaErrorOp,
+    NxaEntityActionDataServiceError,
     Logger,
 } from '../../lib';
 
-describe('EntityEffects (normal testing)', () => {
+describe('NxaEntityEffects (normal testing)', () => {
     // factory never changes in these tests
-    const entityActionFactory = new EntityActionFactory();
+    const nxaEntityActionFactory = new NxaEntityActionFactory();
 
     let actions$: ReplaySubject<Action>;
-    let effects: EntityEffects;
+    let effects: NxaEntityEffects;
     let logger: Logger;
     let dataService: TestDataService;
 
-    function expectCompletion(completion: EntityAction, done: DoneFn) {
+    function expectCompletion(completion: NxaEntityAction, done: DoneFn) {
         effects.persist$.subscribe(
             result => {
                 expect(result).toEqual(completion);
@@ -49,28 +49,28 @@ describe('EntityEffects (normal testing)', () => {
 
         TestBed.configureTestingModule({
             providers: [
-                EntityEffects,
+                NxaEntityEffects,
                 { provide: Actions, useValue: actions$ },
-                { provide: EntityActionFactory, useValue: entityActionFactory },
+                { provide: NxaEntityActionFactory, useValue: NxaEntityActionFactory },
                 /* tslint:disable-next-line:no-use-before-declare */
-                { provide: EntityDataService, useClass: TestDataService },
+                { provide: NxaEntityDataService, useClass: TestDataService },
                 { provide: Logger, useValue: logger },
                 {
-                    provide: PersistenceResultHandler,
-                    useClass: DefaultPersistenceResultHandler,
+                    provide: NxaPersistenceResultHandler,
+                    useClass: DefaultNxaPersistenceResultHandler,
                 },
             ],
         });
 
         actions$ = TestBed.get(Actions);
-        effects = TestBed.get(EntityEffects);
-        dataService = TestBed.get(EntityDataService);
+        effects = TestBed.get(NxaEntityEffects);
+        dataService = TestBed.get(NxaEntityDataService);
     });
 
     it('cancel$ should emit correlation id for CANCEL_PERSIST', (done: DoneFn) => {
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.CANCEL_PERSIST,
+            NxaEntityOp.CANCEL_PERSIST,
             undefined,
             { correlationId: 42 }
         );
@@ -87,10 +87,10 @@ describe('EntityEffects (normal testing)', () => {
         const heroes = [hero1, hero2];
         dataService.setResponse('getAll', heroes);
 
-        const action = entityActionFactory.create('Hero', EntityOp.QUERY_ALL);
-        const completion = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL);
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.QUERY_ALL_SUCCESS,
+            NxaEntityOp.QUERY_ALL_SUCCESS,
             heroes
         );
 
@@ -104,14 +104,14 @@ describe('EntityEffects (normal testing)', () => {
         const heroes = [hero1, hero2];
         dataService.setResponse('getAll', heroes);
 
-        const action = entityActionFactory.create({
+        const action = nxaEntityActionFactory.create({
             entityName: 'Hero',
-            entityOp: EntityOp.QUERY_ALL,
+            entityOp: NxaEntityOp.QUERY_ALL,
             tag: 'Custom Hero Tag',
         });
 
-        const completion = entityActionFactory.createFromAction(action, {
-            entityOp: EntityOp.QUERY_ALL_SUCCESS,
+        const completion = nxaEntityActionFactory.createFromAction(action, {
+            entityOp: NxaEntityOp.QUERY_ALL_SUCCESS,
             data: heroes,
         });
 
@@ -129,12 +129,12 @@ describe('EntityEffects (normal testing)', () => {
             type: 'some/arbitrary/type/text',
             payload: {
                 entityName: 'Hero',
-                entityOp: EntityOp.QUERY_ALL,
+                entityOp: NxaEntityOp.QUERY_ALL,
             },
         };
 
-        const completion = entityActionFactory.createFromAction(action, {
-            entityOp: EntityOp.QUERY_ALL_SUCCESS,
+        const completion = nxaEntityActionFactory.createFromAction(action, {
+            entityOp: NxaEntityOp.QUERY_ALL_SUCCESS,
             data: heroes,
         });
 
@@ -143,24 +143,24 @@ describe('EntityEffects (normal testing)', () => {
     });
 
     it('should return a QUERY_ALL_ERROR when data service fails', (done: DoneFn) => {
-        const action = entityActionFactory.create('Hero', EntityOp.QUERY_ALL);
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL);
         const httpError = { error: new Error('Test Failure'), status: 501 };
-        const error = makeDataServiceError('GET', httpError);
+        const error = makeNxaDataServiceError('GET', httpError);
         const completion = makeEntityErrorCompletion(action, error);
 
         actions$.next(action);
         dataService.setErrorResponse('getAll', error);
 
         expectCompletion(completion, done);
-        expect(completion.payload.entityOp).toEqual(EntityOp.QUERY_ALL_ERROR);
+        expect(completion.payload.entityOp).toEqual(NxaEntityOp.QUERY_ALL_ERROR);
     });
 
     it('should return a QUERY_BY_KEY_SUCCESS with a hero on success', (done: DoneFn) => {
         const hero = { id: 1, name: 'A' } as Hero;
-        const action = entityActionFactory.create('Hero', EntityOp.QUERY_BY_KEY, 1);
-        const completion = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_BY_KEY, 1);
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.QUERY_BY_KEY_SUCCESS,
+            NxaEntityOp.QUERY_BY_KEY_SUCCESS,
             hero
         );
 
@@ -171,13 +171,13 @@ describe('EntityEffects (normal testing)', () => {
     });
 
     it('should return a QUERY_BY_KEY_ERROR when data service fails', (done: DoneFn) => {
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.QUERY_BY_KEY,
+            NxaEntityOp.QUERY_BY_KEY,
             42
         );
         const httpError = { error: new Error('Entity not found'), status: 404 };
-        const error = makeDataServiceError('GET', httpError);
+        const error = makeNxaDataServiceError('GET', httpError);
         const completion = makeEntityErrorCompletion(action, error);
 
         actions$.next(action);
@@ -191,12 +191,12 @@ describe('EntityEffects (normal testing)', () => {
         const hero2 = { id: 2, name: 'BB' } as Hero;
         const heroes = [hero1, hero2];
 
-        const action = entityActionFactory.create('Hero', EntityOp.QUERY_MANY, {
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_MANY, {
             name: 'B',
         });
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.QUERY_MANY_SUCCESS,
+            NxaEntityOp.QUERY_MANY_SUCCESS,
             heroes
         );
 
@@ -207,11 +207,11 @@ describe('EntityEffects (normal testing)', () => {
     });
 
     it('should return a QUERY_MANY_ERROR when data service fails', (done: DoneFn) => {
-        const action = entityActionFactory.create('Hero', EntityOp.QUERY_MANY, {
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_MANY, {
             name: 'B',
         });
         const httpError = { error: new Error('Resource not found'), status: 404 };
-        const error = makeDataServiceError('GET', httpError, {
+        const error = makeNxaDataServiceError('GET', httpError, {
             name: 'B',
         });
         const completion = makeEntityErrorCompletion(action, error);
@@ -225,15 +225,15 @@ describe('EntityEffects (normal testing)', () => {
     it('should return a SAVE_ADD_ONE_SUCCESS (Optimistic) with the hero on success', (done: DoneFn) => {
         const hero = { id: 1, name: 'A' } as Hero;
 
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_ADD_ONE,
+            NxaEntityOp.SAVE_ADD_ONE,
             hero,
             { isOptimistic: true }
         );
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_ADD_ONE_SUCCESS,
+            NxaEntityOp.SAVE_ADD_ONE_SUCCESS,
             hero,
             { isOptimistic: true }
         );
@@ -247,14 +247,14 @@ describe('EntityEffects (normal testing)', () => {
     it('should return a SAVE_ADD_ONE_SUCCESS (Pessimistic) with the hero on success', (done: DoneFn) => {
         const hero = { id: 1, name: 'A' } as Hero;
 
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_ADD_ONE,
+            NxaEntityOp.SAVE_ADD_ONE,
             hero
         );
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_ADD_ONE_SUCCESS,
+            NxaEntityOp.SAVE_ADD_ONE_SUCCESS,
             hero
         );
 
@@ -266,13 +266,13 @@ describe('EntityEffects (normal testing)', () => {
 
     it('should return a SAVE_ADD_ONE_ERROR when data service fails', (done: DoneFn) => {
         const hero = { id: 1, name: 'A' } as Hero;
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_ADD_ONE,
+            NxaEntityOp.SAVE_ADD_ONE,
             hero
         );
         const httpError = { error: new Error('Test Failure'), status: 501 };
-        const error = makeDataServiceError('PUT', httpError);
+        const error = makeNxaDataServiceError('PUT', httpError);
         const completion = makeEntityErrorCompletion(action, error);
 
         actions$.next(action);
@@ -282,15 +282,15 @@ describe('EntityEffects (normal testing)', () => {
     });
 
     it('should return a SAVE_DELETE_ONE_SUCCESS (Optimistic) on success with delete id', (done: DoneFn) => {
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_DELETE_ONE,
+            NxaEntityOp.SAVE_DELETE_ONE,
             42,
             { isOptimistic: true }
         );
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_DELETE_ONE_SUCCESS,
+            NxaEntityOp.SAVE_DELETE_ONE_SUCCESS,
             42,
             { isOptimistic: true }
         );
@@ -302,14 +302,14 @@ describe('EntityEffects (normal testing)', () => {
     });
 
     it('should return a SAVE_DELETE_ONE_SUCCESS (Pessimistic) on success', (done: DoneFn) => {
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_DELETE_ONE,
+            NxaEntityOp.SAVE_DELETE_ONE,
             42
         );
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_DELETE_ONE_SUCCESS,
+            NxaEntityOp.SAVE_DELETE_ONE_SUCCESS,
             42
         );
 
@@ -320,13 +320,13 @@ describe('EntityEffects (normal testing)', () => {
     });
 
     it('should return a SAVE_DELETE_ONE_ERROR when data service fails', (done: DoneFn) => {
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_DELETE_ONE,
+            NxaEntityOp.SAVE_DELETE_ONE,
             42
         );
         const httpError = { error: new Error('Test Failure'), status: 501 };
-        const error = makeDataServiceError('DELETE', httpError);
+        const error = makeNxaDataServiceError('DELETE', httpError);
         const completion = makeEntityErrorCompletion(action, error);
 
         actions$.next(action);
@@ -340,15 +340,15 @@ describe('EntityEffects (normal testing)', () => {
         const update = { id: 1, changes: updateEntity } as Update<Hero>;
         const updateResponse = { ...update, changed: true };
 
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPDATE_ONE,
+            NxaEntityOp.SAVE_UPDATE_ONE,
             update,
             { isOptimistic: true }
         );
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPDATE_ONE_SUCCESS,
+            NxaEntityOp.SAVE_UPDATE_ONE_SUCCESS,
             updateResponse,
             { isOptimistic: true }
         );
@@ -364,14 +364,14 @@ describe('EntityEffects (normal testing)', () => {
         const update = { id: 1, changes: updateEntity } as Update<Hero>;
         const updateResponse = { ...update, changed: true };
 
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPDATE_ONE,
+            NxaEntityOp.SAVE_UPDATE_ONE,
             update
         );
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPDATE_ONE_SUCCESS,
+            NxaEntityOp.SAVE_UPDATE_ONE_SUCCESS,
             updateResponse
         );
 
@@ -383,13 +383,13 @@ describe('EntityEffects (normal testing)', () => {
 
     it('should return a SAVE_UPDATE_ONE_ERROR when data service fails', (done: DoneFn) => {
         const update = { id: 1, changes: { id: 1, name: 'A' } } as Update<Hero>;
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPDATE_ONE,
+            NxaEntityOp.SAVE_UPDATE_ONE,
             update
         );
         const httpError = { error: new Error('Test Failure'), status: 501 };
-        const error = makeDataServiceError('PUT', httpError);
+        const error = makeNxaDataServiceError('PUT', httpError);
         const completion = makeEntityErrorCompletion(action, error);
 
         actions$.next(action);
@@ -401,15 +401,15 @@ describe('EntityEffects (normal testing)', () => {
     it('should return a SAVE_UPSERT_ONE_SUCCESS (Optimistic) with the hero on success', (done: DoneFn) => {
         const hero = { id: 1, name: 'A' } as Hero;
 
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPSERT_ONE,
+            NxaEntityOp.SAVE_UPSERT_ONE,
             hero,
             { isOptimistic: true }
         );
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPSERT_ONE_SUCCESS,
+            NxaEntityOp.SAVE_UPSERT_ONE_SUCCESS,
             hero,
             { isOptimistic: true }
         );
@@ -423,14 +423,14 @@ describe('EntityEffects (normal testing)', () => {
     it('should return a SAVE_UPSERT_ONE_SUCCESS (Pessimistic) with the hero on success', (done: DoneFn) => {
         const hero = { id: 1, name: 'A' } as Hero;
 
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPSERT_ONE,
+            NxaEntityOp.SAVE_UPSERT_ONE,
             hero
         );
-        const completion = entityActionFactory.create(
+        const completion = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPSERT_ONE_SUCCESS,
+            NxaEntityOp.SAVE_UPSERT_ONE_SUCCESS,
             hero
         );
 
@@ -442,13 +442,13 @@ describe('EntityEffects (normal testing)', () => {
 
     it('should return a SAVE_UPSERT_ONE_ERROR when data service fails', (done: DoneFn) => {
         const hero = { id: 1, name: 'A' } as Hero;
-        const action = entityActionFactory.create(
+        const action = nxaEntityActionFactory.create(
             'Hero',
-            EntityOp.SAVE_UPSERT_ONE,
+            NxaEntityOp.SAVE_UPSERT_ONE,
             hero
         );
         const httpError = { error: new Error('Test Failure'), status: 501 };
-        const error = makeDataServiceError('POST', httpError);
+        const error = makeNxaDataServiceError('POST', httpError);
         const completion = makeEntityErrorCompletion(action, error);
 
         actions$.next(action);
@@ -458,7 +458,7 @@ describe('EntityEffects (normal testing)', () => {
     });
     it(`should not do anything with an irrelevant action`, (done: DoneFn) => {
         // Would clear the cached collection
-        const action = entityActionFactory.create('Hero', EntityOp.REMOVE_ALL);
+        const action = nxaEntityActionFactory.create('Hero', NxaEntityOp.REMOVE_ALL);
 
         actions$.next(action);
         const sentinel = 'no persist$ effect';
@@ -466,7 +466,7 @@ describe('EntityEffects (normal testing)', () => {
         merge(
             effects.persist$,
             of(sentinel).pipe(delay(1))
-            // of(entityActionFactory.create('Hero', EntityOp.QUERY_ALL)) // will cause test to fail
+            // of(nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL)) // will cause test to fail
         )
             .pipe(first())
             .subscribe(
@@ -486,10 +486,10 @@ export class Hero {
     name!: string;
 }
 
-/** make error produced by the EntityDataService */
-function makeDataServiceError(
+/** make error produced by the NxaEntityDataService */
+function makeNxaDataServiceError(
     /** Http method for that action */
-    method: HttpMethods,
+    method: NxaHttpMethods,
     /** Http error from the web api */
     httpError?: any,
     /** Options sent with the request */
@@ -501,21 +501,21 @@ function makeDataServiceError(
     } else {
         httpError = { error: new Error('Test error'), status: 500, url };
     }
-    return new DataServiceError(httpError, { method, url, options });
+    return new NxaDataServiceError(httpError, { method, url, options });
 }
 
-/** Make an EntityDataService error */
+/** Make an NxaEntityDataService error */
 function makeEntityErrorCompletion(
     /** The action that initiated the data service call */
-    originalAction: EntityAction,
-    /** error produced by the EntityDataService */
-    error: DataServiceError
+    originalAction: NxaEntityAction,
+    /** error produced by the NxaEntityDataService */
+    error: NxaDataServiceError
 ) {
-    const errOp = makeErrorOp(originalAction.payload.entityOp);
+    const errOp = makeNxaErrorOp(originalAction.payload.entityOp);
 
     // Entity Error Action
-    const eaFactory = new EntityActionFactory();
-    return eaFactory.create<EntityActionDataServiceError>('Hero', errOp, {
+    const eaFactory = new NxaEntityActionFactory();
+    return eaFactory.create<NxaEntityActionDataServiceError>('Hero', errOp, {
         originalAction,
         error,
     });

@@ -1,13 +1,13 @@
 import {
-    EntityMetadata,
-    EntityCollectionCreator,
-    EntityDefinitionService,
-    createEntityDefinition,
-    EntityCollection,
+    NxaEntityMetadata,
+    NxaEntityCollectionCreator,
+    NxaEntityDefinitionService,
+    createNxaEntityDefinition,
+    NxaEntityCollection,
 } from '../../lib';
 
 /** HeroMetadata identifies extra collection state properties */
-const heroMetadata: EntityMetadata<Hero> = {
+const heroMetadata: NxaEntityMetadata<Hero> = {
     entityName: 'Hero',
     additionalCollectionState: {
         foo: 'Foo',
@@ -15,17 +15,17 @@ const heroMetadata: EntityMetadata<Hero> = {
     },
 };
 
-describe('EntityCollectionCreator', () => {
-    let creator: EntityCollectionCreator;
-    let eds: EntityDefinitionService;
+describe('NxaEntityCollectionCreator', () => {
+    let creator: NxaEntityCollectionCreator;
+    let eds: NxaEntityDefinitionService;
 
     beforeEach(() => {
-        eds = new EntityDefinitionService(null as any);
-        const hdef = createEntityDefinition(heroMetadata);
+        eds = new NxaEntityDefinitionService(null as any);
+        const hdef = createNxaEntityDefinition(heroMetadata);
         hdef.initialState.filter = 'super';
         eds.registerDefinition(hdef);
 
-        creator = new EntityCollectionCreator(eds);
+        creator = new NxaEntityCollectionCreator(eds);
     });
 
     it('should create collection with the definitions initial state', () => {
@@ -57,7 +57,7 @@ interface Hero {
 }
 
 /** HeroCollection is EntityCollection<Hero> with extra collection properties */
-interface HeroCollection extends EntityCollection<Hero> {
+interface HeroCollection extends NxaEntityCollection<Hero> {
     foo: string;
     bar: number;
 }

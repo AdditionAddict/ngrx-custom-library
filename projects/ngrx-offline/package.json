@@ -1,7 +1,7 @@
 {
   "name": "ngrx-offline-experimental",
-  "version": "0.0.1",
-  "description": "An experimental copy of the @ngrx/data module",
+  "version": "^0.0.3",
+  "description": "An experimental copy of the @ngrx/data module with changes to support offline - not public facing",
   "author": "Andrew Allen",
   "peerDependencies": {
     "@angular/common": "^8.2.14",

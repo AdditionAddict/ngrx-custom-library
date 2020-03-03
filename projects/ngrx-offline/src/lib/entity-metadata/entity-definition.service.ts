@@ -1,26 +1,26 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 
-import { createEntityDefinition, EntityDefinition } from './entity-definition';
+import { createNxaEntityDefinition, NxaEntityDefinition } from './entity-definition';
 import {
-    EntityMetadata,
-    EntityMetadataMap,
-    ENTITY_METADATA_TOKEN,
+    NxaEntityMetadata,
+    NxaEntityMetadataMap,
+    NXA_ENTITY_METADATA_TOKEN,
 } from './entity-metadata';
 
-export interface EntityDefinitions {
-    [entityName: string]: EntityDefinition<any>;
+export interface NxaEntityDefinitions {
+    [entityName: string]: NxaEntityDefinition<any>;
 }
 
-/** Registry of EntityDefinitions for all cached entity types */
+/** Registry of NxaEntityDefinitions for all cached entity types */
 @Injectable()
-export class EntityDefinitionService {
-    /** {EntityDefinition} for all cached entity types */
-    private readonly definitions: EntityDefinitions = {};
+export class NxaEntityDefinitionService {
+    /** {NxaEntityDefinition} for all cached entity types */
+    private readonly definitions: NxaEntityDefinitions = {};
 
     constructor(
         @Optional()
-        @Inject(ENTITY_METADATA_TOKEN)
-        entityMetadataMaps: EntityMetadataMap[]
+        @Inject(NXA_ENTITY_METADATA_TOKEN)
+        entityMetadataMaps: NxaEntityMetadataMap[]
     ) {
         if (entityMetadataMaps) {
             entityMetadataMaps.forEach(map => this.registerMetadataMap(map));
@@ -38,11 +38,11 @@ export class EntityDefinitionService {
     getDefinition<T>(
         entityName: string,
         shouldThrow = true
-    ): EntityDefinition<T> {
+    ): NxaEntityDefinition<T> {
         entityName = entityName.trim();
         const definition = this.definitions[entityName];
         if (!definition && shouldThrow) {
-            throw new Error(`No EntityDefinition for entity type "${entityName}".`);
+            throw new Error(`No NxaEntityDefinition for entity type "${entityName}".`);
         }
         return definition;
     }
@@ -50,22 +50,22 @@ export class EntityDefinitionService {
     //////// Registration methods //////////
 
     /**
-     * Create and register the {EntityDefinition} for the {EntityMetadata} of an entity type
+     * Create and register the {NxaEntityDefinition} for the {NxaEntityMetadata} of an entity type
      * @param name - the name of the entity type
-     * @param definition - {EntityMetadata} for a collection for that entity type
+     * @param definition - {NxaEntityMetadata} for a collection for that entity type
      *
      * Examples:
-     *   registerMetadata(myHeroEntityDefinition);
+     *   registerMetadata(myHeroNxaEntityDefinition);
      */
-    registerMetadata(metadata: EntityMetadata) {
+    registerMetadata(metadata: NxaEntityMetadata) {
         if (metadata) {
-            const definition = createEntityDefinition(metadata);
+            const definition = createNxaEntityDefinition(metadata);
             this.registerDefinition(definition);
         }
     }
 
     /**
-     * Register an EntityMetadataMap.
+     * Register an NxaEntityMetadataMap.
      * @param metadataMap - a map of entityType names to entity metadata
      *
      * Examples:
@@ -74,7 +74,7 @@ export class EntityDefinitionService {
      *     Villain: myVillainMetadata
      *   });
      */
-    registerMetadataMap(metadataMap: EntityMetadataMap = {}) {
+    registerMetadataMap(metadataMap: NxaEntityMetadataMap = {}) {
         // The entity type name should be the same as the map key
         Object.keys(metadataMap || {}).forEach(entityName =>
             this.registerMetadata({ entityName, ...metadataMap[entityName] })
@@ -82,27 +82,27 @@ export class EntityDefinitionService {
     }
 
     /**
-     * Register an {EntityDefinition} for an entity type
-     * @param definition - EntityDefinition of a collection for that entity type
+     * Register an {NxaEntityDefinition} for an entity type
+     * @param definition - NxaEntityDefinition of a collection for that entity type
      *
      * Examples:
-     *   registerDefinition('Hero', myHeroEntityDefinition);
+     *   registerDefinition('Hero', myHeroNxaEntityDefinition);
      */
-    registerDefinition<T>(definition: EntityDefinition<T>) {
+    registerDefinition<T>(definition: NxaEntityDefinition<T>) {
         this.definitions[definition.entityName] = definition;
     }
 
     /**
-     * Register a batch of EntityDefinitions.
-     * @param definitions - map of entityType name and associated EntityDefinitions to merge.
+     * Register a batch of NxaEntityDefinitions.
+     * @param definitions - map of entityType name and associated NxaEntityDefinitions to merge.
      *
      * Examples:
      *   registerDefinitions({
-     *     'Hero': myHeroEntityDefinition,
-     *     Villain: myVillainEntityDefinition
+     *     'Hero': myHeroNxaEntityDefinition,
+     *     Villain: myVillainNxaEntityDefinition
      *   });
      */
-    registerDefinitions(definitions: EntityDefinitions) {
+    registerDefinitions(definitions: NxaEntityDefinitions) {
         Object.assign(this.definitions, definitions);
     }
 }

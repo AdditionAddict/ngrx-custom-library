@@ -4,16 +4,16 @@ import { Update } from '@ngrx/entity';
 import { Subject } from 'rxjs';
 
 import {
-    EntityDispatcherDefaultOptions,
+    NxaEntityDispatcherDefaultOptions,
     CorrelationIdGenerator,
-    EntityActionFactory,
-    createEntityCacheSelector,
+    NxaEntityActionFactory,
+    createNxaEntityCacheSelector,
     defaultSelectId,
-    EntityDispatcherBase,
-    EntityDispatcher,
-    EntityAction,
-    EntityOp,
-    MergeStrategy,
+    NxaEntityDispatcherBase,
+    NxaEntityDispatcher,
+    NxaEntityAction,
+    NxaEntityOp,
+    NxaMergeStrategy,
 } from '../../lib';
 
 class Hero {
@@ -29,22 +29,22 @@ class TestStore {
     select() { }
 }
 
-const defaultDispatcherOptions = new EntityDispatcherDefaultOptions();
+const defaultDispatcherOptions = new NxaEntityDispatcherDefaultOptions();
 
-describe('EntityDispatcher', () => {
+describe('NxaEntityDispatcher', () => {
     commandDispatchTest(entityDispatcherSetup);
 
     function entityDispatcherSetup() {
         const correlationIdGenerator = new CorrelationIdGenerator();
-        const entityActionFactory = new EntityActionFactory();
-        const entityCacheSelector = createEntityCacheSelector();
+        const nxaEntityActionFactory = new NxaEntityActionFactory();
+        const entityCacheSelector = createNxaEntityCacheSelector();
         const scannedActions$ = new Subject<Action>();
         const selectId = defaultSelectId;
         const store: any = new TestStore();
 
-        const dispatcher = new EntityDispatcherBase<Hero>(
+        const dispatcher = new NxaEntityDispatcherBase<Hero>(
             'Hero',
-            entityActionFactory,
+            nxaEntityActionFactory,
             store,
             selectId,
             defaultDispatcherOptions,
@@ -59,17 +59,17 @@ describe('EntityDispatcher', () => {
 ///// Tests /////
 
 /**
- * Test that implementer of EntityCommands dispatches properly
- * @param setup Function that sets up the EntityDispatcher before each test (called in a BeforeEach()).
+ * Test that implementer of NxaEntityCommands dispatches properly
+ * @param setup Function that sets up the NxaEntityDispatcher before each test (called in a BeforeEach()).
  */
 export function commandDispatchTest(
-    setup: () => { dispatcher: EntityDispatcher<Hero>; store: any }
+    setup: () => { dispatcher: NxaEntityDispatcher<Hero>; store: any }
 ) {
-    let dispatcher: EntityDispatcher<Hero>;
+    let dispatcher: NxaEntityDispatcher<Hero>;
     let testStore: { dispatch: jasmine.Spy };
 
     function dispatchedAction() {
-        return <EntityAction>testStore.dispatch.calls.argsFor(0)[0];
+        return <NxaEntityAction>testStore.dispatch.calls.argsFor(0)[0];
     }
 
     beforeEach(() => {
@@ -86,7 +86,7 @@ export function commandDispatchTest(
     it('#cancel(correlationId) can dispatch CANCEL_PERSIST', () => {
         dispatcher.cancel('CRID007', 'Test cancel');
         const { entityOp, correlationId, data } = dispatchedAction().payload;
-        expect(entityOp).toBe(EntityOp.CANCEL_PERSIST);
+        expect(entityOp).toBe(NxaEntityOp.CANCEL_PERSIST);
         expect(correlationId).toBe('CRID007');
         expect(data).toBe('Test cancel');
     });
@@ -100,7 +100,7 @@ export function commandDispatchTest(
                 const hero: Hero = { id: 42, name: 'test' };
                 dispatcher.add(hero, { isOptimistic: true });
                 const { entityOp, isOptimistic, data } = dispatchedAction().payload;
-                expect(entityOp).toBe(EntityOp.SAVE_ADD_ONE);
+                expect(entityOp).toBe(NxaEntityOp.SAVE_ADD_ONE);
                 expect(isOptimistic).toBe(true);
                 expect(data).toBe(hero);
             });
@@ -108,7 +108,7 @@ export function commandDispatchTest(
             it('#delete(42) dispatches SAVE_DELETE_ONE optimistically for the id:42', () => {
                 dispatcher.delete(42); // optimistic by default
                 const { entityOp, isOptimistic, data } = dispatchedAction().payload;
-                expect(entityOp).toBe(EntityOp.SAVE_DELETE_ONE);
+                expect(entityOp).toBe(NxaEntityOp.SAVE_DELETE_ONE);
                 expect(isOptimistic).toBe(true);
                 expect(data).toBe(42);
             });
@@ -118,7 +118,7 @@ export function commandDispatchTest(
                 const hero: Hero = { id, name: 'test' };
                 dispatcher.delete(hero); // optimistic by default
                 const { entityOp, isOptimistic, data } = dispatchedAction().payload;
-                expect(entityOp).toBe(EntityOp.SAVE_DELETE_ONE);
+                expect(entityOp).toBe(NxaEntityOp.SAVE_DELETE_ONE);
                 expect(isOptimistic).toBe(true);
                 expect(data).toBe(42);
             });
@@ -129,7 +129,7 @@ export function commandDispatchTest(
 
                 dispatcher.update(hero, { isOptimistic: true });
                 const { entityOp, isOptimistic, data } = dispatchedAction().payload;
-                expect(entityOp).toBe(EntityOp.SAVE_UPDATE_ONE);
+                expect(entityOp).toBe(NxaEntityOp.SAVE_UPDATE_ONE);
                 expect(isOptimistic).toBe(true);
                 expect(data).toEqual(expectedUpdate);
             });
@@ -140,7 +140,7 @@ export function commandDispatchTest(
                 const hero: Hero = { id: 42, name: 'test' };
                 dispatcher.add(hero); // pessimistic by default
                 const { entityOp, isOptimistic, data } = dispatchedAction().payload;
-                expect(entityOp).toBe(EntityOp.SAVE_ADD_ONE);
+                expect(entityOp).toBe(NxaEntityOp.SAVE_ADD_ONE);
                 expect(isOptimistic).toBe(false);
                 expect(data).toBe(hero);
             });
@@ -148,7 +148,7 @@ export function commandDispatchTest(
             it('#delete(42) can dispatch SAVE_DELETE pessimistically for the id:42', () => {
                 dispatcher.delete(42, { isOptimistic: false }); // optimistic by default
                 const { entityOp, isOptimistic, data } = dispatchedAction().payload;
-                expect(entityOp).toBe(EntityOp.SAVE_DELETE_ONE);
+                expect(entityOp).toBe(NxaEntityOp.SAVE_DELETE_ONE);
                 expect(isOptimistic).toBe(false);
                 expect(data).toBe(42);
             });
@@ -159,7 +159,7 @@ export function commandDispatchTest(
 
                 dispatcher.delete(hero, { isOptimistic: false }); // optimistic by default
                 const { entityOp, isOptimistic, data } = dispatchedAction().payload;
-                expect(entityOp).toBe(EntityOp.SAVE_DELETE_ONE);
+                expect(entityOp).toBe(NxaEntityOp.SAVE_DELETE_ONE);
                 expect(isOptimistic).toBe(false);
                 expect(data).toBe(42);
             });
@@ -170,7 +170,7 @@ export function commandDispatchTest(
 
                 dispatcher.update(hero); // pessimistic by default
                 const { entityOp, isOptimistic, data } = dispatchedAction().payload;
-                expect(entityOp).toBe(EntityOp.SAVE_UPDATE_ONE);
+                expect(entityOp).toBe(NxaEntityOp.SAVE_UPDATE_ONE);
                 expect(isOptimistic).toBe(false);
                 expect(data).toEqual(expectedUpdate);
             });
@@ -186,45 +186,45 @@ export function commandDispatchTest(
                 entityName,
                 mergeStrategy,
             } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.QUERY_ALL);
+            expect(entityOp).toBe(NxaEntityOp.QUERY_ALL);
             expect(entityName).toBe('Hero');
-            expect(mergeStrategy).toBeUndefined('no MergeStrategy');
+            expect(mergeStrategy).toBeUndefined('no NxaMergeStrategy');
         });
 
-        it('#getAll({mergeStrategy}) dispatches QUERY_ALL with a MergeStrategy', () => {
-            dispatcher.getAll({ mergeStrategy: MergeStrategy.PreserveChanges });
+        it('#getAll({mergeStrategy}) dispatches QUERY_ALL with a NxaMergeStrategy', () => {
+            dispatcher.getAll({ mergeStrategy: NxaMergeStrategy.PreserveChanges });
 
             const {
                 entityOp,
                 entityName,
                 mergeStrategy,
             } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.QUERY_ALL);
+            expect(entityOp).toBe(NxaEntityOp.QUERY_ALL);
             expect(entityName).toBe('Hero');
-            expect(mergeStrategy).toBe(MergeStrategy.PreserveChanges);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.PreserveChanges);
         });
 
         it('#getByKey(42) dispatches QUERY_BY_KEY for the id:42', () => {
             dispatcher.getByKey(42);
 
             const { entityOp, data, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.QUERY_BY_KEY);
+            expect(entityOp).toBe(NxaEntityOp.QUERY_BY_KEY);
             expect(data).toBe(42);
-            expect(mergeStrategy).toBeUndefined('no MergeStrategy');
+            expect(mergeStrategy).toBeUndefined('no NxaMergeStrategy');
         });
 
-        it('#getByKey(42, {mergeStrategy}) dispatches QUERY_BY_KEY with a MergeStrategy', () => {
+        it('#getByKey(42, {mergeStrategy}) dispatches QUERY_BY_KEY with a NxaMergeStrategy', () => {
             dispatcher.getByKey(42, {
-                mergeStrategy: MergeStrategy.OverwriteChanges,
+                mergeStrategy: NxaMergeStrategy.OverwriteChanges,
             });
 
             const { entityOp, data, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.QUERY_BY_KEY);
+            expect(entityOp).toBe(NxaEntityOp.QUERY_BY_KEY);
             expect(data).toBe(42);
-            expect(mergeStrategy).toBe(MergeStrategy.OverwriteChanges);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.OverwriteChanges);
         });
 
-        it('#getWithQuery(QueryParams) dispatches QUERY_MANY', () => {
+        it('#getWithQuery(NxaQueryParams) dispatches QUERY_MANY', () => {
             dispatcher.getWithQuery({ name: 'B' });
 
             const {
@@ -233,10 +233,10 @@ export function commandDispatchTest(
                 entityName,
                 mergeStrategy,
             } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.QUERY_MANY);
+            expect(entityOp).toBe(NxaEntityOp.QUERY_MANY);
             expect(entityName).toBe('Hero');
             expect(data).toEqual({ name: 'B' }, 'params');
-            expect(mergeStrategy).toBeUndefined('no MergeStrategy');
+            expect(mergeStrategy).toBeUndefined('no NxaMergeStrategy');
         });
 
         it('#getWithQuery(string) dispatches QUERY_MANY', () => {
@@ -248,15 +248,15 @@ export function commandDispatchTest(
                 entityName,
                 mergeStrategy,
             } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.QUERY_MANY);
+            expect(entityOp).toBe(NxaEntityOp.QUERY_MANY);
             expect(entityName).toBe('Hero');
             expect(data).toEqual('name=B', 'params');
-            expect(mergeStrategy).toBeUndefined('no MergeStrategy');
+            expect(mergeStrategy).toBeUndefined('no NxaMergeStrategy');
         });
 
-        it('#getWithQuery(string) dispatches QUERY_MANY with a MergeStrategy', () => {
+        it('#getWithQuery(string) dispatches QUERY_MANY with a NxaMergeStrategy', () => {
             dispatcher.getWithQuery('name=B', {
-                mergeStrategy: MergeStrategy.PreserveChanges,
+                mergeStrategy: NxaMergeStrategy.PreserveChanges,
             });
 
             const {
@@ -265,10 +265,10 @@ export function commandDispatchTest(
                 entityName,
                 mergeStrategy,
             } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.QUERY_MANY);
+            expect(entityOp).toBe(NxaEntityOp.QUERY_MANY);
             expect(entityName).toBe('Hero');
             expect(data).toEqual('name=B', 'params');
-            expect(mergeStrategy).toBe(MergeStrategy.PreserveChanges);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.PreserveChanges);
         });
 
         it('#load() dispatches QUERY_LOAD', () => {
@@ -279,9 +279,9 @@ export function commandDispatchTest(
                 entityName,
                 mergeStrategy,
             } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.QUERY_LOAD);
+            expect(entityOp).toBe(NxaEntityOp.QUERY_LOAD);
             expect(entityName).toBe('Hero');
-            expect(mergeStrategy).toBeUndefined('no MergeStrategy');
+            expect(mergeStrategy).toBeUndefined('no NxaMergeStrategy');
         });
     });
 
@@ -294,7 +294,7 @@ export function commandDispatchTest(
             ];
             dispatcher.addAllToCache(heroes);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.ADD_ALL);
+            expect(entityOp).toBe(NxaEntityOp.ADD_ALL);
             expect(data).toBe(heroes);
         });
 
@@ -302,19 +302,19 @@ export function commandDispatchTest(
             const hero: Hero = { id: 42, name: 'test' };
             dispatcher.addOneToCache(hero);
             const { entityOp, data, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.ADD_ONE);
+            expect(entityOp).toBe(NxaEntityOp.ADD_ONE);
             expect(data).toBe(hero);
-            expect(mergeStrategy).toBeUndefined('no MergeStrategy');
+            expect(mergeStrategy).toBeUndefined('no NxaMergeStrategy');
         });
 
-        it('#addOneToCache can dispatch ADD_ONE and MergeStrategy.IgnoreChanges', () => {
+        it('#addOneToCache can dispatch ADD_ONE and NxaMergeStrategy.IgnoreChanges', () => {
             const hero: Hero = { id: 42, name: 'test' };
             dispatcher.addOneToCache(hero, {
-                mergeStrategy: MergeStrategy.IgnoreChanges,
+                mergeStrategy: NxaMergeStrategy.IgnoreChanges,
             });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.ADD_ONE);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.ADD_ONE);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
 
         it('#addManyToCache dispatches ADD_MANY', () => {
@@ -324,71 +324,71 @@ export function commandDispatchTest(
             ];
             dispatcher.addManyToCache(heroes);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.ADD_MANY);
+            expect(entityOp).toBe(NxaEntityOp.ADD_MANY);
             expect(data).toBe(heroes);
         });
 
-        it('#addManyToCache can dispatch ADD_MANY and MergeStrategy.IgnoreChanges', () => {
+        it('#addManyToCache can dispatch ADD_MANY and NxaMergeStrategy.IgnoreChanges', () => {
             const heroes: Hero[] = [
                 { id: 42, name: 'test 42' },
                 { id: 84, name: 'test 84', saying: 'howdy' },
             ];
             dispatcher.addManyToCache(heroes, {
-                mergeStrategy: MergeStrategy.IgnoreChanges,
+                mergeStrategy: NxaMergeStrategy.IgnoreChanges,
             });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.ADD_MANY);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.ADD_MANY);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
 
         it('#clearCache() dispatches REMOVE_ALL for the Hero collection', () => {
             dispatcher.clearCache();
             const { entityOp, entityName } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.REMOVE_ALL);
+            expect(entityOp).toBe(NxaEntityOp.REMOVE_ALL);
             expect(entityName).toBe('Hero');
         });
 
         it('#clearCache() can dispatch REMOVE_ALL with options', () => {
-            dispatcher.clearCache({ mergeStrategy: MergeStrategy.IgnoreChanges });
+            dispatcher.clearCache({ mergeStrategy: NxaMergeStrategy.IgnoreChanges });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.REMOVE_ALL);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.REMOVE_ALL);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
 
         it('#removeOneFromCache(key) dispatches REMOVE_ONE', () => {
             const id = 42;
             dispatcher.removeOneFromCache(id);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.REMOVE_ONE);
+            expect(entityOp).toBe(NxaEntityOp.REMOVE_ONE);
             expect(data).toBe(id);
         });
 
-        it('#removeOneFromCache(key) can dispatch REMOVE_ONE and MergeStrategy.IgnoreChanges', () => {
+        it('#removeOneFromCache(key) can dispatch REMOVE_ONE and NxaMergeStrategy.IgnoreChanges', () => {
             const id = 42;
             dispatcher.removeOneFromCache(id, {
-                mergeStrategy: MergeStrategy.IgnoreChanges,
+                mergeStrategy: NxaMergeStrategy.IgnoreChanges,
             });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.REMOVE_ONE);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.REMOVE_ONE);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
 
         it('#removeManyFromCache(keys) dispatches REMOVE_MANY', () => {
             const keys = [42, 84];
             dispatcher.removeManyFromCache(keys);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.REMOVE_MANY);
+            expect(entityOp).toBe(NxaEntityOp.REMOVE_MANY);
             expect(data).toBe(keys);
         });
 
-        it('#removeManyFromCache(keys) can dispatch REMOVE_MANY and MergeStrategy.IgnoreChanges', () => {
+        it('#removeManyFromCache(keys) can dispatch REMOVE_MANY and NxaMergeStrategy.IgnoreChanges', () => {
             const keys = [42, 84];
             dispatcher.removeManyFromCache(keys, {
-                mergeStrategy: MergeStrategy.IgnoreChanges,
+                mergeStrategy: NxaMergeStrategy.IgnoreChanges,
             });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.REMOVE_MANY);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.REMOVE_MANY);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
 
         it('#removeManyFromCache(entities) dispatches REMOVE_MANY', () => {
@@ -399,7 +399,7 @@ export function commandDispatchTest(
             const keys = heroes.map(h => h.id);
             dispatcher.removeManyFromCache(heroes);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.REMOVE_MANY);
+            expect(entityOp).toBe(NxaEntityOp.REMOVE_MANY);
             expect(data).toEqual(keys);
         });
 
@@ -415,19 +415,19 @@ export function commandDispatchTest(
             const update = { id: 42, changes: hero };
             dispatcher.updateOneInCache(hero);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.UPDATE_ONE);
+            expect(entityOp).toBe(NxaEntityOp.UPDATE_ONE);
             expect(data).toEqual(update);
         });
 
-        it('#updateOneInCache can dispatch UPDATE_ONE and MergeStrategy.IgnoreChanges', () => {
+        it('#updateOneInCache can dispatch UPDATE_ONE and NxaMergeStrategy.IgnoreChanges', () => {
             const hero: Partial<Hero> = { id: 42, name: 'test' };
             const update = { id: 42, changes: hero };
             dispatcher.updateOneInCache(hero, {
-                mergeStrategy: MergeStrategy.IgnoreChanges,
+                mergeStrategy: NxaMergeStrategy.IgnoreChanges,
             });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.UPDATE_ONE);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.UPDATE_ONE);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
 
         it('#updateManyInCache dispatches UPDATE_MANY', () => {
@@ -441,11 +441,11 @@ export function commandDispatchTest(
             ];
             dispatcher.updateManyInCache(heroes);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.UPDATE_MANY);
+            expect(entityOp).toBe(NxaEntityOp.UPDATE_MANY);
             expect(data).toEqual(updates);
         });
 
-        it('#updateManyInCache can dispatch UPDATE_MANY and MergeStrategy.IgnoreChanges', () => {
+        it('#updateManyInCache can dispatch UPDATE_MANY and NxaMergeStrategy.IgnoreChanges', () => {
             const heroes: Partial<Hero>[] = [
                 { id: 42, name: 'test 42' },
                 { id: 84, saying: 'ho ho ho' },
@@ -455,29 +455,29 @@ export function commandDispatchTest(
                 { id: 84, changes: heroes[1] },
             ];
             dispatcher.updateManyInCache(heroes, {
-                mergeStrategy: MergeStrategy.IgnoreChanges,
+                mergeStrategy: NxaMergeStrategy.IgnoreChanges,
             });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.UPDATE_MANY);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.UPDATE_MANY);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
 
         it('#upsertOneInCache dispatches UPSERT_ONE', () => {
             const hero = { id: 42, name: 'test' };
             dispatcher.upsertOneInCache(hero);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.UPSERT_ONE);
+            expect(entityOp).toBe(NxaEntityOp.UPSERT_ONE);
             expect(data).toEqual(hero);
         });
 
-        it('#upsertOneInCache can dispatch UPSERT_ONE and MergeStrategy.IgnoreChanges', () => {
+        it('#upsertOneInCache can dispatch UPSERT_ONE and NxaMergeStrategy.IgnoreChanges', () => {
             const hero = { id: 42, name: 'test' };
             dispatcher.upsertOneInCache(hero, {
-                mergeStrategy: MergeStrategy.IgnoreChanges,
+                mergeStrategy: NxaMergeStrategy.IgnoreChanges,
             });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.UPSERT_ONE);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.UPSERT_ONE);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
 
         it('#upsertManyInCache dispatches UPSERT_MANY', () => {
@@ -487,21 +487,21 @@ export function commandDispatchTest(
             ];
             dispatcher.upsertManyInCache(heroes);
             const { entityOp, data } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.UPSERT_MANY);
+            expect(entityOp).toBe(NxaEntityOp.UPSERT_MANY);
             expect(data).toEqual(heroes);
         });
 
-        it('#upsertManyInCache can dispatch UPSERT_MANY and MergeStrategy.IgnoreChanges', () => {
+        it('#upsertManyInCache can dispatch UPSERT_MANY and NxaMergeStrategy.IgnoreChanges', () => {
             const heroes = [
                 { id: 42, name: 'test 42' },
                 { id: 84, saying: 'ho ho ho' },
             ];
             dispatcher.upsertManyInCache(heroes, {
-                mergeStrategy: MergeStrategy.IgnoreChanges,
+                mergeStrategy: NxaMergeStrategy.IgnoreChanges,
             });
             const { entityOp, mergeStrategy } = dispatchedAction().payload;
-            expect(entityOp).toBe(EntityOp.UPSERT_MANY);
-            expect(mergeStrategy).toBe(MergeStrategy.IgnoreChanges);
+            expect(entityOp).toBe(NxaEntityOp.UPSERT_MANY);
+            expect(mergeStrategy).toBe(NxaMergeStrategy.IgnoreChanges);
         });
     });
 }

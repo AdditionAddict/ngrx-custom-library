@@ -1,18 +1,18 @@
 import { IdSelector, Update } from '@ngrx/entity';
 
-import { EntityAction } from './entity-action';
-import { UpdateResponseData } from '../actions/update-response-data';
+import { NxaEntityAction } from './entity-action';
+import { NxaUpdateResponseData } from '../actions/update-response-data';
 
 /**
- * Guard methods that ensure EntityAction payload is as expected.
+ * Guard methods that ensure NxaEntityAction payload is as expected.
  * Each method returns that payload if it passes the guard or
  * throws an error.
  */
-export class EntityActionGuard<T> {
+export class NxaEntityActionGuard<T> {
     constructor(private entityName: string, private selectId: IdSelector<T>) { }
 
     /** Throw if the action payload is not an entity with a valid key */
-    mustBeEntity(action: EntityAction<T>): T {
+    mustBeEntity(action: NxaEntityAction<T>): T {
         const data = this.extractData(action);
         if (!data) {
             return this.throwError(action, `should have a single entity.`);
@@ -25,7 +25,7 @@ export class EntityActionGuard<T> {
     }
 
     /** Throw if the action payload is not an array of entities with valid keys */
-    mustBeEntities(action: EntityAction<T[]>): T[] {
+    mustBeEntities(action: NxaEntityAction<T[]>): T[] {
         const data = this.extractData(action);
         if (!Array.isArray(data)) {
             return this.throwError(action, `should be an array of entities`);
@@ -41,7 +41,7 @@ export class EntityActionGuard<T> {
     }
 
     /** Throw if the action payload is not a single, valid key */
-    mustBeKey(action: EntityAction<string | number>): string | number | never {
+    mustBeKey(action: NxaEntityAction<string | number>): string | number | never {
         const data = this.extractData(action);
         if (!data) {
             throw new Error(`should be a single entity key`);
@@ -53,7 +53,7 @@ export class EntityActionGuard<T> {
     }
 
     /** Throw if the action payload is not an array of valid keys */
-    mustBeKeys(action: EntityAction<(string | number)[]>): (string | number)[] {
+    mustBeKeys(action: NxaEntityAction<(string | number)[]>): (string | number)[] {
         const data = this.extractData(action);
         if (!Array.isArray(data)) {
             return this.throwError(action, `should be an array of entity keys (id)`);
@@ -69,7 +69,7 @@ export class EntityActionGuard<T> {
     }
 
     /** Throw if the action payload is not an update with a valid key (id) */
-    mustBeUpdate(action: EntityAction<Update<T>>): Update<T> {
+    mustBeUpdate(action: NxaEntityAction<Update<T>>): Update<T> {
         const data = this.extractData(action);
         if (!data) {
             return this.throwError(action, `should be a single entity update`);
@@ -83,7 +83,7 @@ export class EntityActionGuard<T> {
     }
 
     /** Throw if the action payload is not an array of updates with valid keys (ids) */
-    mustBeUpdates(action: EntityAction<Update<T>[]>): Update<T>[] {
+    mustBeUpdates(action: NxaEntityAction<Update<T>[]>): Update<T>[] {
         const data = this.extractData(action);
         if (!Array.isArray(data)) {
             return this.throwError(action, `should be an array of entity updates`);
@@ -103,8 +103,8 @@ export class EntityActionGuard<T> {
 
     /** Throw if the action payload is not an update response with a valid key (id) */
     mustBeUpdateResponse(
-        action: EntityAction<UpdateResponseData<T>>
-    ): UpdateResponseData<T> {
+        action: NxaEntityAction<NxaUpdateResponseData<T>>
+    ): NxaUpdateResponseData<T> {
         const data = this.extractData(action);
         if (!data) {
             return this.throwError(action, `should be a single entity update`);
@@ -119,8 +119,8 @@ export class EntityActionGuard<T> {
 
     /** Throw if the action payload is not an array of update responses with valid keys (ids) */
     mustBeUpdateResponses(
-        action: EntityAction<UpdateResponseData<T>[]>
-    ): UpdateResponseData<T>[] {
+        action: NxaEntityAction<NxaUpdateResponseData<T>[]>
+    ): NxaUpdateResponseData<T>[] {
         const data = this.extractData(action);
         if (!Array.isArray(data)) {
             return this.throwError(action, `should be an array of entity updates`);
@@ -138,7 +138,7 @@ export class EntityActionGuard<T> {
         return data;
     }
 
-    private extractData<T>(action: EntityAction<T>) {
+    private extractData<T>(action: NxaEntityAction<T>) {
         return action.payload && action.payload.data;
     }
 
@@ -147,9 +147,9 @@ export class EntityActionGuard<T> {
         return typeof id !== 'string' && typeof id !== 'number';
     }
 
-    private throwError(action: EntityAction, msg: string): never {
+    private throwError(action: NxaEntityAction, msg: string): never {
         throw new Error(
-            `${this.entityName} EntityAction guard for "${
+            `${this.entityName} NxaEntityAction guard for "${
             action.type
             }": payload ${msg}`
         );

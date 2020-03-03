@@ -2,38 +2,38 @@ import { Injectable } from '@angular/core';
 import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { EntityAction } from '../actions/entity-action';
-import { EntityCache } from '../reducers/entity-cache';
-import { EntityDispatcherFactory } from '../dispatchers/entity-dispatcher-factory';
-import { EntitySelectors$Factory } from '../selectors/entity-selectors$';
-import { EntityCollectionServiceFactory } from './entity-collection-service-factory';
+import { NxaEntityAction } from '../actions/entity-action';
+import { NxaEntityCache } from '../reducers/entity-cache';
+import { NxaEntityDispatcherFactory } from '../dispatchers/entity-dispatcher-factory';
+import { NxaEntitySelectors$Factory } from '../selectors/entity-selectors$';
+import { NxaEntityCollectionServiceFactory } from './entity-collection-service-factory';
 
 /** Core ingredients of an EntityServices class */
 @Injectable()
-export class EntityServicesElements {
+export class NxaEntityServicesElements {
     constructor(
         /**
          * Creates EntityCollectionService instances for
          * a cached collection of T entities in the ngrx store.
          */
-        public readonly entityCollectionServiceFactory: EntityCollectionServiceFactory,
-        /** Creates EntityDispatchers for entity collections */
-        entityDispatcherFactory: EntityDispatcherFactory,
-        /** Creates observable EntitySelectors$ for entity collections. */
-        entitySelectors$Factory: EntitySelectors$Factory,
-        /** The ngrx store, scoped to the EntityCache */
-        public readonly store: Store<EntityCache>
+        public readonly entityCollectionServiceFactory: NxaEntityCollectionServiceFactory,
+        /** Creates NxaEntityDispatchers for entity collections */
+        entityDispatcherFactory: NxaEntityDispatcherFactory,
+        /** Creates observable NxaEntitySelectors$ for entity collections. */
+        entitySelectors$Factory: NxaEntitySelectors$Factory,
+        /** The ngrx store, scoped to the NxaEntityCache */
+        public readonly store: Store<NxaEntityCache>
     ) {
-        this.entityActionErrors$ = entitySelectors$Factory.entityActionErrors$;
+        this.NxaEntityActionErrors$ = entitySelectors$Factory.NxaEntityActionErrors$;
         this.entityCache$ = entitySelectors$Factory.entityCache$;
         this.reducedActions$ = entityDispatcherFactory.reducedActions$;
     }
 
-    /** Observable of error EntityActions (e.g. QUERY_ALL_ERROR) for all entity types */
-    readonly entityActionErrors$: Observable<EntityAction>;
+    /** Observable of error NxaEntityActions (e.g. QUERY_ALL_ERROR) for all entity types */
+    readonly NxaEntityActionErrors$: Observable<NxaEntityAction>;
 
     /** Observable of the entire entity cache */
-    readonly entityCache$: Observable<EntityCache> | Store<EntityCache>;
+    readonly entityCache$: Observable<NxaEntityCache> | Store<NxaEntityCache>;
 
     /**
      * Actions scanned by the store after it processed them with reducers.

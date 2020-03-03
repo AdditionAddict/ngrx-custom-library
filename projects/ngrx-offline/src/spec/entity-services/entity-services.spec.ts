@@ -5,49 +5,49 @@ import { Observable } from 'rxjs';
 import { first, skip } from 'rxjs/operators';
 
 import {
-    EntityAction,
-    EntityOp,
-    EntityCacheQuerySet,
-    MergeQuerySet,
-    EntityMetadataMap,
+    NxaEntityAction,
+    NxaEntityOp,
+    NxaEntityCacheQuerySet,
+    NxaMergeQuerySet,
+    NxaEntityMetadataMap,
     EntityDataModule,
-    EntityCacheEffects,
-    EntityDataService,
-    EntityActionFactory,
-    EntityDispatcherFactory,
+    NxaEntityCacheEffects,
+    NxaEntityDataService,
+    NxaEntityActionFactory,
+    NxaEntityDispatcherFactory,
     EntityServices,
-    EntityCache,
-    HttpMethods,
-    DataServiceError,
+    NxaEntityCache,
+    NxaHttpMethods,
+    NxaDataServiceError,
     Logger,
 } from '../../lib';
 
 describe('EntityServices', () => {
-    describe('entityActionErrors$', () => {
-        it('should emit EntityAction errors for multiple entity types', () => {
-            const errors: EntityAction[] = [];
-            const { entityActionFactory, entityServices } = entityServicesSetup();
-            entityServices.entityActionErrors$.subscribe(error => errors.push(error));
+    describe('NxaEntityActionErrors$', () => {
+        it('should emit NxaEntityAction errors for multiple entity types', () => {
+            const errors: NxaEntityAction[] = [];
+            const { nxaEntityActionFactory, entityServices } = entityServicesSetup();
+            entityServices.NxaEntityActionErrors$.subscribe(error => errors.push(error));
 
             entityServices.dispatch({ type: 'not-an-entity-action' });
             entityServices.dispatch(
-                entityActionFactory.create('Hero', EntityOp.QUERY_ALL)
+                nxaEntityActionFactory.create('Hero', NxaEntityOp.QUERY_ALL)
             ); // not an error
             entityServices.dispatch(
-                entityActionFactory.create(
+                nxaEntityActionFactory.create(
                     'Hero',
-                    EntityOp.QUERY_ALL_ERROR,
-                    makeDataServiceError('GET', new Error('Bad hero news'))
+                    NxaEntityOp.QUERY_ALL_ERROR,
+                    makeNxaDataServiceError('GET', new Error('Bad hero news'))
                 )
             );
             entityServices.dispatch(
-                entityActionFactory.create('Villain', EntityOp.QUERY_ALL)
+                nxaEntityActionFactory.create('Villain', NxaEntityOp.QUERY_ALL)
             ); // not an error
             entityServices.dispatch(
-                entityActionFactory.create(
+                nxaEntityActionFactory.create(
                     'Villain',
-                    EntityOp.SAVE_ADD_ONE_ERROR,
-                    makeDataServiceError('PUT', new Error('Bad villain news'))
+                    NxaEntityOp.SAVE_ADD_ONE_ERROR,
+                    makeNxaDataServiceError('PUT', new Error('Bad villain news'))
                 )
             );
 
@@ -60,7 +60,7 @@ describe('EntityServices', () => {
             const entityCacheValues: any = [];
 
             const {
-                entityActionFactory,
+                nxaEntityActionFactory,
                 entityServices,
                 store,
             } = entityServicesSetup();
@@ -69,11 +69,11 @@ describe('EntityServices', () => {
             entityServices.entityCache$.subscribe(ec => entityCacheValues.push(ec));
 
             // This first action to go through the Hero's EntityCollectionReducer
-            // creates the collection in the EntityCache as a side-effect,
+            // creates the collection in the NxaEntityCache as a side-effect,
             // triggering the second entityCache$.subscribe() callback
-            const heroAction = entityActionFactory.create(
+            const heroAction = nxaEntityActionFactory.create(
                 'Hero',
-                EntityOp.SET_FILTER,
+                NxaEntityOp.SET_FILTER,
                 'test'
             );
             store.dispatch(heroAction);
@@ -87,7 +87,7 @@ describe('EntityServices', () => {
         });
     });
 
-    describe('dispatch(MergeQuerySet)', () => {
+    describe('dispatch(NxaMergeQuerySet)', () => {
         // using async test to guard against false test pass.
         it('should update entityCache$ twice after merging two individual collections', (done: DoneFn) => {
             const hero1 = { id: 1, name: 'A' } as Hero;
@@ -126,26 +126,26 @@ describe('EntityServices', () => {
 
             // Emulate what would happen if had queried collections separately
             heroCollectionService.createAndDispatch(
-                EntityOp.QUERY_MANY_SUCCESS,
+                NxaEntityOp.QUERY_MANY_SUCCESS,
                 heroes
             );
             villainCollectionService.createAndDispatch(
-                EntityOp.QUERY_BY_KEY_SUCCESS,
+                NxaEntityOp.QUERY_BY_KEY_SUCCESS,
                 villain
             );
         });
 
         // using async test to guard against false test pass.
-        it('should update entityCache$ once when MergeQuerySet multiple collections', (done: DoneFn) => {
+        it('should update entityCache$ once when NxaMergeQuerySet multiple collections', (done: DoneFn) => {
             const hero1 = { id: 1, name: 'A' } as Hero;
             const hero2 = { id: 2, name: 'B' } as Hero;
             const heroes = [hero1, hero2];
             const villain = { key: 'DE', name: 'Dr. Evil' } as Villain;
-            const querySet: EntityCacheQuerySet = {
+            const querySet: NxaEntityCacheQuerySet = {
                 Hero: heroes,
                 Villain: [villain],
             };
-            const action = new MergeQuerySet(querySet);
+            const action = new NxaMergeQuerySet(querySet);
 
             const { entityServices } = entityServicesSetup();
 
@@ -179,7 +179,7 @@ class Villain {
     name!: string;
 }
 
-const entityMetadata: EntityMetadataMap = {
+const entityMetadata: NxaEntityMetadataMap = {
     Hero: {},
     Villain: { selectId: villain => villain.key },
 };
@@ -197,34 +197,34 @@ function entityServicesSetup() {
         ],
         /* tslint:disable-next-line:no-use-before-declare */
         providers: [
-            { provide: EntityCacheEffects, useValue: {} },
-            { provide: EntityDataService, useValue: null },
+            { provide: NxaEntityCacheEffects, useValue: {} },
+            { provide: NxaEntityDataService, useValue: null },
             { provide: Logger, useValue: logger },
         ],
     });
 
     const actions$: Observable<Action> = TestBed.get(Actions);
-    const entityActionFactory: EntityActionFactory = TestBed.get(
-        EntityActionFactory
+    const nxaEntityActionFactory: NxaEntityActionFactory = TestBed.get(
+        NxaEntityActionFactory
     );
-    const entityDispatcherFactory: EntityDispatcherFactory = TestBed.get(
-        EntityDispatcherFactory
+    const entityDispatcherFactory: NxaEntityDispatcherFactory = TestBed.get(
+        NxaEntityDispatcherFactory
     );
     const entityServices: EntityServices = TestBed.get(EntityServices);
-    const store: Store<EntityCache> = TestBed.get(Store);
+    const store: Store<NxaEntityCache> = TestBed.get(Store);
 
     return {
         actions$,
-        entityActionFactory,
+        nxaEntityActionFactory,
         entityServices,
         store,
     };
 }
 
-/** make error produced by the EntityDataService */
-function makeDataServiceError(
+/** make error produced by the NxaEntityDataService */
+function makeNxaDataServiceError(
     /** Http method for that action */
-    method: HttpMethods,
+    method: NxaHttpMethods,
     /** Http error from the web api */
     httpError?: any,
     /** Options sent with the request */
@@ -236,6 +236,6 @@ function makeDataServiceError(
     } else {
         httpError = { error: new Error('Test error'), status: 500, url };
     }
-    return new DataServiceError(httpError, { method, url, options });
+    return new NxaDataServiceError(httpError, { method, url, options });
 }
 // #endregion test helpers

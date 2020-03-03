@@ -1,12 +1,12 @@
 /**
- * Data returned in an EntityAction from the EntityEffects for SAVE_UPDATE_ONE_SUCCESS.
+ * Data returned in an NxaEntityAction from the NxaEntityEffects for SAVE_UPDATE_ONE_SUCCESS.
  * Effectively extends Update<T> with a 'changed' flag.
  * The is true if the server sent back changes to the entity data after update.
  * Such changes must be in the entity data in changes property.
  * Default is false (server did not return entity data; assume it changed nothing).
- * See EntityEffects.
+ * See NxaEntityEffects.
  */
-export interface UpdateResponseData<T> {
+export interface NxaUpdateResponseData<T> {
     /** Original key (id) of the entity */
     id: number | string;
     /** Entity update data. Should include the key (original or changed) */

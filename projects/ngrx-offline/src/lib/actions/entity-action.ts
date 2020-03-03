@@ -1,21 +1,21 @@
 import { Action } from '@ngrx/store';
 
-import { EntityOp } from './entity-op';
-import { MergeStrategy } from './merge-strategy';
+import { NxaEntityOp } from './entity-op';
+import { NxaMergeStrategy } from './merge-strategy';
 
 /** Action concerning an entity collection. */
-export interface EntityAction<P = any> extends Action {
+export interface NxaEntityAction<P = any> extends Action {
     readonly type: string;
-    readonly payload: EntityActionPayload<P>;
+    readonly payload: NxaEntityActionPayload<P>;
 }
 
-/** Options of an EntityAction */
-export interface EntityActionOptions {
-    /** Correlate related EntityActions, particularly related saves. Must be serializable. */
+/** Options of an NxaEntityAction */
+export interface NxaEntityActionOptions {
+    /** Correlate related NxaEntityActions, particularly related saves. Must be serializable. */
     readonly correlationId?: any;
     /** True if should perform action optimistically (before server responds) */
     readonly isOptimistic?: boolean;
-    readonly mergeStrategy?: MergeStrategy;
+    readonly mergeStrategy?: NxaMergeStrategy;
     /** The tag to use in the action's type. The entityName if no tag specified. */
     readonly tag?: string;
 
@@ -36,9 +36,9 @@ export interface EntityActionOptions {
     skip?: boolean;
 }
 
-/** Payload of an EntityAction */
-export interface EntityActionPayload<P = any> extends EntityActionOptions {
+/** Payload of an NxaEntityAction */
+export interface NxaEntityActionPayload<P = any> extends NxaEntityActionOptions {
     readonly entityName: string;
-    readonly entityOp: EntityOp;
+    readonly entityOp: NxaEntityOp;
     readonly data?: P;
 }

@@ -1,4 +1,4 @@
-import { EntityActionGuard, EntityAction, EntityOp } from '../../lib';
+import { NxaEntityActionGuard, NxaEntityAction, NxaEntityOp } from '../../lib';
 
 class Hero {
     id!: number;
@@ -6,21 +6,21 @@ class Hero {
     power?: string;
 }
 
-describe('EntityActionGuard', () => {
-    let guard: EntityActionGuard<Hero>;
+describe('NxaEntityActionGuard', () => {
+    let guard: NxaEntityActionGuard<Hero>;
     let createAction: any;
-    let action: EntityAction<any>;
+    let action: NxaEntityAction<any>;
 
     beforeEach(() => {
         let selectId = (hero: Hero) => hero.id;
-        guard = new EntityActionGuard('Hero', selectId);
+        guard = new NxaEntityActionGuard('Hero', selectId);
 
         createAction = (data?: any) =>
             (action = {
                 type: 'TEST',
                 payload: {
                     entityName: 'Hero',
-                    entityOp: EntityOp.ADD_ALL, // not used
+                    entityOp: NxaEntityOp.ADD_ALL, // not used
                     data,
                 },
             });

@@ -1,9 +1,9 @@
-import { EntityAction, EntityActionOptions } from '../actions/entity-action';
-import { EntityCommands } from '../dispatchers/entity-commands';
-import { EntityDispatcher } from '../dispatchers/entity-dispatcher';
-import { EntityOp } from '../actions/entity-op';
-import { EntitySelectors$ } from '../selectors/entity-selectors$';
-import { EntitySelectors } from '../selectors/entity-selectors';
+import { NxaEntityAction, NxaEntityActionOptions } from '../actions/entity-action';
+import { NxaEntityCommands } from '../dispatchers/entity-commands';
+import { NxaEntityDispatcher } from '../dispatchers/entity-dispatcher';
+import { NxaEntityOp } from '../actions/entity-op';
+import { NxaEntitySelectors$ } from '../selectors/entity-selectors$';
+import { NxaEntitySelectors } from '../selectors/entity-selectors';
 
 // tslint:disable:member-ordering
 
@@ -11,45 +11,45 @@ import { EntitySelectors } from '../selectors/entity-selectors';
  * A facade for managing
  * a cached collection of T entities in the ngrx store.
  */
-export interface EntityCollectionService<T>
-    extends EntityCommands<T>,
-    EntitySelectors$<T> {
+export interface NxaEntityCollectionService<T>
+    extends NxaEntityCommands<T>,
+    NxaEntitySelectors$<T> {
     /**
-     * Create an {EntityAction} for this entity type.
-     * @param op {EntityOp} the entity operation
+     * Create an {NxaEntityAction} for this entity type.
+     * @param op {NxaEntityOp} the entity operation
      * @param [data] the action data
      * @param [options] additional options
-     * @returns the EntityAction
+     * @returns the NxaEntityAction
      */
-    createEntityAction(
-        op: EntityOp,
+    createNxaEntityAction(
+        op: NxaEntityOp,
         payload?: any,
-        options?: EntityActionOptions
-    ): EntityAction<T>;
+        options?: NxaEntityActionOptions
+    ): NxaEntityAction<T>;
 
     /**
-     * Create an {EntityAction} for this entity type and
+     * Create an {NxaEntityAction} for this entity type and
      * dispatch it immediately to the store.
-     * @param op {EntityOp} the entity operation
+     * @param op {NxaEntityOp} the entity operation
      * @param [data] the action data
      * @param [options] additional options
-     * @returns the dispatched EntityAction
+     * @returns the dispatched NxaEntityAction
      */
     createAndDispatch<P = any>(
-        op: EntityOp,
+        op: NxaEntityOp,
         data?: P,
-        options?: EntityActionOptions
-    ): EntityAction<P>;
+        options?: NxaEntityActionOptions
+    ): NxaEntityAction<P>;
 
-    /** Dispatcher of EntityCommands (EntityActions) */
-    readonly dispatcher: EntityDispatcher<T>;
+    /** Dispatcher of NxaEntityCommands (NxaEntityActions) */
+    readonly dispatcher: NxaEntityDispatcher<T>;
 
     /** Name of the entity type for this collection service */
     readonly entityName: string;
 
     /** All selector functions of the entity collection */
-    readonly selectors: EntitySelectors<T>;
+    readonly selectors: NxaEntitySelectors<T>;
 
     /** All selectors$ (observables of the selectors of entity collection properties) */
-    readonly selectors$: EntitySelectors$<T>;
+    readonly selectors$: NxaEntitySelectors$<T>;
 }

@@ -1,26 +1,26 @@
 import { InjectionToken, Optional, FactoryProvider } from '@angular/core';
 import { createFeatureSelector, MemoizedSelector } from '@ngrx/store';
-import { EntityCache } from '../reducers/entity-cache';
+import { NxaEntityCache } from '../reducers/entity-cache';
 import {
-    ENTITY_CACHE_NAME,
-    ENTITY_CACHE_NAME_TOKEN,
+    NXA_ENTITY_CACHE_NAME,
+    NXA_ENTITY_CACHE_NAME_TOKEN,
 } from '../reducers/constants';
 
-export const ENTITY_CACHE_SELECTOR_TOKEN = new InjectionToken<
-    MemoizedSelector<Object, EntityCache>
+export const NXA_ENTITY_CACHE_SELECTOR_TOKEN = new InjectionToken<
+    MemoizedSelector<Object, NxaEntityCache>
 >('@@ngrx/action/entity-cache-selector');
 
-export const entityCacheSelectorProvider: FactoryProvider = {
-    provide: ENTITY_CACHE_SELECTOR_TOKEN,
-    useFactory: createEntityCacheSelector,
-    deps: [[new Optional(), ENTITY_CACHE_NAME_TOKEN]],
+export const nxaEntityCacheSelectorProvider: FactoryProvider = {
+    provide: NXA_ENTITY_CACHE_SELECTOR_TOKEN,
+    useFactory: createNxaEntityCacheSelector,
+    deps: [[new Optional(), NXA_ENTITY_CACHE_NAME_TOKEN]],
 };
 
-export type EntityCacheSelector = MemoizedSelector<Object, EntityCache>;
+export type NxaEntityCacheSelector = MemoizedSelector<Object, NxaEntityCache>;
 
-export function createEntityCacheSelector(
+export function createNxaEntityCacheSelector(
     entityCacheName?: string
-): MemoizedSelector<Object, EntityCache> {
-    entityCacheName = entityCacheName || ENTITY_CACHE_NAME;
-    return createFeatureSelector<EntityCache>(entityCacheName);
+): MemoizedSelector<Object, NxaEntityCache> {
+    entityCacheName = entityCacheName || NXA_ENTITY_CACHE_NAME;
+    return createFeatureSelector<NxaEntityCache>(entityCacheName);
 }

@@ -7,17 +7,17 @@ import { Observable } from 'rxjs';
 import { skip } from 'rxjs/operators';
 
 import {
-    EntityMetadataMap,
-    EntityActionFactory,
-    EntitySelectorsFactory,
-    EntityCache,
-    EntityDataModuleWithoutEffects,
-    ENTITY_METADATA_TOKEN,
-    EntityOp,
-    EntityAction,
+    NxaEntityMetadataMap,
+    NxaEntityActionFactory,
+    NxaEntitySelectorsFactory,
+    NxaEntityCache,
+    NxaEntityDataModuleWithoutEffects,
+    NXA_ENTITY_METADATA_TOKEN,
+    NxaEntityOp,
+    NxaEntityAction,
 } from '../../lib';
 
-const entityMetadataMap: EntityMetadataMap = {
+const entityMetadataMap: NxaEntityMetadataMap = {
     Battle: {},
     Hero: {},
     HeroPowerMap: {},
@@ -29,18 +29,18 @@ const entityMetadataMap: EntityMetadataMap = {
 
 describe('Related-entity Selectors', () => {
     // #region setup
-    let eaFactory: EntityActionFactory;
-    let entitySelectorsFactory: EntitySelectorsFactory;
-    let store: Store<EntityCache>;
+    let eaFactory: NxaEntityActionFactory;
+    let entitySelectorsFactory: NxaEntitySelectorsFactory;
+    let store: Store<NxaEntityCache>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [StoreModule.forRoot({}), EntityDataModuleWithoutEffects],
+            imports: [StoreModule.forRoot({}), NxaEntityDataModuleWithoutEffects],
             providers: [
                 // required by EntityData but not used in these tests
                 { provide: Actions, useValue: null },
                 {
-                    provide: ENTITY_METADATA_TOKEN,
+                    provide: NXA_ENTITY_METADATA_TOKEN,
                     multi: true,
                     useValue: entityMetadataMap,
                 },
@@ -48,15 +48,15 @@ describe('Related-entity Selectors', () => {
         });
 
         store = TestBed.get(Store);
-        eaFactory = TestBed.get(EntityActionFactory);
-        entitySelectorsFactory = TestBed.get(EntitySelectorsFactory);
+        eaFactory = TestBed.get(NxaEntityActionFactory);
+        entitySelectorsFactory = TestBed.get(NxaEntitySelectorsFactory);
         initializeCache(eaFactory, store);
     });
 
     // #endregion setup
 
     describe('hero -> sidekick (1-1)', () => {
-        function setCollectionSelectors() {
+        function setNxaCollectionSelectors() {
             const heroSelectors = entitySelectorsFactory.create<Hero>('Hero');
             const selectHeroMap = heroSelectors.selectEntityMap;
 
@@ -72,7 +72,7 @@ describe('Related-entity Selectors', () => {
         }
 
         function createHeroSidekickSelector$(heroId: number): Observable<Sidekick> {
-            const { selectHeroMap, selectSidekickMap } = setCollectionSelectors();
+            const { selectHeroMap, selectSidekickMap } = setNxaCollectionSelectors();
             const selectHero = createSelector(
                 selectHeroMap,
                 heroes => heroes[heroId]
@@ -109,7 +109,7 @@ describe('Related-entity Selectors', () => {
             // update the related sidekick
             const action = eaFactory.create<Update<Sidekick>>(
                 'Sidekick',
-                EntityOp.UPDATE_ONE,
+                NxaEntityOp.UPDATE_ONE,
                 { id: 1, changes: { id: 1, name: 'Robert' } }
             );
             store.dispatch(action);
@@ -127,7 +127,7 @@ describe('Related-entity Selectors', () => {
             // update the hero's sidekick from fk=1 to fk=2
             const action = eaFactory.create<Update<Hero>>(
                 'Hero',
-                EntityOp.UPDATE_ONE,
+                NxaEntityOp.UPDATE_ONE,
                 { id: 1, changes: { id: 1, sidekickFk: 2 } } // Sally
             );
             store.dispatch(action);
@@ -154,7 +154,7 @@ describe('Related-entity Selectors', () => {
 
             const action = eaFactory.create<Update<Hero>>(
                 'Hero',
-                EntityOp.UPDATE_ONE,
+                NxaEntityOp.UPDATE_ONE,
                 { id: 2, changes: { id: 2, sidekickFk: 1 } } // Bob
             );
             store.dispatch(action);
@@ -186,9 +186,9 @@ describe('Related-entity Selectors', () => {
                 });
 
             // create a new sidekick
-            let action: EntityAction = eaFactory.create<Sidekick>(
+            let action: NxaEntityAction = eaFactory.create<Sidekick>(
                 'Sidekick',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 {
                     id: 42,
                     name: 'Robin',
@@ -197,7 +197,7 @@ describe('Related-entity Selectors', () => {
             store.dispatch(action);
 
             // assign new sidekick to Gamma
-            action = eaFactory.create<Update<Hero>>('Hero', EntityOp.UPDATE_ONE, {
+            action = eaFactory.create<Update<Hero>>('Hero', NxaEntityOp.UPDATE_ONE, {
                 id: 3,
                 changes: { id: 3, sidekickFk: 42 },
             });
@@ -206,7 +206,7 @@ describe('Related-entity Selectors', () => {
     });
 
     describe('hero -> battles (1-m)', () => {
-        function setCollectionSelectors() {
+        function setNxaCollectionSelectors() {
             const heroSelectors = entitySelectorsFactory.create<Hero>('Hero');
             const selectHeroMap = heroSelectors.selectEntityMap;
 
@@ -240,7 +240,7 @@ describe('Related-entity Selectors', () => {
         }
 
         function createHeroBattlesSelector$(heroId: number): Observable<Battle[]> {
-            const { selectHeroMap, selectHeroBattleMap } = setCollectionSelectors();
+            const { selectHeroMap, selectHeroBattleMap } = setNxaCollectionSelectors();
 
             const selectHero = createSelector(
                 selectHeroMap,
@@ -280,7 +280,7 @@ describe('Related-entity Selectors', () => {
             // update the first of the related battles
             const action = eaFactory.create<Update<Battle>>(
                 'Battle',
-                EntityOp.UPDATE_ONE,
+                NxaEntityOp.UPDATE_ONE,
                 { id: 100, changes: { id: 100, name: 'Scalliwag' } }
             );
             store.dispatch(action);
@@ -295,7 +295,7 @@ describe('Related-entity Selectors', () => {
     });
 
     describe('hero -> heropower <- power (m-m)', () => {
-        function setCollectionSelectors() {
+        function setNxaCollectionSelectors() {
             const heroSelectors = entitySelectorsFactory.create<Hero>('Hero');
             const selectHeroMap = heroSelectors.selectEntityMap;
 
@@ -339,7 +339,7 @@ describe('Related-entity Selectors', () => {
                 selectHeroMap,
                 selectHeroPowerIds,
                 selectPowerMap,
-            } = setCollectionSelectors();
+            } = setNxaCollectionSelectors();
 
             const selectHero = createSelector(
                 selectHeroMap,
@@ -387,9 +387,9 @@ describe('Related-entity Selectors', () => {
                 });
 
             // delete Beta's one power via the HeroPowerMap
-            const action: EntityAction = eaFactory.create<number>(
+            const action: NxaEntityAction = eaFactory.create<number>(
                 'HeroPowerMap',
-                EntityOp.REMOVE_ONE,
+                NxaEntityOp.REMOVE_ONE,
                 96
             );
             store.dispatch(action);
@@ -442,25 +442,25 @@ export function sortByName(a: { name: string }, b: { name: string }): number {
 }
 
 function initializeCache(
-    eaFactory: EntityActionFactory,
-    store: Store<EntityCache>
+    eaFactory: NxaEntityActionFactory,
+    store: Store<NxaEntityCache>
 ) {
-    let action: EntityAction;
+    let action: NxaEntityAction;
 
-    action = eaFactory.create<Sidekick[]>('Sidekick', EntityOp.ADD_ALL, [
+    action = eaFactory.create<Sidekick[]>('Sidekick', NxaEntityOp.ADD_ALL, [
         { id: 1, name: 'Bob' },
         { id: 2, name: 'Sally' },
     ]);
     store.dispatch(action);
 
-    action = eaFactory.create<Hero[]>('Hero', EntityOp.ADD_ALL, [
+    action = eaFactory.create<Hero[]>('Hero', NxaEntityOp.ADD_ALL, [
         { id: 1, name: 'Alpha', sidekickFk: 1 },
         { id: 2, name: 'Beta', sidekickFk: 2 },
         { id: 3, name: 'Gamma' }, // no sidekick
     ]);
     store.dispatch(action);
 
-    action = eaFactory.create<Battle[]>('Battle', EntityOp.ADD_ALL, [
+    action = eaFactory.create<Battle[]>('Battle', NxaEntityOp.ADD_ALL, [
         { id: 100, heroFk: 1, name: 'Plains of Yon', won: true },
         { id: 200, heroFk: 1, name: 'Yippee-kai-eh', won: false },
         { id: 300, heroFk: 1, name: 'Yada Yada', won: true },
@@ -468,14 +468,14 @@ function initializeCache(
     ]);
     store.dispatch(action);
 
-    action = eaFactory.create<Power[]>('Power', EntityOp.ADD_ALL, [
+    action = eaFactory.create<Power[]>('Power', NxaEntityOp.ADD_ALL, [
         { id: 10, name: 'Speed' },
         { id: 20, name: 'Strength' },
         { id: 30, name: 'Invisibility' },
     ]);
     store.dispatch(action);
 
-    action = eaFactory.create<HeroPowerMap[]>('HeroPowerMap', EntityOp.ADD_ALL, [
+    action = eaFactory.create<HeroPowerMap[]>('HeroPowerMap', NxaEntityOp.ADD_ALL, [
         { id: 99, heroFk: 1, powerFk: 10 },
         { id: 98, heroFk: 1, powerFk: 20 },
         { id: 97, heroFk: 1, powerFk: 30 },

@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 
-import { EntityCollectionDataService } from './interfaces';
-import { DefaultDataServiceFactory } from './default-data.service';
+import { NxaEntityCollectionDataService } from './interfaces';
+import { NxaDefaultDataServiceFactory } from './default-data.service';
 
 /**
  * Registry of EntityCollection data services that make REST-like CRUD calls
  * to entity collection endpoints.
  */
 @Injectable()
-export class EntityDataService {
-    protected services: { [name: string]: EntityCollectionDataService<any> } = {};
+export class NxaEntityDataService {
+    protected services: { [name: string]: NxaEntityCollectionDataService<any> } = {};
 
     // TODO:  Optionally inject specialized entity data services
     // for those that aren't derived from BaseDataService.
-    constructor(protected defaultDataServiceFactory: DefaultDataServiceFactory) { }
+    constructor(protected defaultDataServiceFactory: NxaDefaultDataServiceFactory) { }
 
     /**
      * Get (or create) a data service for entity type
@@ -23,7 +23,7 @@ export class EntityDataService {
      *   getService('Hero'); // data service for Heroes, untyped
      *   getService<Hero>('Hero'); // data service for Heroes, typed as Hero
      */
-    getService<T>(entityName: string): EntityCollectionDataService<T> {
+    getService<T>(entityName: string): NxaEntityCollectionDataService<T> {
         entityName = entityName.trim();
         let service = this.services[entityName];
         if (!service) {
@@ -34,7 +34,7 @@ export class EntityDataService {
     }
 
     /**
-     * Register an EntityCollectionDataService for an entity type
+     * Register an NxaEntityCollectionDataService for an entity type
      * @param entityName - the name of the entity type
      * @param service - data service for that entity type
      *
@@ -44,7 +44,7 @@ export class EntityDataService {
      */
     registerService<T>(
         entityName: string,
-        service: EntityCollectionDataService<T>
+        service: NxaEntityCollectionDataService<T>
     ) {
         this.services[entityName.trim()] = service;
     }
@@ -60,7 +60,7 @@ export class EntityDataService {
      *   });
      */
     registerServices(services: {
-        [name: string]: EntityCollectionDataService<any>;
+        [name: string]: NxaEntityCollectionDataService<any>;
     }) {
         this.services = { ...this.services, ...services };
     }

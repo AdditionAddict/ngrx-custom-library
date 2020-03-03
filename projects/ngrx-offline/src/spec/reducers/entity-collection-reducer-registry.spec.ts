@@ -3,21 +3,21 @@ import { Action, ActionReducer, MetaReducer } from '@ngrx/store';
 import { IdSelector } from '@ngrx/entity';
 
 import {
-    EntityMetadataMap,
-    EntityCollectionCreator,
-    EntityActionFactory,
-    EntityCache,
-    EntityCollectionReducerRegistry,
-    EntityCacheReducerFactory,
-    EntityCollectionReducerMethodsFactory,
-    EntityCollectionReducerFactory,
-    EntityDefinitionService,
-    ENTITY_METADATA_TOKEN,
-    EntityOp,
-    EntityCollectionReducers,
+    NxaEntityMetadataMap,
+    NxaEntityCollectionCreator,
+    NxaEntityActionFactory,
+    NxaEntityCache,
+    NxaEntityCollectionReducerRegistry,
+    NxaEntityCacheReducerFactory,
+    NxaEntityCollectionReducerMethodsFactory,
+    NxaEntityCollectionReducerFactory,
+    NxaEntityDefinitionService,
+    NXA_ENTITY_METADATA_TOKEN,
+    NxaEntityOp,
+    NxaEntityCollectionReducers,
     EntityCollection,
-    EntityAction,
-    ENTITY_COLLECTION_META_REDUCERS,
+    NxaEntityAction,
+    NXA_ENTITY_COLLECTION_META_REDUCERS,
     Logger,
 } from '../../lib';
 
@@ -39,33 +39,33 @@ class Villain {
     name!: string;
 }
 
-const metadata: EntityMetadataMap = {
+const metadata: NxaEntityMetadataMap = {
     Hero: {},
     Villain: { selectId: villain => villain.key },
 };
-describe('EntityCollectionReducerRegistry', () => {
-    let collectionCreator: EntityCollectionCreator;
-    let entityActionFactory: EntityActionFactory;
-    let entityCacheReducer: ActionReducer<EntityCache, Action>;
-    let entityCollectionReducerRegistry: EntityCollectionReducerRegistry;
+describe('NxaEntityCollectionReducerRegistry', () => {
+    let collectionCreator: NxaEntityCollectionCreator;
+    let nxaEntityActionFactory: NxaEntityActionFactory;
+    let entityCacheReducer: ActionReducer<NxaEntityCache, Action>;
+    let entityCollectionReducerRegistry: NxaEntityCollectionReducerRegistry;
     let logger: jasmine.Spy;
 
     beforeEach(() => {
-        entityActionFactory = new EntityActionFactory();
+        nxaEntityActionFactory = new NxaEntityActionFactory();
         logger = jasmine.createSpyObj('Logger', ['error', 'log', 'warn']);
 
         TestBed.configureTestingModule({
             providers: [
-                EntityCacheReducerFactory,
-                EntityCollectionCreator,
+                NxaEntityCacheReducerFactory,
+                NxaEntityCollectionCreator,
                 {
-                    provide: EntityCollectionReducerMethodsFactory,
-                    useClass: EntityCollectionReducerMethodsFactory,
+                    provide: NxaEntityCollectionReducerMethodsFactory,
+                    useClass: NxaEntityCollectionReducerMethodsFactory,
                 },
-                EntityCollectionReducerFactory,
-                EntityCollectionReducerRegistry,
-                EntityDefinitionService,
-                { provide: ENTITY_METADATA_TOKEN, multi: true, useValue: metadata },
+                NxaEntityCollectionReducerFactory,
+                NxaEntityCollectionReducerRegistry,
+                NxaEntityDefinitionService,
+                { provide: NXA_ENTITY_METADATA_TOKEN, multi: true, useValue: metadata },
                 { provide: Logger, useValue: logger },
             ],
         });
@@ -73,13 +73,13 @@ describe('EntityCollectionReducerRegistry', () => {
 
     /** Sets the test variables with injected values. Closes TestBed configuration. */
     function setup() {
-        collectionCreator = TestBed.get(EntityCollectionCreator);
+        collectionCreator = TestBed.get(NxaEntityCollectionCreator);
         const entityCacheReducerFactory = TestBed.get(
-            EntityCacheReducerFactory
-        ) as EntityCacheReducerFactory;
+            NxaEntityCacheReducerFactory
+        ) as NxaEntityCacheReducerFactory;
         entityCacheReducer = entityCacheReducerFactory.create();
         entityCollectionReducerRegistry = TestBed.get(
-            EntityCollectionReducerRegistry
+            NxaEntityCollectionReducerRegistry
         );
     }
 
@@ -89,7 +89,7 @@ describe('EntityCollectionReducerRegistry', () => {
         it('can register a new reducer', () => {
             const reducer = createNoopReducer();
             entityCollectionReducerRegistry.registerReducer('Foo', reducer);
-            const action = entityActionFactory.create<Foo>('Foo', EntityOp.ADD_ONE, {
+            const action = nxaEntityActionFactory.create<Foo>('Foo', NxaEntityOp.ADD_ONE, {
                 id: 'forty-two',
                 foo: 'fooz',
             });
@@ -105,9 +105,9 @@ describe('EntityCollectionReducerRegistry', () => {
             const hero: Hero = { id: 42, name: 'Bobby' };
             const reducer = createNoopReducer();
             entityCollectionReducerRegistry.registerReducer('Hero', reducer);
-            const action = entityActionFactory.create<Hero>(
+            const action = nxaEntityActionFactory.create<Hero>(
                 'Hero',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 hero
             );
             const state = entityCacheReducer({}, action);
@@ -121,20 +121,20 @@ describe('EntityCollectionReducerRegistry', () => {
 
         it('can register several reducers at the same time.', () => {
             const reducer = createNoopReducer();
-            const reducers: EntityCollectionReducers = {
+            const reducers: NxaEntityCollectionReducers = {
                 Foo: reducer,
                 Bar: reducer,
             };
             entityCollectionReducerRegistry.registerReducers(reducers);
 
-            const fooAction = entityActionFactory.create<Foo>(
+            const fooAction = nxaEntityActionFactory.create<Foo>(
                 'Foo',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 { id: 'forty-two', foo: 'fooz' }
             );
-            const barAction = entityActionFactory.create<Bar>(
+            const barAction = nxaEntityActionFactory.create<Bar>(
                 'Bar',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 { id: 84, bar: 'baz' }
             );
 
@@ -147,20 +147,20 @@ describe('EntityCollectionReducerRegistry', () => {
 
         it('can register several reducers that may override.', () => {
             const reducer = createNoopReducer();
-            const reducers: EntityCollectionReducers = {
+            const reducers: NxaEntityCollectionReducers = {
                 Foo: reducer,
                 Hero: reducer,
             };
             entityCollectionReducerRegistry.registerReducers(reducers);
 
-            const fooAction = entityActionFactory.create<Foo>(
+            const fooAction = nxaEntityActionFactory.create<Foo>(
                 'Foo',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 { id: 'forty-two', foo: 'fooz' }
             );
-            const heroAction = entityActionFactory.create<Hero>(
+            const heroAction = nxaEntityActionFactory.create<Hero>(
                 'Hero',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 { id: 84, name: 'Alex' }
             );
 
@@ -173,16 +173,16 @@ describe('EntityCollectionReducerRegistry', () => {
     });
 
     describe('with EntityCollectionMetadataReducers', () => {
-        let metaReducerA: MetaReducer<EntityCollection, EntityAction>;
-        let metaReducerB: MetaReducer<EntityCollection, EntityAction>;
+        let metaReducerA: MetaReducer<EntityCollection, NxaEntityAction>;
+        let metaReducerB: MetaReducer<EntityCollection, NxaEntityAction>;
         let metaReducerOutput: any[];
 
         // Create MetaReducer that reports how it was called on the way in and out
         function testMetadataReducerFactory(name: string) {
             // Return the MetaReducer
-            return (r: ActionReducer<EntityCollection, EntityAction>) => {
+            return (r: ActionReducer<EntityCollection, NxaEntityAction>) => {
                 // Return the wrapped reducer
-                return (state: EntityCollection, action: EntityAction) => {
+                return (state: EntityCollection, action: NxaEntityAction) => {
                     // entered
                     metaReducerOutput.push({ metaReducer: name, inOut: 'in', action });
                     // called reducer
@@ -194,7 +194,7 @@ describe('EntityCollectionReducerRegistry', () => {
             };
         }
 
-        let addOneAction: EntityAction<Hero>;
+        let addOneAction: NxaEntityAction<Hero>;
         let hero: Hero;
 
         beforeEach(() => {
@@ -209,17 +209,17 @@ describe('EntityCollectionReducerRegistry', () => {
 
             TestBed.configureTestingModule({
                 providers: [
-                    EntityCacheReducerFactory,
-                    EntityCollectionCreator,
+                    NxaEntityCacheReducerFactory,
+                    NxaEntityCollectionCreator,
                     {
-                        provide: EntityCollectionReducerMethodsFactory,
-                        useClass: EntityCollectionReducerMethodsFactory,
+                        provide: NxaEntityCollectionReducerMethodsFactory,
+                        useClass: NxaEntityCollectionReducerMethodsFactory,
                     },
-                    EntityCollectionReducerFactory,
-                    EntityCollectionReducerRegistry,
-                    EntityDefinitionService,
-                    { provide: ENTITY_METADATA_TOKEN, multi: true, useValue: metadata },
-                    { provide: ENTITY_COLLECTION_META_REDUCERS, useValue: metaReducers },
+                    NxaEntityCollectionReducerFactory,
+                    NxaEntityCollectionReducerRegistry,
+                    NxaEntityDefinitionService,
+                    { provide: NXA_ENTITY_METADATA_TOKEN, multi: true, useValue: metadata },
+                    { provide: NXA_ENTITY_COLLECTION_META_REDUCERS, useValue: metaReducers },
                     { provide: Logger, useValue: logger },
                 ],
             });
@@ -227,9 +227,9 @@ describe('EntityCollectionReducerRegistry', () => {
             setup();
 
             hero = { id: 42, name: 'Bobby' };
-            addOneAction = entityActionFactory.create<Hero>(
+            addOneAction = nxaEntityActionFactory.create<Hero>(
                 'Hero',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 hero
             );
         });
@@ -260,7 +260,7 @@ describe('EntityCollectionReducerRegistry', () => {
         it('should call meta reducers for custom registered reducer', () => {
             const reducer = createNoopReducer();
             entityCollectionReducerRegistry.registerReducer('Foo', reducer);
-            const action = entityActionFactory.create<Foo>('Foo', EntityOp.ADD_ONE, {
+            const action = nxaEntityActionFactory.create<Foo>('Foo', NxaEntityOp.ADD_ONE, {
                 id: 'forty-two',
                 foo: 'fooz',
             });
@@ -272,15 +272,15 @@ describe('EntityCollectionReducerRegistry', () => {
 
         it('should call meta reducers for multiple registered reducers', () => {
             const reducer = createNoopReducer();
-            const reducers: EntityCollectionReducers = {
+            const reducers: NxaEntityCollectionReducers = {
                 Foo: reducer,
                 Hero: reducer,
             };
             entityCollectionReducerRegistry.registerReducers(reducers);
 
-            const fooAction = entityActionFactory.create<Foo>(
+            const fooAction = nxaEntityActionFactory.create<Foo>(
                 'Foo',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 { id: 'forty-two', foo: 'fooz' }
             );
 
@@ -288,9 +288,9 @@ describe('EntityCollectionReducerRegistry', () => {
             expect(metaReducerA).toHaveBeenCalled();
             expect(metaReducerB).toHaveBeenCalled();
 
-            const heroAction = entityActionFactory.create<Hero>(
+            const heroAction = nxaEntityActionFactory.create<Hero>(
                 'Hero',
-                EntityOp.ADD_ONE,
+                NxaEntityOp.ADD_ONE,
                 { id: 84, name: 'Alex' }
             );
 
@@ -320,7 +320,7 @@ describe('EntityCollectionReducerRegistry', () => {
     }
 
     function createInitialCache(entityMap: { [entityName: string]: any[] }) {
-        const cache: EntityCache = {};
+        const cache: NxaEntityCache = {};
         // tslint:disable-next-line:forin
         for (const entityName in entityMap) {
             const selectId =
@@ -338,7 +338,7 @@ describe('EntityCollectionReducerRegistry', () => {
     function createNoopReducer<T>() {
         return function NoopReducer(
             collection: EntityCollection<T>,
-            action: EntityAction
+            action: NxaEntityAction
         ): EntityCollection<T> {
             return collection;
         };

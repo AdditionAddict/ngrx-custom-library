@@ -1,113 +1,113 @@
 import { Update } from '@ngrx/entity';
 
-export enum ChangeSetOperation {
+export enum NxaChangeSetOperation {
     Add = 'Add',
     Delete = 'Delete',
     Update = 'Update',
     Upsert = 'Upsert',
 }
-export interface ChangeSetAdd<T = any> {
-    op: ChangeSetOperation.Add;
+export interface NxaChangeSetAdd<T = any> {
+    op: NxaChangeSetOperation.Add;
     entityName: string;
     entities: T[];
 }
 
-export interface ChangeSetDelete {
-    op: ChangeSetOperation.Delete;
+export interface NxaChangeSetDelete {
+    op: NxaChangeSetOperation.Delete;
     entityName: string;
     entities: string[] | number[];
 }
 
-export interface ChangeSetUpdate<T = any> {
-    op: ChangeSetOperation.Update;
+export interface NxaChangeSetUpdate<T = any> {
+    op: NxaChangeSetOperation.Update;
     entityName: string;
     entities: Update<T>[];
 }
 
-export interface ChangeSetUpsert<T = any> {
-    op: ChangeSetOperation.Upsert;
+export interface NxaChangeSetUpsert<T = any> {
+    op: NxaChangeSetOperation.Upsert;
     entityName: string;
     entities: T[];
 }
 
 /**
- * A entities of a single entity type, which are changed in the same way by a ChangeSetOperation
+ * A entities of a single entity type, which are changed in the same way by a NxaChangeSetOperation
  */
-export type ChangeSetItem =
-    | ChangeSetAdd
-    | ChangeSetDelete
-    | ChangeSetUpdate
-    | ChangeSetUpsert;
+export type NxaChangeSetItem =
+    | NxaChangeSetAdd
+    | NxaChangeSetDelete
+    | NxaChangeSetUpdate
+    | NxaChangeSetUpsert;
 
 /*
  * A set of entity Changes, typically to be saved.
  */
-export interface ChangeSet<T = any> {
-    /** An array of ChangeSetItems to be processed in the array order */
-    changes: ChangeSetItem[];
+export interface NxaChangeSet<T = any> {
+    /** An array of NxaChangeSetItems to be processed in the array order */
+    changes: NxaChangeSetItem[];
 
     /**
-     * An arbitrary, serializable object that should travel with the ChangeSet.
-     * Meaningful to the ChangeSet producer and consumer. Ignored by @@ngrx/action.
+     * An arbitrary, serializable object that should travel with the NxaChangeSet.
+     * Meaningful to the NxaChangeSet producer and consumer. Ignored by @@ngrx/action.
      */
     extras?: T;
 
-    /** An arbitrary string, identifying the ChangeSet and perhaps its purpose */
+    /** An arbitrary string, identifying the NxaChangeSet and perhaps its purpose */
     tag?: string;
 }
 
 /**
- * Factory to create a ChangeSetItem for a ChangeSetOperation
+ * Factory to create a NxaChangeSetItem for a NxaChangeSetOperation
  */
-export class ChangeSetItemFactory {
-    /** Create the ChangeSetAdd for new entities of the given entity type */
-    add<T>(entityName: string, entities: T | T[]): ChangeSetAdd<T> {
+export class NxaChangeSetItemFactory {
+    /** Create the NxaChangeSetAdd for new entities of the given entity type */
+    add<T>(entityName: string, entities: T | T[]): NxaChangeSetAdd<T> {
         entities = Array.isArray(entities) ? entities : entities ? [entities] : [];
-        return { entityName, op: ChangeSetOperation.Add, entities };
+        return { entityName, op: NxaChangeSetOperation.Add, entities };
     }
 
-    /** Create the ChangeSetDelete for primary keys of the given entity type */
+    /** Create the NxaChangeSetDelete for primary keys of the given entity type */
     delete(
         entityName: string,
         keys: number | number[] | string | string[]
-    ): ChangeSetDelete {
+    ): NxaChangeSetDelete {
         const ids = Array.isArray(keys)
             ? keys
             : keys
                 ? ([keys] as string[] | number[])
                 : [];
-        return { entityName, op: ChangeSetOperation.Delete, entities: ids };
+        return { entityName, op: NxaChangeSetOperation.Delete, entities: ids };
     }
 
-    /** Create the ChangeSetUpdate for Updates of entities of the given entity type */
+    /** Create the NxaChangeSetUpdate for Updates of entities of the given entity type */
     update<T extends { id: string | number }>(
         entityName: string,
         updates: Update<T> | Update<T>[]
-    ): ChangeSetUpdate<T> {
+    ): NxaChangeSetUpdate<T> {
         updates = Array.isArray(updates) ? updates : updates ? [updates] : [];
-        return { entityName, op: ChangeSetOperation.Update, entities: updates };
+        return { entityName, op: NxaChangeSetOperation.Update, entities: updates };
     }
 
-    /** Create the ChangeSetUpsert for new or existing entities of the given entity type */
-    upsert<T>(entityName: string, entities: T | T[]): ChangeSetUpsert<T> {
+    /** Create the NxaChangeSetUpsert for new or existing entities of the given entity type */
+    upsert<T>(entityName: string, entities: T | T[]): NxaChangeSetUpsert<T> {
         entities = Array.isArray(entities) ? entities : entities ? [entities] : [];
-        return { entityName, op: ChangeSetOperation.Upsert, entities };
+        return { entityName, op: NxaChangeSetOperation.Upsert, entities };
     }
 }
 
 /**
- * Instance of a factory to create a ChangeSetItem for a ChangeSetOperation
+ * Instance of a factory to create a NxaChangeSetItem for a NxaChangeSetOperation
  */
-export const changeSetItemFactory = new ChangeSetItemFactory();
+export const nxaChangeSetItemFactory = new NxaChangeSetItemFactory();
 
 /**
- * Return ChangeSet after filtering out null and empty ChangeSetItems.
- * @param changeSet ChangeSet with changes to filter
+ * Return NxaChangeSet after filtering out null and empty NxaChangeSetItems.
+ * @param NxaChangeSet NxaChangeSet with changes to filter
  */
-export function excludeEmptyChangeSetItems(changeSet: ChangeSet): ChangeSet {
-    changeSet = changeSet && changeSet.changes ? changeSet : { changes: [] };
-    const changes = changeSet.changes.filter(
+export function excludeEmptyNxaChangeSetItems(NxaChangeSet: NxaChangeSet): NxaChangeSet {
+    NxaChangeSet = NxaChangeSet && NxaChangeSet.changes ? NxaChangeSet : { changes: [] };
+    const changes = NxaChangeSet.changes.filter(
         c => c != null && c.entities && c.entities.length > 0
     );
-    return { ...changeSet, changes };
+    return { ...NxaChangeSet, changes };
 }

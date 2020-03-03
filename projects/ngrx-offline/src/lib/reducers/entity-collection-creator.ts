@@ -1,19 +1,19 @@
 import { Injectable, Optional } from '@angular/core';
 
-import { EntityCollection } from './entity-collection';
-import { EntityDefinitionService } from '../entity-metadata/entity-definition.service';
+import { NxaEntityCollection } from './entity-collection';
+import { NxaEntityDefinitionService } from '../entity-metadata/entity-definition.service';
 
 @Injectable()
-export class EntityCollectionCreator {
+export class NxaEntityCollectionCreator {
     constructor(
-        @Optional() private entityDefinitionService?: EntityDefinitionService
+        @Optional() private entityDefinitionService?: NxaEntityDefinitionService
     ) { }
 
     /**
      * Create the default collection for an entity type.
      * @param entityName {string} entity type name
      */
-    create<T = any, S extends EntityCollection<T> = EntityCollection<T>>(
+    create<T = any, S extends NxaEntityCollection<T> = NxaEntityCollection<T>>(
         entityName: string
     ): S {
         const def =
@@ -25,13 +25,13 @@ export class EntityCollectionCreator {
 
         const initialState = def && def.initialState;
 
-        return <S>(initialState || createEmptyEntityCollection<T>(entityName));
+        return <S>(initialState || createEmptyNxaEntityCollection<T>(entityName));
     }
 }
 
-export function createEmptyEntityCollection<T>(
+export function createEmptyNxaEntityCollection<T>(
     entityName?: string
-): EntityCollection<T> {
+): NxaEntityCollection<T> {
     return {
         entityName,
         ids: [],
@@ -40,5 +40,5 @@ export function createEmptyEntityCollection<T>(
         loaded: false,
         loading: false,
         changeState: {},
-    } as EntityCollection<T>;
+    } as NxaEntityCollection<T>;
 }

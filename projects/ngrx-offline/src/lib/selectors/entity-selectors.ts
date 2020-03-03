@@ -5,69 +5,69 @@ import { MemoizedSelector } from '@ngrx/store';
 import { createSelector, Selector } from '@ngrx/store';
 import { Dictionary } from '@ngrx/entity';
 
-import { EntityCache } from '../reducers/entity-cache';
+import { NxaEntityCache } from '../reducers/entity-cache';
 import {
-    ENTITY_CACHE_SELECTOR_TOKEN,
-    EntityCacheSelector,
-    createEntityCacheSelector,
+    NXA_ENTITY_CACHE_SELECTOR_TOKEN,
+    NxaEntityCacheSelector,
+    createNxaEntityCacheSelector,
 } from './entity-cache-selector';
-import { ENTITY_CACHE_NAME } from '../reducers/constants';
+import { NXA_ENTITY_CACHE_NAME } from '../reducers/constants';
 import {
-    EntityCollection,
-    ChangeStateMap,
+    NxaEntityCollection,
+    NxaChangeStateMap,
 } from '../reducers/entity-collection';
-import { EntityCollectionCreator } from '../reducers/entity-collection-creator';
-import { EntityMetadata } from '../entity-metadata/entity-metadata';
+import { NxaEntityCollectionCreator } from '../reducers/entity-collection-creator';
+import { NxaEntityMetadata } from '../entity-metadata/entity-metadata';
 
 /**
  * The selector functions for entity collection members,
  * Selects from the entity collection to the collection member
- * Contrast with {EntitySelectors}.
+ * Contrast with {NxaEntitySelectors}.
  */
-export interface CollectionSelectors<T> {
+export interface NxaCollectionSelectors<T> {
     readonly [selector: string]: any;
 
     /** Count of entities in the cached collection. */
-    readonly selectCount: Selector<EntityCollection<T>, number>;
+    readonly selectCount: Selector<NxaEntityCollection<T>, number>;
 
     /** All entities in the cached collection. */
-    readonly selectEntities: Selector<EntityCollection<T>, T[]>;
+    readonly selectEntities: Selector<NxaEntityCollection<T>, T[]>;
 
     /** Map of entity keys to entities */
-    readonly selectEntityMap: Selector<EntityCollection<T>, Dictionary<T>>;
+    readonly selectEntityMap: Selector<NxaEntityCollection<T>, Dictionary<T>>;
 
     /** Filter pattern applied by the entity collection's filter function */
-    readonly selectFilter: Selector<EntityCollection<T>, string>;
+    readonly selectFilter: Selector<NxaEntityCollection<T>, string>;
 
     /** Entities in the cached collection that pass the filter function */
-    readonly selectFilteredEntities: Selector<EntityCollection<T>, T[]>;
+    readonly selectFilteredEntities: Selector<NxaEntityCollection<T>, T[]>;
 
     /** Keys of the cached collection, in the collection's native sort order */
-    readonly selectKeys: Selector<EntityCollection<T>, string[] | number[]>;
+    readonly selectKeys: Selector<NxaEntityCollection<T>, string[] | number[]>;
 
     /** True when the collection has been fully loaded. */
-    readonly selectLoaded: Selector<EntityCollection<T>, boolean>;
+    readonly selectLoaded: Selector<NxaEntityCollection<T>, boolean>;
 
     /** True when a multi-entity query command is in progress. */
-    readonly selectLoading: Selector<EntityCollection<T>, boolean>;
+    readonly selectLoading: Selector<NxaEntityCollection<T>, boolean>;
 
-    /** ChangeState (including original values) of entities with unsaved changes */
-    readonly selectChangeState: Selector<EntityCollection<T>, ChangeStateMap<T>>;
+    /** NxaChangeState (including original values) of entities with unsaved changes */
+    readonly selectNxaChangeState: Selector<NxaEntityCollection<T>, NxaChangeStateMap<T>>;
 }
 
 /**
  * The selector functions for entity collection members,
- * Selects from store root, through EntityCache, to the entity collection member
- * Contrast with {CollectionSelectors}.
+ * Selects from store root, through NxaEntityCache, to the entity collection member
+ * Contrast with {NxaCollectionSelectors}.
  */
-export interface EntitySelectors<T> {
+export interface NxaEntitySelectors<T> {
     /** Name of the entity collection for these selectors */
     readonly entityName: string;
 
-    readonly [name: string]: MemoizedSelector<EntityCollection<T>, any> | string;
+    readonly [name: string]: MemoizedSelector<NxaEntityCollection<T>, any> | string;
 
     /** The cached EntityCollection itself */
-    readonly selectCollection: MemoizedSelector<Object, EntityCollection<T>>;
+    readonly selectCollection: MemoizedSelector<Object, NxaEntityCollection<T>>;
 
     /** Count of entities in the cached collection. */
     readonly selectCount: MemoizedSelector<Object, number>;
@@ -75,8 +75,8 @@ export interface EntitySelectors<T> {
     /** All entities in the cached collection. */
     readonly selectEntities: MemoizedSelector<Object, T[]>;
 
-    /** The EntityCache */
-    readonly selectEntityCache: MemoizedSelector<Object, EntityCache>;
+    /** The NxaEntityCache */
+    readonly selectNxaEntityCache: MemoizedSelector<Object, NxaEntityCache>;
 
     /** Map of entity keys to entities */
     readonly selectEntityMap: MemoizedSelector<Object, Dictionary<T>>;
@@ -96,26 +96,26 @@ export interface EntitySelectors<T> {
     /** True when a multi-entity query command is in progress. */
     readonly selectLoading: MemoizedSelector<Object, boolean>;
 
-    /** ChangeState (including original values) of entities with unsaved changes */
-    readonly selectChangeState: MemoizedSelector<Object, ChangeStateMap<T>>;
+    /** NxaChangeState (including original values) of entities with unsaved changes */
+    readonly selectNxaChangeState: MemoizedSelector<Object, NxaChangeStateMap<T>>;
 }
 
 /** Creates EntitySelector functions for entity collections. */
 @Injectable()
-export class EntitySelectorsFactory {
-    private entityCollectionCreator: EntityCollectionCreator;
-    private selectEntityCache: EntityCacheSelector;
+export class NxaEntitySelectorsFactory {
+    private entityCollectionCreator: NxaEntityCollectionCreator;
+    private selectNxaEntityCache: NxaEntityCacheSelector;
 
     constructor(
-        @Optional() entityCollectionCreator?: EntityCollectionCreator,
+        @Optional() entityCollectionCreator?: NxaEntityCollectionCreator,
         @Optional()
-        @Inject(ENTITY_CACHE_SELECTOR_TOKEN)
-        selectEntityCache?: EntityCacheSelector
+        @Inject(NXA_ENTITY_CACHE_SELECTOR_TOKEN)
+        selectNxaEntityCache?: NxaEntityCacheSelector
     ) {
         this.entityCollectionCreator =
-            entityCollectionCreator || new EntityCollectionCreator();
-        this.selectEntityCache =
-            selectEntityCache || createEntityCacheSelector(ENTITY_CACHE_NAME);
+            entityCollectionCreator || new NxaEntityCollectionCreator();
+        this.selectNxaEntityCache =
+            selectNxaEntityCache || createNxaEntityCacheSelector(NXA_ENTITY_CACHE_NAME);
     }
 
     /**
@@ -125,73 +125,73 @@ export class EntitySelectorsFactory {
      */
     createCollectionSelector<
         T = any,
-        C extends EntityCollection<T> = EntityCollection<T>
+        C extends NxaEntityCollection<T> = NxaEntityCollection<T>
     >(entityName: string) {
-        const getCollection = (cache: EntityCache = {}) =>
+        const getCollection = (cache: NxaEntityCache = {}) =>
             <C>(
                 (cache[entityName] ||
                     this.entityCollectionCreator.create<T>(entityName))
             );
-        return createSelector(this.selectEntityCache, getCollection);
+        return createSelector(this.selectNxaEntityCache, getCollection);
     }
 
-    /////// createCollectionSelectors //////////
+    /////// createNxaCollectionSelectors //////////
 
     // Based on @ngrx/entity/state_selectors.ts
 
     // tslint:disable:unified-signatures
-    // createCollectionSelectors(metadata) overload
+    // createNxaCollectionSelectors(metadata) overload
     /**
      * Creates entity collection selectors from metadata.
-     * @param metadata - EntityMetadata for the collection.
+     * @param metadata - NxaEntityMetadata for the collection.
      * May be partial but much have `entityName`.
      */
-    createCollectionSelectors<
+    createNxaCollectionSelectors<
         T,
-        S extends CollectionSelectors<T> = CollectionSelectors<T>
-    >(metadata: EntityMetadata<T>): S;
+        S extends NxaCollectionSelectors<T> = NxaCollectionSelectors<T>
+    >(metadata: NxaEntityMetadata<T>): S;
 
     // tslint:disable:unified-signatures
-    // createCollectionSelectors(entityName) overload
+    // createNxaCollectionSelectors(entityName) overload
     /**
      * Creates default entity collection selectors for an entity type.
      * Use the metadata overload for additional collection selectors.
      * @param entityName - name of the entity type
      */
-    createCollectionSelectors<
+    createNxaCollectionSelectors<
         T,
-        S extends CollectionSelectors<T> = CollectionSelectors<T>
+        S extends NxaCollectionSelectors<T> = NxaCollectionSelectors<T>
     >(entityName: string): S;
 
-    // createCollectionSelectors implementation
-    createCollectionSelectors<
+    // createNxaCollectionSelectors implementation
+    createNxaCollectionSelectors<
         T,
-        S extends CollectionSelectors<T> = CollectionSelectors<T>
-    >(metadataOrName: EntityMetadata<T> | string): S {
+        S extends NxaCollectionSelectors<T> = NxaCollectionSelectors<T>
+    >(metadataOrName: NxaEntityMetadata<T> | string): S {
         const metadata =
             typeof metadataOrName === 'string'
                 ? { entityName: metadataOrName }
                 : metadataOrName;
-        const selectKeys = (c: EntityCollection<T>) => c.ids;
-        const selectEntityMap = (c: EntityCollection<T>) => c.entities;
+        const selectKeys = (c: NxaEntityCollection<T>) => c.ids;
+        const selectEntityMap = (c: NxaEntityCollection<T>) => c.entities;
 
-        const selectEntities: Selector<EntityCollection<T>, T[]> = createSelector(
+        const selectEntities: Selector<NxaEntityCollection<T>, T[]> = createSelector(
             selectKeys,
             selectEntityMap,
             (keys: (number | string)[], entities: Dictionary<T>): T[] =>
                 keys.map(key => entities[key] as T)
         );
 
-        const selectCount: Selector<EntityCollection<T>, number> = createSelector(
+        const selectCount: Selector<NxaEntityCollection<T>, number> = createSelector(
             selectKeys,
             keys => keys.length
         );
 
         // EntityCollection selectors that go beyond the ngrx/entity/EntityState selectors
-        const selectFilter = (c: EntityCollection<T>) => c.filter;
+        const selectFilter = (c: NxaEntityCollection<T>) => c.filter;
 
         const filterFn = metadata.filterFn;
-        const selectFilteredEntities: Selector<EntityCollection<T>, T[]> = filterFn
+        const selectFilteredEntities: Selector<NxaEntityCollection<T>, T[]> = filterFn
             ? createSelector(
                 selectEntities,
                 selectFilter,
@@ -199,19 +199,19 @@ export class EntitySelectorsFactory {
             )
             : selectEntities;
 
-        const selectLoaded = (c: EntityCollection<T>) => c.loaded;
-        const selectLoading = (c: EntityCollection<T>) => c.loading;
-        const selectChangeState = (c: EntityCollection<T>) => c.changeState;
+        const selectLoaded = (c: NxaEntityCollection<T>) => c.loaded;
+        const selectLoading = (c: NxaEntityCollection<T>) => c.loading;
+        const selectNxaChangeState = (c: NxaEntityCollection<T>) => c.changeState;
 
         // Create collection selectors for each `additionalCollectionState` property.
         // These all extend from `selectCollection`
         const extra = metadata.additionalCollectionState || {};
         const extraSelectors: {
-            [name: string]: Selector<EntityCollection<T>, any>;
+            [name: string]: Selector<NxaEntityCollection<T>, any>;
         } = {};
         Object.keys(extra).forEach(k => {
             extraSelectors['select' + k[0].toUpperCase() + k.slice(1)] = (
-                c: EntityCollection<T>
+                c: NxaEntityCollection<T>
             ) => (<any>c)[k];
         });
 
@@ -224,7 +224,7 @@ export class EntitySelectorsFactory {
             selectKeys,
             selectLoaded,
             selectLoading,
-            selectChangeState,
+            selectNxaChangeState,
             ...extraSelectors,
         } as S;
     }
@@ -234,23 +234,23 @@ export class EntitySelectorsFactory {
     // create(metadata) overload
     /**
      * Creates the store-rooted selectors for an entity collection.
-     * {EntitySelectors$Factory} turns them into selectors$.
+     * {NxaEntitySelectors$Factory} turns them into selectors$.
      *
-     * @param metadata - EntityMetadata for the collection.
+     * @param metadata - NxaEntityMetadata for the collection.
      * May be partial but much have `entityName`.
      *
      * Based on ngrx/entity/state_selectors.ts
      * Differs in that these selectors select from the NgRx store root,
      * through the collection, to the collection members.
      */
-    create<T, S extends EntitySelectors<T> = EntitySelectors<T>>(
-        metadata: EntityMetadata<T>
+    create<T, S extends NxaEntitySelectors<T> = NxaEntitySelectors<T>>(
+        metadata: NxaEntityMetadata<T>
     ): S;
 
     // create(entityName) overload
     /**
      * Creates the default store-rooted selectors for an entity collection.
-     * {EntitySelectors$Factory} turns them into selectors$.
+     * {NxaEntitySelectors$Factory} turns them into selectors$.
      * Use the metadata overload for additional collection selectors.
      *
      * @param entityName - name of the entity type.
@@ -259,14 +259,14 @@ export class EntitySelectorsFactory {
      * Differs in that these selectors select from the NgRx store root,
      * through the collection, to the collection members.
      */
-    create<T, S extends EntitySelectors<T> = EntitySelectors<T>>(
+    create<T, S extends NxaEntitySelectors<T> = NxaEntitySelectors<T>>(
         // tslint:disable-next-line:unified-signatures
         entityName: string
     ): S;
 
-    // createCollectionSelectors implementation
-    create<T, S extends EntitySelectors<T> = EntitySelectors<T>>(
-        metadataOrName: EntityMetadata<T> | string
+    // createNxaCollectionSelectors implementation
+    create<T, S extends NxaEntitySelectors<T> = NxaEntitySelectors<T>>(
+        metadataOrName: NxaEntityMetadata<T> | string
     ): S {
         const metadata =
             typeof metadataOrName === 'string'
@@ -275,12 +275,12 @@ export class EntitySelectorsFactory {
         const entityName = metadata.entityName;
         const selectCollection: Selector<
             Object,
-            EntityCollection<T>
+            NxaEntityCollection<T>
         > = this.createCollectionSelector<T>(entityName);
-        const collectionSelectors = this.createCollectionSelectors<T>(metadata);
+        const collectionSelectors = this.createNxaCollectionSelectors<T>(metadata);
 
         const entitySelectors: {
-            [name: string]: Selector<EntityCollection<T>, any>;
+            [name: string]: Selector<NxaEntityCollection<T>, any>;
         } = {};
         Object.keys(collectionSelectors).forEach(k => {
             entitySelectors[k] = createSelector(
@@ -292,7 +292,7 @@ export class EntitySelectorsFactory {
         return {
             entityName,
             selectCollection,
-            selectEntityCache: this.selectEntityCache,
+            selectNxaEntityCache: this.selectNxaEntityCache,
             ...entitySelectors,
         } as S;
     }

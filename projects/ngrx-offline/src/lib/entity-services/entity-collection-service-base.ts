@@ -3,37 +3,37 @@ import { Dictionary, IdSelector, Update } from '@ngrx/entity';
 
 import { Observable } from 'rxjs';
 
-import { EntityAction, EntityActionOptions } from '../actions/entity-action';
-import { EntityActionGuard } from '../actions/entity-action-guard';
+import { NxaEntityAction, NxaEntityActionOptions } from '../actions/entity-action';
+import { NxaEntityActionGuard } from '../actions/entity-action-guard';
 import {
     EntityCollection,
-    ChangeStateMap,
+    NxaChangeStateMap,
 } from '../reducers/entity-collection';
-import { EntityDispatcher } from '../dispatchers/entity-dispatcher';
+import { NxaEntityDispatcher } from '../dispatchers/entity-dispatcher';
 import { EntityCollectionService } from './entity-collection-service';
-import { EntityCollectionServiceElementsFactory } from './entity-collection-service-elements-factory';
-import { EntityOp } from '../actions/entity-op';
-import { EntitySelectors } from '../selectors/entity-selectors';
-import { EntitySelectors$ } from '../selectors/entity-selectors$';
-import { QueryParams } from '../dataservices/interfaces';
+import { NxaEntityCollectionServiceElementsFactory } from './entity-collection-service-elements-factory';
+import { NxaEntityOp } from '../actions/entity-op';
+import { NxaEntitySelectors } from '../selectors/entity-selectors';
+import { NxaEntitySelectors$ } from '../selectors/entity-selectors$';
+import { NxaQueryParams } from '../dataservices/interfaces';
 
 // tslint:disable:member-ordering
 
 /**
  * Base class for a concrete EntityCollectionService<T>.
- * Can be instantiated. Cannot be injected. Use EntityCollectionServiceFactory to create.
- * @param EntityCollectionServiceElements The ingredients for this service
+ * Can be instantiated. Cannot be injected. Use NxaEntityCollectionServiceFactory to create.
+ * @param NxaEntityCollectionServiceElements The ingredients for this service
  * as a source of supporting services for creating an EntityCollectionService<T> instance.
  */
-export class EntityCollectionServiceBase<
+export class NxaEntityCollectionServiceBase<
     T,
-    S$ extends EntitySelectors$<T> = EntitySelectors$<T>
+    S$ extends NxaEntitySelectors$<T> = NxaEntitySelectors$<T>
     > implements EntityCollectionService<T> {
-    /** Dispatcher of EntityCommands (EntityActions) */
-    readonly dispatcher: EntityDispatcher<T>;
+    /** Dispatcher of NxaEntityCommands (NxaEntityActions) */
+    readonly dispatcher: NxaEntityDispatcher<T>;
 
     /** All selectors of entity collection properties */
-    readonly selectors: EntitySelectors<T>;
+    readonly selectors: NxaEntitySelectors<T>;
 
     /** All selectors$ (observables of entity collection properties) */
     readonly selectors$: S$;
@@ -42,7 +42,7 @@ export class EntityCollectionServiceBase<
         /** Name of the entity type of this collection service */
         public readonly entityName: string,
         /** Creates the core elements of the EntityCollectionService for this entity type */
-        serviceElementsFactory: EntityCollectionServiceElementsFactory
+        serviceElementsFactory: NxaEntityCollectionServiceElementsFactory
     ) {
         entityName = entityName.trim();
         const { dispatcher, selectors, selectors$ } = serviceElementsFactory.create<
@@ -61,7 +61,7 @@ export class EntityCollectionServiceBase<
         this.collection$ = selectors$.collection$;
         this.count$ = selectors$.count$;
         this.entities$ = selectors$.entities$;
-        this.entityActions$ = selectors$.entityActions$;
+        this.NxaEntityActions$ = selectors$.NxaEntityActions$;
         this.entityMap$ = selectors$.entityMap$;
         this.errors$ = selectors$.errors$;
         this.filter$ = selectors$.filter$;
@@ -73,33 +73,33 @@ export class EntityCollectionServiceBase<
     }
 
     /**
-     * Create an {EntityAction} for this entity type.
-     * @param op {EntityOp} the entity operation
+     * Create an {NxaEntityAction} for this entity type.
+     * @param op {NxaEntityOp} the entity operation
      * @param [data] the action data
      * @param [options] additional options
-     * @returns the EntityAction
+     * @returns the NxaEntityAction
      */
-    createEntityAction<P = any>(
-        op: EntityOp,
+    createNxaEntityAction<P = any>(
+        op: NxaEntityOp,
         data?: P,
-        options?: EntityActionOptions
-    ): EntityAction<P> {
-        return this.dispatcher.createEntityAction(op, data, options);
+        options?: NxaEntityActionOptions
+    ): NxaEntityAction<P> {
+        return this.dispatcher.createNxaEntityAction(op, data, options);
     }
 
     /**
-     * Create an {EntityAction} for this entity type and
+     * Create an {NxaEntityAction} for this entity type and
      * dispatch it immediately to the store.
-     * @param op {EntityOp} the entity operation
+     * @param op {NxaEntityOp} the entity operation
      * @param [data] the action data
      * @param [options] additional options
-     * @returns the dispatched EntityAction
+     * @returns the dispatched NxaEntityAction
      */
     createAndDispatch<P = any>(
-        op: EntityOp,
+        op: NxaEntityOp,
         data?: P,
-        options?: EntityActionOptions
-    ): EntityAction<P> {
+        options?: NxaEntityActionOptions
+    ): NxaEntityAction<P> {
         return this.dispatcher.createAndDispatch(op, data, options);
     }
 
@@ -112,15 +112,15 @@ export class EntityCollectionServiceBase<
         return this.dispatcher.dispatch(action);
     }
 
-    /** The NgRx Store for the {EntityCache} */
+    /** The NgRx Store for the {NxaEntityCache} */
     get store() {
         return this.dispatcher.store;
     }
 
     /**
-     * Utility class with methods to validate EntityAction payloads.
+     * Utility class with methods to validate NxaEntityAction payloads.
      */
-    guard: EntityActionGuard<T>;
+    guard: NxaEntityActionGuard<T>;
 
     /** Returns the primary key (id) of this entity */
     selectId: IdSelector<T>;
@@ -141,20 +141,20 @@ export class EntityCollectionServiceBase<
      * @returns Observable of the entity
      * after server reports successful save or the save error.
      */
-    add(entity: T, options?: EntityActionOptions): Observable<T> {
+    add(entity: T, options?: NxaEntityActionOptions): Observable<T> {
         return this.dispatcher.add(entity, options);
     }
 
     /**
      * Dispatch action to cancel the persistence operation (query or save) with the given correlationId.
-     * @param correlationId The correlation id for the corresponding EntityAction
+     * @param correlationId The correlation id for the corresponding NxaEntityAction
      * @param [reason] explains why canceled and by whom.
      * @param [options] options such as the tag and mergeStrategy
      */
     cancel(
         correlationId: any,
         reason?: string,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         this.dispatcher.cancel(correlationId, reason, options);
     }
@@ -166,7 +166,7 @@ export class EntityCollectionServiceBase<
      * @returns Observable of the deleted key
      * after server reports successful save or the save error.
      */
-    delete(entity: T, options?: EntityActionOptions): Observable<number | string>;
+    delete(entity: T, options?: NxaEntityActionOptions): Observable<number | string>;
 
     /**
      * Dispatch action to delete entity from remote storage by key.
@@ -177,11 +177,11 @@ export class EntityCollectionServiceBase<
      */
     delete(
         key: number | string,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): Observable<number | string>;
     delete(
         arg: number | string | T,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): Observable<number | string> {
         return this.dispatcher.delete(arg as any, options);
     }
@@ -194,7 +194,7 @@ export class EntityCollectionServiceBase<
      * after server reports successful query or the query error.
      * @see load()
      */
-    getAll(options?: EntityActionOptions): Observable<T[]> {
+    getAll(options?: NxaEntityActionOptions): Observable<T[]> {
         return this.dispatcher.getAll(options);
     }
 
@@ -207,7 +207,7 @@ export class EntityCollectionServiceBase<
      * @returns Observable of the queried entity that is in the collection
      * after server reports success or the query error.
      */
-    getByKey(key: any, options?: EntityActionOptions): Observable<T> {
+    getByKey(key: any, options?: NxaEntityActionOptions): Observable<T> {
         return this.dispatcher.getByKey(key, options);
     }
 
@@ -221,8 +221,8 @@ export class EntityCollectionServiceBase<
      * after server reports successful query or the query error.
      */
     getWithQuery(
-        queryParams: QueryParams | string,
-        options?: EntityActionOptions
+        queryParams: NxaQueryParams | string,
+        options?: NxaEntityActionOptions
     ): Observable<T[]> {
         return this.dispatcher.getWithQuery(queryParams, options);
     }
@@ -235,7 +235,7 @@ export class EntityCollectionServiceBase<
      * after server reports successful query or the query error.
      * @see getAll
      */
-    load(options?: EntityActionOptions): Observable<T[]> {
+    load(options?: NxaEntityActionOptions): Observable<T[]> {
         return this.dispatcher.load(options);
     }
 
@@ -248,7 +248,7 @@ export class EntityCollectionServiceBase<
      * @returns Observable of the updated entity
      * after server reports successful save or the save error.
      */
-    update(entity: Partial<T>, options?: EntityActionOptions): Observable<T> {
+    update(entity: Partial<T>, options?: NxaEntityActionOptions): Observable<T> {
         return this.dispatcher.update(entity, options);
     }
 
@@ -262,7 +262,7 @@ export class EntityCollectionServiceBase<
      * @returns Observable of the entity
      * after server reports successful save or the save error.
      */
-    upsert(entity: T, options?: EntityActionOptions): Observable<T> {
+    upsert(entity: T, options?: NxaEntityActionOptions): Observable<T> {
         return this.dispatcher.upsert(entity, options);
     }
 
@@ -274,7 +274,7 @@ export class EntityCollectionServiceBase<
      * @param entities to add directly to cache.
      * @param [options] options such as mergeStrategy
      */
-    addAllToCache(entities: T[], options?: EntityActionOptions): void {
+    addAllToCache(entities: T[], options?: NxaEntityActionOptions): void {
         this.dispatcher.addAllToCache(entities, options);
     }
 
@@ -285,7 +285,7 @@ export class EntityCollectionServiceBase<
      * @param entity to add directly to cache.
      * @param [options] options such as mergeStrategy
      */
-    addOneToCache(entity: T, options?: EntityActionOptions): void {
+    addOneToCache(entity: T, options?: NxaEntityActionOptions): void {
         this.dispatcher.addOneToCache(entity, options);
     }
 
@@ -296,7 +296,7 @@ export class EntityCollectionServiceBase<
      * @param entities to add directly to cache.
      * @param [options] options such as mergeStrategy
      */
-    addManyToCache(entities: T[], options?: EntityActionOptions): void {
+    addManyToCache(entities: T[], options?: NxaEntityActionOptions): void {
         this.dispatcher.addManyToCache(entities, options);
     }
 
@@ -311,7 +311,7 @@ export class EntityCollectionServiceBase<
      * @param entity The entity to remove
      * @param [options] options such as mergeStrategy
      */
-    removeOneFromCache(entity: T, options?: EntityActionOptions): void;
+    removeOneFromCache(entity: T, options?: NxaEntityActionOptions): void;
 
     /**
      * Remove an entity directly from the cache.
@@ -319,10 +319,10 @@ export class EntityCollectionServiceBase<
      * @param key The primary key of the entity to remove
      * @param [options] options such as mergeStrategy
      */
-    removeOneFromCache(key: number | string, options?: EntityActionOptions): void;
+    removeOneFromCache(key: number | string, options?: NxaEntityActionOptions): void;
     removeOneFromCache(
         arg: (number | string) | T,
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         this.dispatcher.removeOneFromCache(arg as any, options);
     }
@@ -333,7 +333,7 @@ export class EntityCollectionServiceBase<
      * @param entity The entities to remove
      * @param [options] options such as mergeStrategy
      */
-    removeManyFromCache(entities: T[], options?: EntityActionOptions): void;
+    removeManyFromCache(entities: T[], options?: NxaEntityActionOptions): void;
 
     /**
      * Remove multiple entities directly from the cache.
@@ -343,11 +343,11 @@ export class EntityCollectionServiceBase<
      */
     removeManyFromCache(
         keys: (number | string)[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void;
     removeManyFromCache(
         args: (number | string)[] | T[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         this.dispatcher.removeManyFromCache(args as any[], options);
     }
@@ -361,7 +361,7 @@ export class EntityCollectionServiceBase<
      * @param entity to update directly in cache.
      * @param [options] options such as mergeStrategy
      */
-    updateOneInCache(entity: Partial<T>, options?: EntityActionOptions): void {
+    updateOneInCache(entity: Partial<T>, options?: NxaEntityActionOptions): void {
         // update entity might be a partial of T but must at least have its key.
         // pass the Update<T> structure as the payload
         this.dispatcher.updateOneInCache(entity, options);
@@ -378,7 +378,7 @@ export class EntityCollectionServiceBase<
      */
     updateManyInCache(
         entities: Partial<T>[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         this.dispatcher.updateManyInCache(entities, options);
     }
@@ -391,7 +391,7 @@ export class EntityCollectionServiceBase<
      * @param entity to upsert directly in cache.
      * @param [options] options such as mergeStrategy
      */
-    upsertOneInCache(entity: Partial<T>, options?: EntityActionOptions): void {
+    upsertOneInCache(entity: Partial<T>, options?: NxaEntityActionOptions): void {
         this.dispatcher.upsertOneInCache(entity, options);
     }
 
@@ -405,7 +405,7 @@ export class EntityCollectionServiceBase<
      */
     upsertManyInCache(
         entities: Partial<T>[],
-        options?: EntityActionOptions
+        options?: NxaEntityActionOptions
     ): void {
         this.dispatcher.upsertManyInCache(entities, options);
     }
@@ -441,13 +441,13 @@ export class EntityCollectionServiceBase<
     entities$: Observable<T[]> | Store<T[]>;
 
     /** Observable of actions related to this entity type. */
-    entityActions$: Observable<EntityAction>;
+    NxaEntityActions$: Observable<NxaEntityAction>;
 
     /** Observable of the map of entity keys to entities */
     entityMap$: Observable<Dictionary<T>> | Store<Dictionary<T>>;
 
     /** Observable of error actions related to this entity type. */
-    errors$: Observable<EntityAction>;
+    errors$: Observable<NxaEntityAction>;
 
     /** Observable of the filter pattern applied by the entity collection's filter function */
     filter$: Observable<any> | Store<any>;
@@ -465,7 +465,7 @@ export class EntityCollectionServiceBase<
     loading$: Observable<boolean> | Store<boolean>;
 
     /** Original entity values for entities with unsaved changes */
-    changeState$: Observable<ChangeStateMap<T>> | Store<ChangeStateMap<T>>;
+    changeState$: Observable<NxaChangeStateMap<T>> | Store<NxaChangeStateMap<T>>;
 
     // endregion Selectors$
 }

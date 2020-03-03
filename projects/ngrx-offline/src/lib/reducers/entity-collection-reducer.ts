@@ -1,28 +1,28 @@
 import { Injectable } from '@angular/core';
 
-import { EntityAction } from '../actions/entity-action';
-import { EntityCollection } from './entity-collection';
-import { EntityCollectionReducerMethodsFactory } from './entity-collection-reducer-methods';
+import { NxaEntityAction } from '../actions/entity-action';
+import { NxaEntityCollection } from './entity-collection';
+import { NxaEntityCollectionReducerMethodsFactory } from './entity-collection-reducer-methods';
 
-export type EntityCollectionReducer<T = any> = (
-    collection: EntityCollection<T>,
-    action: EntityAction
-) => EntityCollection<T>;
+export type NxaEntityCollectionReducer<T = any> = (
+    collection: NxaEntityCollection<T>,
+    action: NxaEntityAction
+) => NxaEntityCollection<T>;
 
 /** Create a default reducer for a specific entity collection */
 @Injectable()
-export class EntityCollectionReducerFactory {
-    constructor(private methodsFactory: EntityCollectionReducerMethodsFactory) { }
+export class NxaEntityCollectionReducerFactory {
+    constructor(private methodsFactory: NxaEntityCollectionReducerMethodsFactory) { }
 
     /** Create a default reducer for a collection of entities of T */
-    create<T = any>(entityName: string): EntityCollectionReducer<T> {
+    create<T = any>(entityName: string): NxaEntityCollectionReducer<T> {
         const methods = this.methodsFactory.create<T>(entityName);
 
-        /** Perform Actions against a particular entity collection in the EntityCache */
+        /** Perform Actions against a particular entity collection in the NxaEntityCache */
         return function entityCollectionReducer(
-            collection: EntityCollection<T>,
-            action: EntityAction
-        ): EntityCollection<T> {
+            collection: NxaEntityCollection<T>,
+            action: NxaEntityAction
+        ): NxaEntityCollection<T> {
             const reducerMethod = methods[action.payload.entityOp];
             return reducerMethod ? reducerMethod(collection, action) : collection;
         };

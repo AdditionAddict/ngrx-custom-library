@@ -2,10 +2,10 @@ import { NgModule } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import {
-    createEntityDefinition,
-    EntityDefinitionService,
-    EntityMetadataMap,
-    ENTITY_METADATA_TOKEN,
+    createNxaEntityDefinition,
+    NxaEntityDefinitionService,
+    NxaEntityMetadataMap,
+    NXA_ENTITY_METADATA_TOKEN,
 } from '../../lib';
 
 @NgModule({})
@@ -14,14 +14,14 @@ class LazyModule {
         Sidekick: {},
     };
 
-    constructor(entityDefinitionService: EntityDefinitionService) {
+    constructor(entityDefinitionService: NxaEntityDefinitionService) {
         entityDefinitionService.registerMetadataMap(this.lazyMetadataMap);
     }
 }
 
-describe('EntityDefinitionService', () => {
-    let service: EntityDefinitionService;
-    let metadataMap: EntityMetadataMap;
+describe('NxaEntityDefinitionService', () => {
+    let service: NxaEntityDefinitionService;
+    let metadataMap: NxaEntityMetadataMap;
 
     beforeEach(() => {
         metadataMap = {
@@ -33,11 +33,11 @@ describe('EntityDefinitionService', () => {
             // Not actually lazy but demonstrates a module that registers metadata
             imports: [LazyModule],
             providers: [
-                EntityDefinitionService,
-                { provide: ENTITY_METADATA_TOKEN, multi: true, useValue: metadataMap },
+                NxaEntityDefinitionService,
+                { provide: NXA_ENTITY_METADATA_TOKEN, multi: true, useValue: metadataMap },
             ],
         });
-        service = TestBed.get(EntityDefinitionService);
+        service = TestBed.get(NxaEntityDefinitionService);
     });
 
     describe('#getDefinition', () => {
@@ -103,7 +103,7 @@ describe('EntityDefinitionService', () => {
 
     describe('#registerDefinition(s)', () => {
         it('can register a new definition', () => {
-            const newDef = createEntityDefinition({ entityName: 'Foo' });
+            const newDef = createNxaEntityDefinition({ entityName: 'Foo' });
             service.registerDefinition(newDef);
 
             let def = service.getDefinition('Foo');
@@ -115,8 +115,8 @@ describe('EntityDefinitionService', () => {
 
         it('can register a map of several definitions', () => {
             const newDefMap = {
-                Foo: createEntityDefinition({ entityName: 'Foo' }),
-                Bar: createEntityDefinition({ entityName: 'Bar' }),
+                Foo: createNxaEntityDefinition({ entityName: 'Foo' }),
+                Bar: createNxaEntityDefinition({ entityName: 'Bar' }),
             };
             service.registerDefinitions(newDefMap);
 
@@ -130,7 +130,7 @@ describe('EntityDefinitionService', () => {
 
         it('can re-register an existing definition', () => {
             const testSelectId = (entity: any) => 'test-id';
-            const newDef = createEntityDefinition({
+            const newDef = createNxaEntityDefinition({
                 entityName: 'Hero',
                 selectId: testSelectId,
             });

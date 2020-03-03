@@ -16,9 +16,9 @@ export function defaultSelectId(entity: any) {
  * Example:
  * ```
  * // See entity-action-operators.ts
- * const persistOps = [EntityOp.QUERY_ALL, EntityOp.ADD, ...];
- * actions.pipe(ofEntityOp(...persistOps)) // works
- * actions.pipe(ofEntityOp(persistOps)) // also works
+ * const persistNxaOps = [NxaEntityOp.QUERY_ALL, NxaEntityOp.ADD, ...];
+ * actions.pipe(ofNxaEntityOp(...persistNxaOps)) // works
+ * actions.pipe(ofNxaEntityOp(persistNxaOps)) // also works
  * ```
  * */
 export function flattenArgs<T>(args?: any[]): T[] {

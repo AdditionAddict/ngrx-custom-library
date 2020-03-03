@@ -1,8 +1,8 @@
-// Ensure that these suffix values and the EntityOp s@@ngrx/actionuffixes match
+// Ensure that these suffix values and the NxaEntityOp s@@ngrx/actionuffixes match
 // Cannot do that programmatically.
 
 /** General purpose entity action operations, good for any entity type */
-export enum EntityOp {
+export enum NxaEntityOp {
     // Persistance operations
     CANCEL_PERSIST = '@@ngrx/action/cancel-persist',
     CANCELED_PERSIST = '@@ngrx/action/canceled-persist',
@@ -83,18 +83,18 @@ export enum EntityOp {
     SET_LOADING = '@@ngrx/action/set-loading',
 }
 
-/** "Success" suffix appended to EntityOps that are successful.*/
-export const OP_SUCCESS = '/success';
+/** "Success" suffix appended to NxaEntityOps that are successful.*/
+export const OP_NXA_SUCCESS = '/success';
 
-/** "Error" suffix appended to EntityOps that have failed.*/
-export const OP_ERROR = '/error';
+/** "Error" suffix appended to NxaEntityOps that have failed.*/
+export const OP_NXA_ERROR = '/error';
 
-/** Make the error EntityOp corresponding to the given EntityOp */
-export function makeErrorOp(op: EntityOp): EntityOp {
-    return <EntityOp>(op + OP_ERROR);
+/** Make the error NxaEntityOp corresponding to the given NxaEntityOp */
+export function makeNxaErrorOp(op: NxaEntityOp): NxaEntityOp {
+    return <NxaEntityOp>(op + OP_NXA_ERROR);
 }
 
-/** Make the success EntityOp corresponding to the given EntityOp */
-export function makeSuccessOp(op: EntityOp): EntityOp {
-    return <EntityOp>(op + OP_SUCCESS);
+/** Make the success NxaEntityOp corresponding to the given NxaEntityOp */
+export function makeNxaSuccessOp(op: NxaEntityOp): NxaEntityOp {
+    return <NxaEntityOp>(op + OP_NXA_SUCCESS);
 }
