@@ -113,6 +113,12 @@ export const OP_NXA_SUCCESS = '/success';
 /** "Error" suffix appended to NxaEntityOps that have failed.*/
 export const OP_NXA_ERROR = '/error';
 
+/** "Success" suffix appended to NxaEntityOps that are successful.*/
+export const OP_NXA_OFFLINE_SUCCESS = '/offline/success';
+
+/** "Error" suffix appended to NxaEntityOps that have failed.*/
+export const OP_NXA_OFFLINE_ERROR = '/offline/error';
+
 /** Make the error NxaEntityOp corresponding to the given NxaEntityOp */
 export function makeNxaErrorOp(op: NxaEntityOp): NxaEntityOp {
     return <NxaEntityOp>(op + OP_NXA_ERROR);
@@ -121,4 +127,14 @@ export function makeNxaErrorOp(op: NxaEntityOp): NxaEntityOp {
 /** Make the success NxaEntityOp corresponding to the given NxaEntityOp */
 export function makeNxaSuccessOp(op: NxaEntityOp): NxaEntityOp {
     return <NxaEntityOp>(op + OP_NXA_SUCCESS);
+}
+
+/** Make the error NxaEntityOp corresponding to the given NxaEntityOp */
+export function makeNxaOfflineErrorOp(op: NxaEntityOp): NxaEntityOp {
+    return <NxaEntityOp>(op + OP_NXA_OFFLINE_ERROR);
+}
+
+/** Make the success NxaEntityOp corresponding to the given NxaEntityOp */
+export function makeNxaOfflineSuccessOp(op: NxaEntityOp): NxaEntityOp {
+    return <NxaEntityOp>(op + OP_NXA_OFFLINE_SUCCESS);
 }
