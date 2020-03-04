@@ -188,7 +188,7 @@ export class NxaEntityCacheReducerFactory {
         let { mergeStrategy, querySet, tag } = action.payload;
         mergeStrategy =
             mergeStrategy === null ? NxaMergeStrategy.PreserveChanges : mergeStrategy;
-        const entityOp = NxaEntityOp.UPSERT_MANY;
+        const entityOp = NxaEntityOp.QUERY_MANY_SUCCESS;
 
         const entityNames = Object.keys(querySet);
         entityCache = entityNames.reduce((newCache, entityName) => {
