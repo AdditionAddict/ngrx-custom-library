@@ -10,52 +10,76 @@ export enum NxaEntityOp {
     QUERY_ALL = '@@ngrx/action/query-all',
     QUERY_ALL_SUCCESS = '@@ngrx/action/query-all/success',
     QUERY_ALL_ERROR = '@@ngrx/action/query-all/error',
+    QUERY_ALL_OFFLINE_SUCCESS = "@@ngrx/action/query-all/offline/success",
+    QUERY_ALL_OFFLINE_ERROR = "@@ngrx/action/query-all/offline/error",
 
     QUERY_LOAD = '@@ngrx/action/query-load',
     QUERY_LOAD_SUCCESS = '@@ngrx/action/query-load/success',
     QUERY_LOAD_ERROR = '@@ngrx/action/query-load/error',
+    QUERY_LOAD_OFFLINE_SUCCESS = "@@ngrx/action/query-load/offline/success",
+    QUERY_LOAD_OFFLINE_ERROR = "@@ngrx/action/query-load/offline/error",
 
     QUERY_MANY = '@@ngrx/action/query-many',
     QUERY_MANY_SUCCESS = '@@ngrx/action/query-many/success',
     QUERY_MANY_ERROR = '@@ngrx/action/query-many/error',
+    QUERY_MANY_OFFLINE_SUCCESS = "@@ngrx/action/query-many/offline/success",
+    QUERY_MANY_OFFLINE_ERROR = "@@ngrx/action/query-many/offline/error",
 
     QUERY_BY_KEY = '@@ngrx/action/query-by-key',
     QUERY_BY_KEY_SUCCESS = '@@ngrx/action/query-by-key/success',
     QUERY_BY_KEY_ERROR = '@@ngrx/action/query-by-key/error',
+    QUERY_BY_KEY_OFFLINE_SUCCESS = "@@ngrx/action/query-by-key/offline/success",
+    QUERY_BY_KEY_OFFLINE_ERROR = "@@ngrx/action/query-by-key/offline/error",
 
     SAVE_ADD_MANY = '@@ngrx/action/save/add-many',
     SAVE_ADD_MANY_ERROR = '@@ngrx/action/save/add-many/error',
     SAVE_ADD_MANY_SUCCESS = '@@ngrx/action/save/add-many/success',
+    SAVE_ADD_MANY_OFFLINE_ERROR = "@@ngrx/action/save/add-many/offline/error",
+    SAVE_ADD_MANY_OFFLINE_SUCCESS = "@@ngrx/action/save/add-many/offline/success",
 
     SAVE_ADD_ONE = '@@ngrx/action/save/add-one',
     SAVE_ADD_ONE_ERROR = '@@ngrx/action/save/add-one/error',
     SAVE_ADD_ONE_SUCCESS = '@@ngrx/action/save/add-one/success',
+    SAVE_ADD_ONE_OFFLINE_ERROR = "@@ngrx/action/save/add-one/offline/error",
+    SAVE_ADD_ONE_OFFLINE_SUCCESS = "@@ngrx/action/save/add-one/offline/success",
 
     SAVE_DELETE_MANY = '@@ngrx/action/save/delete-many',
     SAVE_DELETE_MANY_SUCCESS = '@@ngrx/action/save/delete-many/success',
     SAVE_DELETE_MANY_ERROR = '@@ngrx/action/save/delete-many/error',
+    SAVE_DELETE_MANY_OFFLINE_SUCCESS = "@@ngrx/action/save/delete-many/offline/success",
+    SAVE_DELETE_MANY_OFFLINE_ERROR = "@@ngrx/action/save/delete-many/offline/error",
 
     SAVE_DELETE_ONE = '@@ngrx/action/save/delete-one',
     SAVE_DELETE_ONE_SUCCESS = '@@ngrx/action/save/delete-one/success',
     SAVE_DELETE_ONE_ERROR = '@@ngrx/action/save/delete-one/error',
+    SAVE_DELETE_ONE_OFFLINE_SUCCESS = "@@ngrx/action/save/delete-one/offline/success",
+    SAVE_DELETE_ONE_OFFLINE_ERROR = "@@ngrx/action/save/delete-one/offline/error",
 
     SAVE_UPDATE_MANY = '@@ngrx/action/save/update-many',
     SAVE_UPDATE_MANY_SUCCESS = '@@ngrx/action/save/update-many/success',
     SAVE_UPDATE_MANY_ERROR = '@@ngrx/action/save/update-many/error',
+    SAVE_UPDATE_MANY_OFFLINE_SUCCESS = "@@ngrx/action/save/update-many/offline/success",
+    SAVE_UPDATE_MANY_OFFLINE_ERROR = "@@ngrx/action/save/update-many/offline/error",
 
     SAVE_UPDATE_ONE = '@@ngrx/action/save/update-one',
     SAVE_UPDATE_ONE_SUCCESS = '@@ngrx/action/save/update-one/success',
     SAVE_UPDATE_ONE_ERROR = '@@ngrx/action/save/update-one/error',
+    SAVE_UPDATE_ONE_OFFLINE_SUCCESS = "@@ngrx/action/save/update-one/offline/success",
+    SAVE_UPDATE_ONE_OFFLINE_ERROR = "@@ngrx/action/save/update-one/offline/error",
 
     // Use only if the server supports upsert;
     SAVE_UPSERT_MANY = '@@ngrx/action/save/upsert-many',
     SAVE_UPSERT_MANY_SUCCESS = '@@ngrx/action/save/upsert-many/success',
     SAVE_UPSERT_MANY_ERROR = '@@ngrx/action/save/upsert-many/error',
+    SAVE_UPSERT_MANY_OFFLINE_SUCCESS = "@@ngrx/action/save/upsert-many/offline/success",
+    SAVE_UPSERT_MANY_OFFLINE_ERROR = "@@ngrx/action/save/upsert-many/offline/error",
 
     // Use only if the server supports upsert;
     SAVE_UPSERT_ONE = '@@ngrx/action/save/upsert-one',
     SAVE_UPSERT_ONE_SUCCESS = '@@ngrx/action/save/upsert-one/success',
     SAVE_UPSERT_ONE_ERROR = '@@ngrx/action/save/upsert-one/error',
+    SAVE_UPSERT_ONE_OFFLINE_SUCCESS = "@@ngrx/action/save/upsert-one/offline/success",
+    SAVE_UPSERT_ONE_OFFLINE_ERROR = "@@ngrx/action/save/upsert-one/offline/error",
 
     // Cache operations
     ADD_ALL = '@@ngrx/action/add-all',
