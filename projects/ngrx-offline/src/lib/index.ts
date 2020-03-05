@@ -39,9 +39,27 @@ export {
     OP_NXA_ERROR,
     makeNxaErrorOp,
     makeNxaSuccessOp,
+    makeNxaOfflineErrorOp,
+    makeNxaOfflineSuccessOp
 } from './actions/entity-op';
 export { NxaMergeStrategy } from './actions/merge-strategy';
 export { NxaUpdateResponseData } from './actions/update-response-data';
+
+// // offline-services
+export { NxaOfflineServiceError } from './offline-services/offline-service-error';
+export {
+    NxaEntityActionOfflineServiceError,
+} from './offline-services/offline-service-error';
+export {
+    NxaDefaultOfflineServiceConfig,
+} from './offline-services/default-offline-service-config';
+export { NxaDefaultOfflineService } from './offline-services/default-offline.service';
+export { NxaDefaultOfflineServiceFactory } from './offline-services/default-offline.service';
+export { NxaEntityOfflineService } from './offline-services/entity-offline.service';
+export {
+    NxaOfflinePersistenceResultHandler,
+    DefaultNxaOfflinePersistenceResultHandler,
+} from './offline-services/offline-persistence-result-handler.service';
 
 // // dataservices
 export { NxaDataServiceError } from './dataservices/data-service-error';
@@ -72,6 +90,7 @@ export {
     NxaPersistenceResultHandler,
     DefaultNxaPersistenceResultHandler,
 } from './dataservices/persistence-result-handler.service';
+
 
 // // dispatchers
 export { NxaEntityCacheDispatcher } from './dispatchers/entity-cache-dispatcher';

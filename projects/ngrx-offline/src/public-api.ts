@@ -77,6 +77,23 @@ export {
     DefaultNxaPersistenceResultHandler,
 } from './lib';
 
+// // offline-services
+export { NxaOfflineServiceError } from './lib';
+export {
+    NxaEntityActionOfflineServiceError,
+} from './lib';
+export {
+    NxaDefaultOfflineServiceConfig,
+} from './lib';
+export { NxaDefaultOfflineService } from './lib';
+export { NxaDefaultOfflineServiceFactory } from './lib';
+export { NxaEntityOfflineService } from './lib';
+export {
+    NxaOfflinePersistenceResultHandler,
+    DefaultNxaOfflinePersistenceResultHandler,
+} from './lib';
+
+
 // // dispatchers
 export { NxaEntityCacheDispatcher } from './lib';
 export {
