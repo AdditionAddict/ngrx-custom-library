@@ -32,6 +32,9 @@ import {
     NxaEntityDataModuleConfig,
     NxaEntityDataModuleWithoutEffects,
 } from './entity-data-without-effects.module';
+import { NxaDefaultOfflineServiceFactory } from './offline-services/default-offline.service';
+import { NxaEntityOfflineService } from './offline-services/entity-offline.service';
+import { DefaultNxaOfflinePersistenceResultHandler, NxaOfflinePersistenceResultHandler } from './offline-services/offline-persistence-result-handler.service';
 
 /**
  * entity-data main module includes effects and HTTP data services
@@ -45,14 +48,20 @@ import {
     ],
     providers: [
         NxaDefaultDataServiceFactory,
+        NxaDefaultOfflineServiceFactory,
         NxaEntityCacheDataService,
         NxaEntityDataService,
+        NxaEntityOfflineService,
         NxaEntityCacheEffects,
         NxaEntityEffects,
         { provide: NxaHttpUrlGenerator, useClass: NxaDefaultHttpUrlGenerator },
         {
             provide: NxaPersistenceResultHandler,
             useClass: DefaultNxaPersistenceResultHandler,
+        },
+        {
+            provide: NxaOfflinePersistenceResultHandler,
+            useClass: DefaultNxaOfflinePersistenceResultHandler,
         },
         { provide: Pluralizer, useClass: DefaultPluralizer },
     ],
