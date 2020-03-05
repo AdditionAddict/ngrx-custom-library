@@ -19,6 +19,8 @@ import { NxaEntityEffects } from '../../lib/effects/entity-effects';
 import { NxaPersistenceResultHandler, DefaultNxaPersistenceResultHandler } from '../../lib/dataservices/persistence-result-handler.service';
 
 import { ENTITY_EFFECTS_SCHEDULER } from '../../lib/effects/entity-effects-scheduler';
+import { NxaEntityOfflineService } from '../../lib/offline-services/entity-offline.service';
+import { DefaultNxaOfflinePersistenceResultHandler, NxaOfflinePersistenceResultHandler } from '../../lib/offline-services/offline-persistence-result-handler.service';
 
 //////// Tests begin ////////
 describe('NxaEntityEffects (marble testing)', () => {
@@ -40,10 +42,15 @@ describe('NxaEntityEffects (marble testing)', () => {
                 { provide: ENTITY_EFFECTS_SCHEDULER, useFactory: getTestScheduler },
                 /* tslint:disable-next-line:no-use-before-declare */
                 { provide: NxaEntityDataService, useClass: TestDataService },
+                { provide: NxaEntityOfflineService, useClass: TestDataService },
                 { provide: Logger, useValue: logger },
                 {
                     provide: NxaPersistenceResultHandler,
                     useClass: DefaultNxaPersistenceResultHandler,
+                },
+                {
+                    provide: NxaOfflinePersistenceResultHandler,
+                    useClass: DefaultNxaOfflinePersistenceResultHandler,
                 },
             ],
         });
