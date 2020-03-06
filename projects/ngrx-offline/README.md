@@ -1,6 +1,9 @@
+# Library is not designed yet for public consumption
+
 # NgrxOffline
 
-This is an experimental copy of the @ngrx/data module to practice publishing to npm.
+
+This is an _experimental_ copy of the @ngrx/data module to practice publishing to npm.
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.14.
 
