@@ -3,10 +3,11 @@ import { TestBed } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
 
-import { NxaDefaultOfflineService } from "../../lib/offline-services/default-offline.service";
+import { NxaDefaultOfflineService, NxaDefaultOfflineServiceFactory } from "../../lib/offline-services/default-offline.service";
 import { NxaEntitySelectorsFactory } from '../../lib/selectors/entity-selectors';
 import { NxaEntityCollection, NxaChangeType } from '../../lib';
 import { Update } from '@ngrx/entity';
+import { NxaDefaultDataService } from 'ngrx-offline/lib';
 
 class Hero {
     id!: number;
@@ -14,13 +15,14 @@ class Hero {
     version?: number;
 }
 
-fdescribe('NxaDefaultOfflineService', () => {
+describe('NxaDefaultOfflineService', () => {
     // TODO: add tests
     let randomString = ''
 
     let service: NxaDefaultOfflineService<Hero>
     let nxaCollectionCreator: any;
     let nxaEntitySelectorsFactory: NxaEntitySelectorsFactory;
+    let store;
 
     beforeEach(() => {
         randomString = makeid(10)
@@ -63,7 +65,62 @@ fdescribe('NxaDefaultOfflineService', () => {
     });
 
     describe('property inspection', () => {
-        // TODO: add tests
+
+        // Test wrapper exposes protected properties
+        class TestService<T> extends NxaDefaultOfflineService<T> {
+            properties = {
+                entityName: this.entityName,
+                dbVersion: this.dbVersion,
+                dbName: this.dbName,
+                idbConfig: this.idbConfig,
+                selectKeyStr: this.selectKeyStr,
+            }
+        }
+
+        let service: TestService<Hero>
+
+
+
+        beforeEach(() => {
+
+            service = new TestService<Hero>(
+                'Hero',
+                nxaEntitySelectorsFactory,
+                store,
+                {
+                    dbName: "spec-test",
+                    dbVersion: 3,
+                    idbConfig: {
+                        Hero: { keyPath: "key" }
+                    }
+                }
+            );
+
+        });
+
+        it('has expected name', () => {
+            expect(service.name).toBe('Hero NxaDefaultOfflineService');
+        });
+        it('has expected entityName', () => {
+            expect(service.properties.entityName).toBe('Hero');
+        });
+        it('has expected dbVersion', () => {
+            expect(service.properties.dbVersion).toBe(3);
+        });
+        it('has expected dbName', () => {
+            expect(service.properties.dbName).toBe('spec-test');
+        });
+        it('has expected idbConfig', () => {
+            expect(service.properties.idbConfig).toEqual({
+                Hero: { keyPath: "key" }
+            });
+        });
+        it('has expected selectKeyStr', () => {
+            expect(service.properties.selectKeyStr).toBe('key');
+        });
+
+
+
     });
 
     describe('#getAll', () => {
@@ -78,7 +135,7 @@ fdescribe('NxaDefaultOfflineService', () => {
         // TODO: add tests
     });
 
-    fdescribe('#add', () => {
+    describe('#add', () => {
 
         it('should return expected hero with id (required)', (done: DoneFn) => {
             const heroData: Hero = { id: 42, name: 'A' }
@@ -94,7 +151,7 @@ fdescribe('NxaDefaultOfflineService', () => {
         });
     });
 
-    fdescribe('#delete', () => {
+    describe('#delete', () => {
         // TODO: add tests
         it('should delete by hero id an unchanged hero', (done: DoneFn) => {
             const { unchangedHero } = createInitialCacheForMerges()
@@ -149,7 +206,7 @@ fdescribe('NxaDefaultOfflineService', () => {
         });
     });
 
-    fdescribe('#update', () => {
+    describe('#update', () => {
         // TODO: add tests
         it('should update an unchanged hero', (done: DoneFn) => {
             const { unchangedHero } = createInitialCacheForMerges()
@@ -254,7 +311,7 @@ fdescribe('NxaDefaultOfflineService', () => {
 
     });
 
-    fdescribe('#upsert', () => {
+    describe('#upsert', () => {
         // TODO: add tests
         it('should update an unchanged hero', (done: DoneFn) => {
             const { unchangedHero } = createInitialCacheForMerges()
@@ -336,24 +393,46 @@ fdescribe('NxaDefaultOfflineService', () => {
 
 
 describe('NxaDefaultDataServiceFactory', () => {
+    let nxaCollectionCreator: any;
+    let nxaEntitySelectorsFactory: NxaEntitySelectorsFactory;
+    let store: MockStore<NxaEntityCollection<Hero>>
+    let randomString = ''
 
 
     beforeEach(() => {
+        randomString = makeid(10)
+        const { initialCache } = createInitialCacheForMerges()
+        let initialState = initialCache.Hero;
 
-    });
-
-    describe('(no config)', () => {
-        it('can create factory', () => {
-            // TODO: add tests
+        TestBed.configureTestingModule({
+            providers: [
+                provideMockStore({ initialState })
+            ],
         });
 
-        it('should produce hero offline service that gets all heroes with expected db name', () => {
-            // TODO: add tests
-        });
+        store = TestBed.get(Store);
+        nxaCollectionCreator = jasmine.createSpyObj('nxaEntityCollectionCreator', [
+            'create',
+        ]);
+        nxaEntitySelectorsFactory = new NxaEntitySelectorsFactory(nxaCollectionCreator);
     });
 
-    describe('(with config)', () => {
+    it('can create factory', () => {
         // TODO: add tests
+        const factory = new NxaDefaultOfflineServiceFactory(
+            nxaEntitySelectorsFactory,
+            store,
+            {
+                dbName: "spec-test-" + randomString,
+                dbVersion: 1,
+                idbConfig: {
+                    Hero: { keyPath: "id" }
+                }
+            }
+        );
+        const heroDS = factory.create<Hero>('Hero');
+        expect(heroDS.name).toBe('Hero NxaDefaultOfflineService');
+
     });
 });
 
