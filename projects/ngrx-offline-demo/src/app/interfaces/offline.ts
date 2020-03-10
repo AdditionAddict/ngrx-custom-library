@@ -19,7 +19,19 @@ export interface Reach {
     reach: ReachState
 }
 
-type AssuranceState = 'Edited' | 'Unsaved' | 'Syncing' | 'Synced'
+type AssuranceState = 'Unsaved' | 'Syncing' | 'Synced' | 'Edited'
+
+/**
+ * Unchanged => selectors
+ * Unsaved => selectors
+ * Syncing => maintain separate ngrx-offline state
+ */
+
+export interface SyncState {
+    syncing: boolean
+    // synced: boolean => derivable, zero unsaved
+
+}
 
 export interface Assurance {
     entityName: string,
