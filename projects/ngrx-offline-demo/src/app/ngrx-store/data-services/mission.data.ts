@@ -1,4 +1,4 @@
-import { Mission, MissionDetail } from '../interfaces/mission';
+import { Mission, MissionDetail } from '../../interfaces';
 
 
 // https://nssdc.gsfc.nasa.gov/planetary/chronology.html
